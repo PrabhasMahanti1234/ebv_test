@@ -394,7 +394,10 @@ def _add_index(conn, cursor, sql, index_name):
             logger.debug(f"Issue with index {index_name}: {e}")
 
 def get_cached_result(file_hash):
-    """Retrieves a cached result from the database."""
+    """
+    Retrieves a complete cached result (drug_table, acronyms, tiers) from the database.
+    Returns the full structured data dictionary and raw_content.
+    """
     with get_db_connection() as conn:
         cursor = conn.cursor()
         cursor.execute(
@@ -403,41 +406,54 @@ def get_cached_result(file_hash):
         )
         result = cursor.fetchone()
         if result:
-            logger.info(f"Cache hit for hash: {file_hash}")
-            # Safely load JSON, returning empty DataFrame on failure
+            logger.info(f"Cache HIT for hash: {file_hash}")
+            structured_data_json, raw_content = result
+            
+            # If the cached JSON is null or empty, treat it as a miss.
+            if not structured_data_json:
+                return None, None
+
             try:
-                # If result[0] is a dict, convert it to a JSON string
-                json_data = json.dumps(result[0]) if isinstance(result[0], dict) else result[0]
-                structured_data = pd.read_json(StringIO(json_data), orient='split')
+                # The stored item is the full dictionary.
+                return structured_data_json, raw_content
             except Exception as e:
-                logger.warning(f"Failed to parse cached structured data for hash {file_hash}: {e}")
-                structured_data = pd.DataFrame()
-            return structured_data, result[1]
+                logger.warning(f"Failed to parse cached JSON for hash {file_hash}. Will re-process. Error: {e}")
+                # Return None to indicate a cache miss due to corruption, forcing reprocessing.
+                return None, None
+                
+    logger.info(f"Cache MISS for hash: {file_hash}")
     return None, None
 
-def cache_result(file_hash, structured_data, raw_content):
-    """Caches a processing result in the database."""
+def cache_result(file_hash, structured_data_dict, raw_content):
+    """
+    Caches the full structured data dictionary (drug_table, acronyms, tiers) in the database.
+    """
+    if not isinstance(structured_data_dict, dict):
+        logger.error("Attempted to cache non-dictionary object. Aborting cache operation.")
+        return
+
     with get_db_connection() as conn:
         cursor = conn.cursor()
         try:
-            # Convert DataFrame to JSON string for storage
-            structured_data_json = structured_data.to_json(orient='split') if not structured_data.empty else '[]'
-
+            # psycopg2 can automatically serialize a Python dictionary to a JSONB field.
             cursor.execute(
                 """
                 INSERT INTO processed_file_cache (file_hash, structured_data_json, raw_content)
                 VALUES (%s, %s, %s)
-                ON CONFLICT (file_hash) DO NOTHING;
+                ON CONFLICT (file_hash) DO UPDATE SET
+                    structured_data_json = EXCLUDED.structured_data_json,
+                    raw_content = EXCLUDED.raw_content,
+                    created_at = CURRENT_TIMESTAMP;
                 """,
-                (file_hash, structured_data_json, raw_content)
+                (file_hash, json.dumps(structured_data_dict), raw_content)
             )
             conn.commit()
-            logger.info(f"Cached result for hash: {file_hash}")
+            logger.info(f"Successfully cached result for hash: {file_hash}")
         except Exception as e:
             conn.rollback()
             logger.error(f"Failed to cache result for hash {file_hash}: {e}")
 
-
+            
 def insert_drug_formulary_data(processed_data):
     """
     Inserts a batch of processed drug formulary data into the database

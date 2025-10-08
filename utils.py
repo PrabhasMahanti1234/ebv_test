@@ -607,11 +607,18 @@ def detect_step_therapy(requirements_text):
     
     return any(keyword in requirements_lower for keyword in st_keywords)
 
+def calculate_bytes_hash(content: bytes) -> str:
+    """Calculates the SHA256 hash of a file's content provided in bytes."""
+    sha256_hash = hashlib.sha256()
+    sha256_hash.update(content)
+    return sha256_hash.hexdigest()
+
+
 def calculate_file_hash(filepath):
-    """Calculates the SHA256 hash of a file."""
+    """Calculates the SHA256 hash of a file on disk."""
     sha256_hash = hashlib.sha256()
     with open(filepath, "rb") as f:
-        # Read and update hash in chunks of 4K
+        # Read and update hash in chunks of 4K for memory efficiency
         for byte_block in iter(lambda: f.read(4096), b""):
             sha256_hash.update(byte_block)
     return sha256_hash.hexdigest()

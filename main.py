@@ -10,7 +10,7 @@ from database import ensure_database_schema, insert_drug_formulary_data, update_
 from excel_processing import populate_payer_and_plan_tables
 from pdf_processing import process_pdfs_from_urls_in_parallel
 from utils import validate_required_files, detect_step_therapy
-from product_labeler_mapping import map_product_labeler_codes
+from product_mapper import map_products_to_formulary
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +64,8 @@ def save_cumulative_exports(all_processed_data):
             "drug_tier", "drug_requirements", "coverage_status",
             "is_prior_authorization_required", "is_step_therapy_required",
             "is_quantity_limit_applied",
-            "status", "file_name", "id", "plan_id", "payer_id"
+            "status", "file_name", "id", "plan_id", "payer_id",
+            "product_labeler_code", "product_proprietaryname"
         ]
         
         # Reorder dataframe columns, adding any missing ones
@@ -150,11 +151,15 @@ def main():
         # Step 5: Update final statuses in the database
         logger.info("STEP 5: Updating final plan and payer statuses.")
         update_plan_and_payer_statuses(processed_plan_ids)
-
-        #step 6: Map Product Labeler Codes
-        logger.info("STEP 6: Mapping Product Labeler Codes from product_master table to drug_formulary_details table.")
-
-        map_product_labeler_codes()
+        
+        # Step 6: Map products to formulary
+        logger.info("STEP 6: Mapping products to formulary")
+        try:
+            records_mapped = map_products_to_formulary()
+            logger.info(f"Successfully mapped {records_mapped:,} drug records to product master data.")
+        except Exception as e:
+            logger.error(f"Product mapping failed, but continuing: {e}")
+            # Don't raise - allow the pipeline to complete even if mapping fails
 
         logger.info("========================================")
         logger.info("DRUG FORMULARY PROCESSING COMPLETE")
