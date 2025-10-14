@@ -180581,3 +180581,1439 @@ Original String: {
 ==================================================
 
 >>>>>>> 7e8ce55 (added new table for formulary names and done some code changes)
+=== JSON Parse Error ===
+Original String: {
+  "drug_table": [
+    {
+      "drug_name": "pramipexole dihydrochloride oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": [
+        "QL"
+      ]
+    },
+    {
+      "drug_name": "ropinirole hcl er oral tablet extended release 24 hour",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": []
+    },
+    {
+      "drug_name": "ropinirole hcl oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": []
+    },
+    {
+      "drug_name": "entacapone oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": [
+        "QL"
+      ]
+    },
+    {
+      "drug_name": "ONGENTYS ORAL CAPSULE",
+      "drug_tier": "3",
+      "drug_requirements": [
+        "PA",
+        "QL"
+      ]
+    },
+    {
+      "drug_name": "lithium carbonate er oral tablet extended release",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": [
+        "QL"
+      ]
+    },
+    {
+      "drug_name": "lithium carbonate oral capsule",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": [
+        "QL"
+      ]
+    },
+    {
+      "drug_name": "lithium carbonate oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": [
+        "QL"
+      ]
+    },
+    {
+      "drug_name": "lithium oral solution",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": []
+    },
+    {
+      "drug_name": "CAPLYTA ORAL CAPSULE 10.5 MG, 21 MG",
+      "drug_tier": "3",
+      "drug_requirements": [
+        "DO",
+        "AL"
+      ]
+    },
+    {
+      "drug_name": "CAPLYTA ORAL CAPSULE 42 MG",
+      "drug_tier": "3",
+      "drug_requirements": [
+        "AL",
+        "QL"
+      ]
+    },
+    {
+      "drug_name": "EQUETRO ORAL CAPSULE EXTENDED RELEASE 12 HOUR",
+      "drug_tier": "3",
+      "drug_requirements": [
+        "QL"
+      ]
+    },
+    {
+      "drug_name": "lurasidone hcl oral tablet 120 mg",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": [
+        "AL"
+      ]
+    },
+    {
+      "drug_name": "lurasidone hcl oral tablet 20 $\mathrm{mg}, 40 \mathrm{mg}$",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": [
+        "DO",
+        "AL"
+      ]
+    },
+    {
+      "drug_name": "lurasidone hcl oral tablet 60 $\mathrm{mg}, 80 \mathrm{mg}$",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": [
+        "AL",
+        "QL"
+      ]
+    },
+    {
+      "drug_name": "NUPLAZID ORAL CAPSULE",
+      "drug_tier": "4",
+      "drug_requirements": [
+        "PA",
+        "LD",
+        "QL",
+        "SP"
+      ]
+    },
+    {
+      "drug_name": "NUPLAZID ORAL TABLET 10 MG",
+      "drug_tier": "4",
+      "drug_requirements": [
+        "PA",
+        "LD",
+        "QL",
+        "SP"
+      ]
+    },
+    {
+      "drug_name": "VRAYLAR ORAL CAPSULE 1.5 MG, 3 MG",
+      "drug_tier": "2",
+      "drug_requirements": [
+        "DO",
+        "AL"
+      ]
+    },
+    {
+      "drug_name": "VRAYLAR ORAL CAPSULE 4.5 MG, 6 MG",
+      "drug_tier": "2",
+      "drug_requirements": [
+        "AL",
+        "QL"
+      ]
+    },
+    {
+      "drug_name": "ziprasidone hcl oral capsule $20 \mathrm{mg}, 40 \mathrm{mg}$",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": [
+        "DO",
+        "AL"
+      ]
+    },
+    {
+      "drug_name": "ziprasidone hcl oral capsule $60 \mathrm{mg}, 80 \mathrm{mg}$",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": [
+        "AL",
+        "QL"
+      ]
+    },
+    {
+      "drug_name": "ziprasidone mesylate intramuscular solution reconstituted",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": [
+        "AL",
+        "QL"
+      ]
+    },
+    {
+      "drug_name": "FANAPT ORAL TABLET 1 MG, 2 MG, 4 MG, 6 MG",
+      "drug_tier": "3",
+      "drug_requirements": [
+        "ST",
+        "DO"
+      ]
+    },
+    {
+      "drug_name": "FANAPT ORAL TABLET 10 MG, 12 MG, 8 MG",
+      "drug_tier": "3",
+      "drug_requirements": [
+        "ST",
+        "QL"
+      ]
+    },
+    {
+      "drug_name": "FANAPT TITRATION PACK A ORAL TABLET",
+      "drug_tier": "3",
+      "drug_requirements": [
+        "ST",
+        "QL"
+      ]
+    },
+    {
+      "drug_name": "FANAPT TITRATION PACK B ORAL TABLET",
+      "drug_tier": "3",
+      "drug_requirements": [
+        "ST",
+        "QL"
+      ]
+    },
+    {
+      "drug_name": "FANAPT TITRATION PACK C ORAL TABLET",
+      "drug_tier": "3",
+      "drug_requirements": [
+        "ST",
+        "QL"
+      ]
+    },
+    {
+      "drug_name": "INVEGA HAFYERA INTRAMUSCULAR SUSPENSION PREFILLED SYRINGE",
+      "drug_tier": "3",
+      "drug_requirements": [
+        "AL",
+        "QL"
+      ]
+    },
+    {
+      "drug_name": "INVEGA SUSTENNA INTRAMUSCULAR SUSPENSION PREFILLED SYRINGE",
+      "drug_tier": "3",
+      "drug_requirements": [
+        "AL",
+        "QL"
+      ]
+    },
+    {
+      "drug_name": "INVEGA TRINZA INTRAMUSCULAR SUSPENSION PREFILLED SYRINGE 273 MG/0.88ML, 410 MG/1.32ML, 546 MG/1.75ML, 819 MG/2.63ML",
+      "drug_tier": "3",
+      "drug_requirements": [
+        "AL",
+        "QL"
+      ]
+    },
+    {
+      "drug_name": "paliperidone er oral tablet extended release 24 hour 1.5 $\mathrm{mg}, 3 \mathrm{mg}$",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": [
+        "DO",
+        "AL"
+      ]
+    },
+    {
+      "drug_name": "paliperidone er oral tablet extended release 24 hour 6 $\mathrm{mg}, 9 \mathrm{mg}$",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": [
+        "AL",
+        "QL"
+      ]
+    },
+    {
+      "drug_name": "PERSERIS
+SUBCUTANEOUS
+PREFILLED SYRINGE",
+      "drug_tier": "3",
+      "drug_requirements": [
+        "AL",
+        "QL"
+      ]
+    },
+    {
+      "drug_name": "risperidone microspheres er intramuscular suspension reconstituted er",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": [
+        "AL",
+        "QL"
+      ]
+    },
+    {
+      "drug_name": "risperidone oral solution",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": [
+        "AL",
+        "QL"
+      ]
+    },
+    {
+      "drug_name": "risperidone oral tablet 0.25 $\mathrm{mg}, 0.5 \mathrm{mg}, 1 \mathrm{mg}, 2 \mathrm{mg}$",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": [
+        "DO",
+        "AL"
+      ]
+    },
+    {
+      "drug_name": "risperidone oral tablet 3 mg , 4 mg",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": [
+        "AL",
+        "QL"
+      ]
+    },
+    {
+      "drug_name": "risperidone oral tablet dispersible $0.25 \mathrm{mg}, 0.5 \mathrm{mg}$, $1 \mathrm{mg}, 2 \mathrm{mg}$",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": [
+        "DO",
+        "AL"
+      ]
+    }
+  ],
+  "acronyms": [
+    {
+      "acronym": "QL",
+      "expansion": "Quantity Limit",
+      "explanation": "There are limits on the amount of the drug that can be covered"
+    },
+    {
+      "acronym": "PA",
+      "expansion": "Prior Authorization",
+      "explanation": "The drug requires approval from the plan before it will be covered"
+    },
+    {
+      "acronym": "AL",
+      "expansion": "Age Limit",
+      "explanation": "There are age restrictions on who can receive the drug"
+    },
+    {
+      "acronym": "DO",
+      "expansion": "Dispense as Original",
+      "explanation": "The drug must be dispensed as the brand name product"
+    },
+    {
+      "acronym": "ST",
+      "expansion": "Step Therapy",
+      "explanation": "Certain criteria must be met before the drug will be covered"
+    },
+    {
+      "acronym": "LD",
+      "expansion": "Limited Distribution",
+      "explanation": "The drug is only available through certain pharmacies or distributors"
+    },
+    {
+      "acronym": "SP",
+      "expansion": "Specialty",
+      "explanation": "The drug is classified as a specialty medication"
+    }
+  ],
+  "tiers": [
+    {
+      "acronym": "1 or $1 a^{*}$",
+      "expansion": "Generic",
+      "explanation": "Drugs in this tier are generic medications"
+    },
+    {
+      "acronym": "1 or $1 b^{*}$",
+      "expansion": "Preferred Brand",
+      "explanation": "Drugs in this tier are preferred brand-name medications"
+    },
+    {
+      "acronym": "2",
+      "expansion": "Non-Preferred Brand",
+      "explanation": "Drugs in this tier are non-preferred brand-name medications"
+    },
+    {
+      "acronym": "3",
+      "expansion": "Non-Preferred Brand/Specialty",
+      "explanation": "Drugs in this tier are non-preferred brand-name or specialty medications"
+    },
+    {
+      "acronym": "4",
+      "expansion": "Specialty",
+      "explanation": "Drugs in this tier are specialty medications"
+    }
+  ]
+}
+==================================================
+
+=== JSON Parse Error ===
+Original String: {
+  "drug_table": [
+    {
+      "drug_name": "azurette oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "desogestrel-ethinyl estradiol oral tablet $0.15-0.02 / 0.01 \\mathrm{mg}$ (21/5)",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "kariva oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "LO LOESTRIN FE ORAL TABLET",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "pimtrea oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "simliya oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "viorele oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "volnea oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "afirmelle oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "altavera oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "alyacen 1/35 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "apri oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "aubra eq oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "aurovela 1.5/30 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "aurovela 1/20 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "aurovela 24 fe oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "aurovela fe 1.5/30 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "aurovela fe 1/20 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "AVERI ORAL TABLET",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "aviane oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "ayuna oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "balziva oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "blisovi 24 fe oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "blisovi fe 1.5/30 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "blisovi fe 1/20 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "briellyn oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "charlotte 24 fe oral tablet chewable",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "chateal eq oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "cryselle-28 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "cyred eq oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "dasetta 1/35 (28) oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "delyla oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "drospiren-eth estradlevomefol oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "drospirenone-ethinyl estradiol oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "elinest oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "enskyce oral tablet 0.15-30 mg-mcg",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "estarylla oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "ethynodiol diac-eth estradiol oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "falmina oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "FEIRZA 1.5/30 ORAL TABLET",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "FEIRZA 1/20 ORAL TABLET",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "FEMLYV ORAL TABLET DISPERSIBLE",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "FINZALA ORAL TABLET CHEWABLE",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "GALBRIELA ORAL TABLET CHEWABLE",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "gemmily oral capsule",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "hailey 1.5/30 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "hailey 24 fe oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "hailey fe 1.5/30 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "hailey fe 1/20 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "isibloom oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "jasmiel oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "JOYEAUX ORAL TABLET",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "juleber oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "junel 1.5/30 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "junel 1/20 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "junel fe 1.5/30 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "junel fe 1/20 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "junel fe 24 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "kaitlib fe oral tablet chewable",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "kalliga oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "kelnor 1/35 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "kurvelo oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "larin 1.5/30 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "larin 1/20 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "larin 24 fe oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "larin fe 1.5/30 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "larin fe 1/20 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "lessina oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    }
+  ],
+  "acronyms": [
+    {
+      "acronym": "*",
+      "expansion": "",
+      "explanation": ""
+    },
+    {
+      "acronym": "PA",
+      "expansion": "Prior Authorization",
+      "explanation": ""
+    },
+    {
+      "acronym": "QL",
+      "expansion": "Quantity Limit",
+      "explanation": ""
+    }
+==================================================
+
+=== JSON Parse Error ===
+Original String: {
+  "drug_table": [
+    {
+      "drug_name": "azurette oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "desogestrel-ethinyl estradiol oral tablet $0.15-0.02 / 0.01 \mathrm{mg}$ (21/5)",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "kariva oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "LO LOESTRIN FE ORAL TABLET",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "pimtrea oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "simliya oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "viorele oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "volnea oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "afirmelle oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "altavera oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "alyacen $1 / 35$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "apri oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "aubra eq oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "aurovela 1.5/30 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "aurovela $1 / 20$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "aurovela 24 fe oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "aurovela fe 1.5/30 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "aurovela fe $1 / 20$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "AVERI ORAL TABLET",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "aviane oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "ayuna oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "balziva oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "blisovi 24 fe oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "blisovi fe 1.5/30 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "blisovi fe $1 / 20$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "briellyn oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "charlotte 24 fe oral tablet chewable",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "chateal eq oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "cryselle-28 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "cyred eq oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "dasetta $1 / 35$ (28) oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "delyla oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "drospiren-eth estradlevomefol oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "drospirenone-ethinyl estradiol oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "elinest oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "enskyce oral tablet 0.15-30 mg-mcg",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "estarylla oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "ethynodiol diac-eth estradiol oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "falmina oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "FEIRZA 1.5/30 ORAL TABLET",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "FEIRZA 1/20 ORAL TABLET",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "FEMLYV ORAL TABLET DISPERSIBLE",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "FINZALA ORAL TABLET CHEWABLE",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "GALBRIELA ORAL TABLET CHEWABLE",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "gemmily oral capsule",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "hailey $1.5 / 30$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "hailey 24 fe oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "hailey fe $1.5 / 30$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "hailey fe $1 / 20$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "isibloom oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "jasmiel oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "JOYEAUX ORAL TABLET",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "juleber oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "junel $1.5 / 30$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "junel $1 / 20$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "junel fe $1.5 / 30$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "junel fe $1 / 20$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "junel fe 24 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "kaitlib fe oral tablet chewable",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "kalliga oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "kelnor $1 / 35$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "kurvelo oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "larin $1.5 / 30$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "larin $1 / 20$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "larin 24 fe oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "larin fe $1.5 / 30$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "larin fe $1 / 20$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "lessina oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    }
+  ],
+  "acronyms": [
+    {
+      "acronym": "PA",
+      "expansion": "Prior Authorization",
+      "explanation": ""
+    },
+    {
+      "acronym": "QL",
+      "expansion": "Quantity Limit",
+      "explanation": ""
+    }
+==================================================
+
+=== JSON Parse Error ===
+Original String: {
+  "drug_table": [
+    {
+      "drug_name": "azurette oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "desogestrel-ethinyl estradiol oral tablet $0.15-0.02 / 0.01 \mathrm{mg}$ (21/5)",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "kariva oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "LO LOESTRIN FE ORAL TABLET",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "pimtrea oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "simliya oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "viorele oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "volnea oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "afirmelle oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "altavera oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "alyacen $1 / 35$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "apri oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "aubra eq oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "aurovela 1.5/30 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "aurovela $1 / 20$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "aurovela 24 fe oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "aurovela fe 1.5/30 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "aurovela fe $1 / 20$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "AVERI ORAL TABLET",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "aviane oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "ayuna oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "balziva oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "blisovi 24 fe oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "blisovi fe 1.5/30 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "blisovi fe $1 / 20$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "briellyn oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "charlotte 24 fe oral tablet chewable",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "chateal eq oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "cryselle-28 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "cyred eq oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "dasetta $1 / 35$ (28) oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "delyla oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "drospiren-eth estradlevomefol oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "drospirenone-ethinyl estradiol oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "elinest oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "enskyce oral tablet 0.15-30 mg-mcg",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "estarylla oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "ethynodiol diac-eth estradiol oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "falmina oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "FEIRZA 1.5/30 ORAL TABLET",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "FEIRZA 1/20 ORAL TABLET",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "FEMLYV ORAL TABLET DISPERSIBLE",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "FINZALA ORAL TABLET CHEWABLE",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "GALBRIELA ORAL TABLET CHEWABLE",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "gemmily oral capsule",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "hailey $1.5 / 30$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "hailey 24 fe oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "hailey fe $1.5 / 30$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "hailey fe $1 / 20$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "isibloom oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "jasmiel oral tablet",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "JOYEAUX ORAL TABLET",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "juleber oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "junel $1.5 / 30$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "junel $1 / 20$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "junel fe $1.5 / 30$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "junel fe $1 / 20$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "junel fe 24 oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "kaitlib fe oral tablet chewable",
+      "drug_tier": "1 or $1 b^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "kalliga oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "kelnor $1 / 35$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "kurvelo oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "larin $1.5 / 30$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "larin $1 / 20$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "larin 24 fe oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "larin fe $1.5 / 30$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "larin fe $1 / 20$ oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    },
+    {
+      "drug_name": "lessina oral tablet",
+      "drug_tier": "1 or $1 a^{*}$",
+      "drug_requirements": "$\$ 0$"
+    }
+  ],
+  "acronyms": [
+    {
+      "acronym": "$",
+      "expansion": "Dollars",
+      "explanation": "Indicates the cost or price of a drug"
+    }
+==================================================
+

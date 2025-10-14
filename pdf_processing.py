@@ -154,7 +154,7 @@ The JSON object must have three top-level keys: "drug_table", "acronyms", and "t
     *   `acronym`: The code (e.g., "PA").
     *   `expansion`: The full name (e.g., "Prior Authorization").
     *   `explanation`: The detailed description.
-    # *   Crucial Rule **DO NOT** include "Tier 1", "Tier 2", "Specialty Tier", "ACA", "nivel 1/nivel 2/nivel 3/nivel 4/nivel 5/nivel 6" or plain numbers like "2", "3", "4". These are tiers must not include them in this table.
+    * *   Crucial Rule **DO NOT** include "Tier 1", "Tier 2", "Specialty Tier", "ACA", "nivel 1/nivel 2/nivel 3/nivel 4/nivel 5/nivel 6" or plain numbers like "2", "3", "4". These are tiers must not include them in this table.
     * **Dont include Nivel or similar non-English terms.** 
 
 
@@ -164,6 +164,8 @@ The JSON object must have three top-level keys: "drug_table", "acronyms", and "t
     *   `explanation`: The detailed description.
     * - **CRITICAL**: **DO NOT** extract requirement codes like PA, QL, MO, or B/D into the `tiers` list. These belong ONLY in the `acronyms` list.
     * * **Dont include Nivel or similar non-English terms.**
+    * *   Crucial Rule **DO NOT** include "Tier 1", "Tier 2", "Specialty Tier", "ACA", "nivel 1/nivel 2/nivel 3/nivel 4/nivel 5/nivel 6" or plain numbers like "2", "3", "4". These are tiers must not include them in this table.
+     * **Dont include Nivel or similar non-English terms.**
     
 IMPORTANT: If the page is a table of contents or index (drug names followed by page numbers like "Aspirin.....5"), return JSON with empty lists for all keys.
 """
