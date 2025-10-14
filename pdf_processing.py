@@ -481,10 +481,9 @@ def process_single_pdf_worker(filename: str, pdf_folder_path: str):
         dedup_acronyms = deduplicate_dicts(all_acronyms)
         dedup_tiers = deduplicate_dicts(all_tiers)
 
-        if dedup_acronyms:
-            insert_acronyms_to_ref_table(dedup_acronyms, state_name, payer, plan_name, "PP_Formulary_Short_Codes_Ref")
-        if dedup_tiers:
-            insert_acronyms_to_ref_table(dedup_tiers, state_name, payer, plan_name, "PP_Tier_Codes_Ref")
+        all_definitions = dedup_acronyms + dedup_tiers
+        if all_definitions:
+            insert_acronyms_to_ref_table(all_definitions, state_name, payer, plan_name, "pp_formulary_names")
 
         if structured_df.empty:
             logger.info(f"{log_prefix} Acronyms/Tiers processed, but no drug records found.")
@@ -492,7 +491,34 @@ def process_single_pdf_worker(filename: str, pdf_folder_path: str):
 
         processed_records = []
         for _, row in structured_df.iterrows():
-            # ... (rest of the record processing logic is unchanged)
+            try:
+                raw_drug_name = str(row.get('drug_name', '') or '')
+                requirements_text = str(row.get('drug_requirements', '') or '').strip()
+                cleaned_drug_name = clean_drug_name(raw_drug_name)
+                if not cleaned_drug_name: continue
+
+                raw_tier = row.get('drug_tier', None)
+                drug_tier_normalized = normalize_drug_tier(raw_tier) or infer_drug_tier_from_text(requirements_text) or infer_drug_tier_from_text(raw_drug_name)
+
+                with get_db_connection() as conn:
+                    coverage_status = determine_coverage_status(requirements_text, drug_tier_normalized, conn, state_name, db_payer_name)
+
+                record = {
+                    "id": str(uuid.uuid4()), "plan_id": plan_id, "payer_id": payer_id,
+                    "drug_name": cleaned_drug_name, "state_name": state_name,
+                    "coverage_status": coverage_status, "drug_tier": drug_tier_normalized,
+                    "drug_requirements": requirements_text or None,
+                    "is_prior_authorization_required": "Yes" if detect_prior_authorization(requirements_text) else "No",
+                    "is_step_therapy_required": "Yes" if detect_step_therapy(requirements_text) else "No",
+                    "is_quantity_limit_applied": "Yes" if "ql" in (requirements_text or "").lower() else "No",
+                    "confidence_score": 0.95, "source_url": formulary_url,
+                    "plan_name": db_plan_name, "payer_name": db_payer_name, "file_name": filename,
+                    "ndc_code": None, "jcode": None, "coverage_details": None,
+                }
+                processed_records.append(record)
+            except Exception as e:
+                logger.warning(f"{log_prefix} Error processing extracted row: {row}. Error: {e}")
+                continue
             pass
 
         if processed_records:
@@ -625,10 +651,9 @@ def process_single_pdf_url_worker(plan_info):
         dedup_acronyms = deduplicate_dicts(all_acronyms)
         dedup_tiers = deduplicate_dicts(all_tiers)
 
-        if dedup_acronyms:
-            insert_acronyms_to_ref_table(dedup_acronyms, state_name, payer_name, plan_name, "PP_Formulary_Short_Codes_Ref")
-        if dedup_tiers:
-            insert_acronyms_to_ref_table(dedup_tiers, state_name, payer_name, plan_name, "PP_Tier_Codes_Ref")
+        all_definitions = dedup_acronyms + dedup_tiers
+        if all_definitions:
+            insert_acronyms_to_ref_table(all_definitions, state_name, payer_name, plan_name, "pp_formulary_names")
         
         if structured_df.empty:
             logger.info(f"{log_prefix} Acronyms/Tiers processed, but no drug records found.")
