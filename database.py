@@ -642,7 +642,7 @@ def process_and_cache_file(file_hash, structured_data, raw_content):
 def insert_acronyms_to_ref_table(acronyms, state_name, payer_name, plan_name, table_name):
     """
     Insert a list of acronyms into the specified reference table.
-    This version prevents duplicate records and updates existing ones with more complete information.
+    This version prevents duplicate records and filters out rows with no meaningful data.
     """
     if not acronyms:
         return
@@ -650,20 +650,29 @@ def insert_acronyms_to_ref_table(acronyms, state_name, payer_name, plan_name, ta
     with get_db_connection() as conn:
         cursor = conn.cursor()
         
-        data_tuples = [
-            (
-                state_name,
-                payer_name,
-                plan_name,
-                ac.get("acronym"),
-                ac.get("expansion"),
-                ac.get("explanation"),
-            )
-            for ac in acronyms if ac.get("acronym")
-        ]
+        data_tuples = []
+        for ac in acronyms:
+            acronym = ac.get("acronym")
+            expansion = ac.get("expansion")
+            explanation = ac.get("explanation")
+             
+            is_expansion_blank = not expansion or str(expansion).strip() in ('', '[null]')
+            is_explanation_blank = not explanation or str(explanation).strip() in ('', '[null]')
+ 
+            if acronym and not (is_expansion_blank and is_explanation_blank):
+                data_tuples.append(
+                    (
+                        state_name,
+                        payer_name,
+                        plan_name,
+                        acronym,
+                        expansion if not is_expansion_blank else None,
+                        explanation if not is_explanation_blank else None,
+                    )
+                )
 
         if not data_tuples:
-            logger.warning(f"No valid acronyms to insert into {table_name}.")
+            logger.warning(f"No valid, non-blank acronyms to insert into {table_name}.")
             return
 
         # ON CONFLICT ensures that if a row with the same unique keys exists, we update it.

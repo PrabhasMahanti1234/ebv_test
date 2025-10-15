@@ -134,7 +134,7 @@ def extract_structured_data_with_llm(page_markdown: str):
         logger.error("Bedrock client is not initialized. Cannot extract structured data.")
         return {"drug_table": [], "acronyms": [], "tiers": []}, costs
 
-    # A more concise and direct prompt for the LLM.
+    # --- CHANGE: A more concise and direct prompt for the LLM. ---
     system_prompt = """
 You are a data extraction expert for pharmaceutical formularies. Your task is to extract three types of information from the provided markdown and return it as a single, valid JSON object.
 
@@ -154,18 +154,18 @@ The JSON object must have three top-level keys: "drug_table", "acronyms", and "t
     *   `acronym`: The code (e.g., "PA").
     *   `expansion`: The full name (e.g., "Prior Authorization").
     *   `explanation`: The detailed description.
-    * *   Crucial Rule **DO NOT** include "Tier 1", "Tier 2", "Specialty Tier", "ACA", "nivel 1/nivel 2/nivel 3/nivel 4/nivel 5/nivel 6" or plain numbers like "2", "3", "4". These are tiers must not include them in this table.
-    * **Dont include Nivel or similar non-English terms.** 
+    *   **Crucial Rule**: **DO NOT** include "Tier 1", "Tier 2", "Specialty Tier", "ACA", "nivel 1/nivel 2/nivel 3/nivel 4/nivel 5/nivel 6" or plain numbers like "2", "3", "4". These are tiers must not include them in this table.
+    *   **Crucial Rule**: **DO NOT** include "Nivel" or similar non-English terms.
 
 
 3.  **tiers**: A list of objects for tier definitions (e.g., Tier 1, Tier 2). Do NOT include requirement codes like PA or QL. Each object must have:
     *   `acronym`: The tier name (e.g., "Tier 1").
     *   `expansion`: The type of drugs in that tier (e.g., "Generic").
     *   `explanation`: The detailed description.
-    * - **CRITICAL**: **DO NOT** extract requirement codes like PA, QL, MO, or B/D into the `tiers` list. These belong ONLY in the `acronyms` list.
-    * * **Dont include Nivel or similar non-English terms.**
-    * *   Crucial Rule **DO NOT** include "Tier 1", "Tier 2", "Specialty Tier", "ACA", "nivel 1/nivel 2/nivel 3/nivel 4/nivel 5/nivel 6" or plain numbers like "2", "3", "4". These are tiers must not include them in this table.
-     * **Dont include Nivel or similar non-English terms.**
+    *   **CRITICAL**: **DO NOT** extract requirement codes like PA, QL, MO, or B/D into the `tiers` list. These belong ONLY in the `acronyms` list.
+    *   **Crucial Rule**: **DO NOT** include "Nivel" or similar non-English terms.
+    *   **Crucial Rule**: **DO NOT** include "Tier 1", "Tier 2", "Specialty Tier", "ACA", "nivel 1/nivel 2/nivel 3/nivel 4/nivel 5/nivel 6" or plain numbers like "2", "3", "4". These are tiers must not include them in this table.
+     *   **Crucial Rule**: **DO NOT** include "Nivel" or similar non-English terms.
     
 IMPORTANT: If the page is a table of contents or index (drug names followed by page numbers like "Aspirin.....5"), return JSON with empty lists for all keys.
 """
@@ -192,7 +192,7 @@ IMPORTANT: If the page is a table of contents or index (drug names followed by p
 
         logger.info(f"Successfully processed page. Extracted: {len(structured_data.get('drug_table', []))} drugs, {len(structured_data.get('acronyms', []))} acronyms, {len(structured_data.get('tiers', []))} tiers.")
         
-        # Defensive block to handle cases where the LLM returns a list of strings instead of dicts.
+        # --- CHANGE: Defensive filtering to remove non-English terms the LLM might have missed. ---
         blocklist = {'nivel'}
         for key in ['acronyms', 'tiers']:
             if key in structured_data and isinstance(structured_data[key], list):
@@ -201,9 +201,11 @@ IMPORTANT: If the page is a table of contents or index (drug names followed by p
                     if isinstance(item, dict):
                         acronym = str(item.get('acronym') or '').lower()
                         expansion = str(item.get('expansion') or '').lower()
+                        # Only keep the item if neither field contains a blocked word
                         if acronym not in blocklist and expansion not in blocklist:
                             filtered_list.append(item)
                     elif isinstance(item, str):
+                        # Also filter out simple strings that are in the blocklist
                         if item.lower() not in blocklist:
                             logger.warning(f"LLM returned a string '{item}' in list '{key}'. Converting to dict.")
                             filtered_list.append({'acronym': item, 'expansion': None, 'explanation': None})
