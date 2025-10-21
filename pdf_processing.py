@@ -603,11 +603,37 @@ def process_single_pdf_url_worker(plan_info):
     log_prefix = f"[URL Worker for {plan_name}]"
     zero_costs = {'mistral_pages': 0, 'bedrock_tokens': 0, 'bedrock_cost': 0.0, 'bedrock_calls': 0}
     try:
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"}
-        with requests.get(formulary_url, timeout=90, headers=headers, stream=True) as resp:
+        proxies = {
+            "http": "http://apzevslp:mlc7veurxhp2@38.170.176.177:5572/",
+            "https": "http://apzevslp:mlc7veurxhp2@38.170.176.177:5572/"
+        }
+        
+        # 2. Define your headers (this part was correct).
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+            "Accept-Language": "en-US,en;q=0.9",
+        }
+        
+        # 3. Use the 'proxies' variable in your request for the formulary_url.
+        #    The unnecessary test call has been removed.
+        logger.info(f"{log_prefix} Using proxy to download from {formulary_url}")
+        with requests.get(formulary_url, timeout=90, headers=headers, stream=True, proxies=proxies) as resp:
             resp.raise_for_status()
-            if 'application/pdf' not in resp.headers.get('Content-Type', ''):
-                return 'ERROR', plan_name, f"Invalid content type: {resp.headers.get('Content-Type', '')}", zero_costs
+            content_type = resp.headers.get('Content-Type', '')
+            if 'application/pdf' not in content_type:
+                # Log the HTML content for easier debugging
+                error_details = f"Invalid content type: {content_type}."
+                try:
+                    # Try to get the first 500 characters of the HTML page
+                    html_preview = resp.text[:500]
+                    error_details += f" Received HTML page starts with: '{html_preview}...'"
+                    logger.error(f"{log_prefix} {error_details}")
+                except Exception as log_e:
+                    # Fallback if we can't even read the text
+                    logger.error(f"{log_prefix} Could not read response text for debugging: {log_e}")
+                
+                return 'ERROR', plan_name, error_details, zero_costs
             pdf_content_bytes = resp.content
             pdf_bytes_io = BytesIO(pdf_content_bytes)
 
@@ -692,6 +718,9 @@ def process_single_pdf_url_worker(plan_info):
         else:
             return 'SKIPPED', plan_name, "Data extracted, but no valid drug records were processed.", costs
 
+    except requests.exceptions.ProxyError as e:
+        logger.error(f"{log_prefix} Proxy Error: Could not connect to the proxy. {e}", exc_info=True)
+        return 'ERROR', plan_name, f"Proxy Error: {e}", zero_costs
     except Exception as e:
         logger.error(f"{log_prefix} Error: {e}", exc_info=True)
         return 'ERROR', plan_name, str(e), zero_costs

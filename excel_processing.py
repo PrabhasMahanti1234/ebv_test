@@ -194,7 +194,7 @@ def populate_payer_and_plan_tables():
     
     validate_required_files()
     
-    df = pd.read_excel(EXCEL_FILE_PATH, sheet_name="Sheet4")
+    df = pd.read_excel(EXCEL_FILE_PATH, sheet_name="Sheet6")
     logger.info(f"Loaded {len(df)} records from Excel")
     
     # Clean the column names
