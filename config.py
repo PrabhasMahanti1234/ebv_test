@@ -24,8 +24,8 @@ logger = logging.getLogger(__name__)
 EXCEL_FILE_PATH = "Insurance Card Formulary.xlsx"
 PDF_FOLDER = "druglist1"
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
-PROCESS_COUNT = 4
-LLM_PAGE_WORKERS = 10
+PROCESS_COUNT = 8 #No of PDFS
+LLM_PAGE_WORKERS = 10 #No of pages
 
 
 

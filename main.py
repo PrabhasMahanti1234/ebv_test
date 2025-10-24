@@ -24,7 +24,10 @@ def safe_create_directory(path):
         return False
  
 def save_cumulative_exports(all_processed_data):
-    """Save all processed data to Excel and CSV files with enhanced error handling and new columns"""
+    """
+    Save all processed data to Excel and CSV files with enhanced error handling and new columns.
+    NOTE: This function is no longer called in the main PDF-by-PDF flow but is kept for potential future use.
+    """
     if not all_processed_data:
         logger.warning("No data to export")
         return
@@ -88,8 +91,6 @@ def save_cumulative_exports(all_processed_data):
 
 def main():
     """Main function to run the entire data processing pipeline"""
-    processed_plan_ids = []
-    all_processed_data = []  # Initialize this variable to collect all processed data
     try:
         logger.info("========================================")
         logger.info("STARTING DRUG FORMULARY PROCESSING")
@@ -102,53 +103,28 @@ def main():
         # Step 1: Populate Payer and Plan tables from Excel
         populate_payer_and_plan_tables()
         
-        # Step 2: Process PDFs in parallel from URLs
-        all_processed_data, _ = process_pdfs_from_urls_in_parallel()
+        # Step 2: Process PDFs in parallel from URLs (now handles its own DB insertion)
+        # This function now returns a list of successfully processed plan IDs.
+        processed_plan_ids, _ = process_pdfs_from_urls_in_parallel()
         
-        # Step 3: Insert data into the database
-        if all_processed_data:
-            logger.info("STEP 3: Inserting data into database")
+        # Step 3 is now integrated into Step 2. We just need to update statuses.
+        if processed_plan_ids:
+            logger.info("STEP 3: Database insertion was handled in real-time during PDF processing.")
             
-            # Deduplicate data before insertion to avoid 'CardinalityViolation'
-            logger.info(f"Deduplicating {len(all_processed_data)} records before insertion.")
-            unique_records = {}
-            for record in all_processed_data:
-                # Key based on the ON CONFLICT constraint in the database
-                key = (
-                    record.get('plan_id'),
-                    record.get('drug_name'),
-                    record.get('drug_tier'),
-                    record.get('drug_requirements')
-                )
-                if key not in unique_records:
-                    unique_records[key] = record
-            
-            deduplicated_data = list(unique_records.values())
-            records_removed = len(all_processed_data) - len(deduplicated_data)
-            if records_removed > 0:
-                logger.warning(f"Removed {records_removed} duplicate records.")
-            
-            # Update status to 'completed' for export and DB insertion
-            for record in deduplicated_data:
-                record['status'] = 'completed'
-            
-            logger.info(f"Proceeding with {len(deduplicated_data)} unique records for insertion.")
-            insert_drug_formulary_data(deduplicated_data)
-            
-            # Collect unique plan IDs that were successfully processed
-            processed_plan_ids = list(set(record['plan_id'] for record in deduplicated_data))
-            
-            # Update status to 'completed' for the inserted drugs
+            # We still need to update the final status for the drugs that were inserted
+            logger.info("Updating status to 'completed' for all inserted drug records.")
             update_drug_formulary_status(processed_plan_ids)
             
+            # The export step is skipped as the primary goal is real-time DB insertion.
+            logger.info("Skipping cumulative data export as data is now in the database.")
             # Step 4: Save cumulative data after all processing and DB operations
-            logger.info("STEP 4: Saving Cumulative Data")
-            save_cumulative_exports(deduplicated_data)
+            # logger.info("STEP 4: Saving Cumulative Data")
+            # save_cumulative_exports(deduplicated_data)
 
         else:
-            logger.warning("Skipping database insertion and export as no data was processed.")
+            logger.warning("No data was processed or inserted into the database.")
 
-        # Step 5: Update final statuses in the database
+        # Step 5: Update final statuses in the database (This uses processed_plan_ids)
         logger.info("STEP 5: Updating final plan and payer statuses.")
         update_plan_and_payer_statuses(processed_plan_ids)
         

@@ -22,12 +22,13 @@ from config import (
     MISTRAL_OCR_COST_PER_1K_PAGES, BEDROCK_COST_PER_1K_TOKENS, LLM_PAGE_WORKERS,
     MAX_RETRIES, BACKOFF_MULTIPLIER, CLIENT_TIMEOUT, CONNECT_TIMEOUT
 )
-from database import get_db_connection, get_cached_result, cache_result, update_plan_file_hash, insert_acronyms_to_ref_table
+from database import get_db_connection, get_cached_result, cache_result, update_plan_file_hash, insert_acronyms_to_ref_table, insert_drug_formulary_data
 from utils import (
     similarity, clean_drug_name, detect_prior_authorization,
     detect_step_therapy, calculate_file_hash, rate_limited_api_call,
     track_bedrock_cost_precalculated, track_mistral_cost, determine_coverage_status,
-    normalize_drug_tier, infer_drug_tier_from_text, calculate_bytes_hash
+    normalize_drug_tier, infer_drug_tier_from_text, calculate_bytes_hash,
+    parse_complex_drug_name, similarity
 )
 
 logger = logging.getLogger(__name__)
@@ -123,6 +124,125 @@ def extract_metadata_from_filename(filename):
     return parts[0].strip(), parts[1].strip(), parts[2].strip()
 
 
+def is_index_page(markdown: str) -> bool:
+    """
+    Detect if a page is an index/table of contents.
+    Returns True if index, False otherwise.
+    """
+    lines = markdown.splitlines()
+    
+    # Count table cells that look like index entries
+    table_index_count = 0
+    table_cell_count = 0
+    
+    # Pattern for index entries: text followed by dots and/or spaces, then a number
+    index_entry_pattern = re.compile(r'[A-Za-z0-9\s\(\)\-]+\.{2,}\s*\d+')
+    
+    for line in lines:
+        # Check if this is a table row with content
+        if '|' in line and not line.strip().startswith(':'):
+            # Split by pipe and process each cell
+            cells = [cell.strip() for cell in line.split('|') if cell.strip()]
+            
+            for cell in cells:
+                if cell:  # Non-empty cell
+                    table_cell_count += 1
+                    # Check if cell contains an index-like entry
+                    if index_entry_pattern.search(cell):
+                        table_index_count += 1
+    
+    # If we found table-based index entries, check if threshold is met
+    if table_cell_count > 0:
+        index_ratio = table_index_count / table_cell_count
+        # If at least 40% of table cells are index entries, it's an index page
+        if index_ratio >= 0.4:
+            logger.info("Detected index page based on table content.")
+            return True
+    
+    # Also check for non-table format
+    content_lines = [
+        line.strip() for line in lines 
+        if line.strip() and not line.strip().startswith('|') and not line.strip().startswith(':')
+    ]
+    
+    if not content_lines:
+        return False
+    
+    # Match lines like "DRUGNAME.....5" or "DRUGNAME 5" or "DRUGNAME (DOSE).....5"
+    index_pattern = re.compile(r'^[A-Za-z0-9\s\(\)\-\.,]+\.{2,}\s*\d+\s*$')
+    alt_pattern = re.compile(r'^[A-Za-z0-9\s\(\)\-\.,]+\s+\d+\s*$')
+    
+    index_lines = sum(
+        1 for line in content_lines
+        if index_pattern.search(line) or alt_pattern.search(line)
+    )
+    
+    # If at least 10% of content lines match the index pattern, it's likely an index page
+    if len(content_lines) > 0 and (index_lines / len(content_lines)) >= 0.1:
+        logger.info("Detected index page based on line patterns.")
+        return True
+        
+    return False
+
+def is_aca_drug_list_page(markdown: str) -> bool:
+    """
+    Detects if a page is part of an 'ACA Drug List' or 'Preventative Medications' section
+    using a heuristic scoring system. This is more robust than simple keyword matching.
+
+    Returns True if the page's score exceeds a confidence threshold, False otherwise.
+    """
+    score = 0
+    # A score of 10 or more gives high confidence that this page should be skipped.
+    CONFIDENCE_THRESHOLD = 10
+    
+    lower_markdown = markdown.lower()
+
+    # --- Feature 1: The Strongest Signal - The BRAND/GENERIC Table Header ---
+    # This structure is unique to these lists and absent from the main formulary.
+    # We use regex to be precise about the table format.
+    if re.search(r'\|\s*brand\s*\|\s*generic\s*\|', lower_markdown):
+        logger.debug("ACA page score +8 for BRAND/GENERIC header.")
+        score += 8
+
+    # --- Feature 2: High-Confidence Titles ---
+    # These titles are very unlikely to appear on a standard formulary page.
+    # We check if they appear as standalone lines (typical for a title).
+    high_confidence_titles = [
+        r'^\s*aca drug list\s*$',
+        r'^\s*preventative medications and preferred contraceptives\s*$',
+        r'^\s*breast cancer prevention\s*$',
+        r'^\s*tobacco cessation\s*$',
+        r'^\s*bowel preparation\s*$',
+        r'^\s*pre-exposure prophylaxis \(prep\)\*\*\s*$'
+    ]
+    for title_pattern in high_confidence_titles:
+        if re.search(title_pattern, lower_markdown, re.MULTILINE):
+            logger.debug(f"ACA page score +5 for title: {title_pattern}")
+            score += 5
+
+    # --- Feature 3: Supporting Keywords ---
+    # These words add confidence but aren't strong enough on their own.
+    supporting_keywords = [
+        'affordable care act',
+        'preventive services',
+        'contraceptives',
+        'statins*',
+        'fluoride products',
+        'iron products'
+    ]
+    for keyword in supporting_keywords:
+        if keyword in lower_markdown:
+            logger.debug(f"ACA page score +2 for keyword: {keyword}")
+            score += 2
+            
+    # --- Final Decision ---
+    if score >= CONFIDENCE_THRESHOLD:
+        logger.info(f"Detected ACA/Preventative drug list page with a confidence score of {score}. Skipping.")
+        return True
+
+    return False
+
+
 @rate_limited_api_call
 def extract_structured_data_with_llm(page_markdown: str):
     """
@@ -134,21 +254,40 @@ def extract_structured_data_with_llm(page_markdown: str):
         logger.error("Bedrock client is not initialized. Cannot extract structured data.")
         return {"drug_table": [], "acronyms": [], "tiers": []}, costs
 
-    # --- CHANGE: A more concise and direct prompt for the LLM. ---
+    # *** INTEGRATION: Check for index page before calling LLM ***
+    if is_index_page(page_markdown):
+        logger.info("Skipping LLM call for index/table of contents page.")
+        return {"drug_table": [], "acronyms": [], "tiers": []}, {'tokens': 0, 'cost': 0.0, 'calls': 0}
+    
+    # *** INTEGRATION: Check for ACA Drug List page before calling LLM ***
+    if is_aca_drug_list_page(page_markdown):
+        logger.info("Skipping LLM call for ACA Drug List/Preventative Medications page.")
+        return {"drug_table": [], "acronyms": [], "tiers": []}, {'tokens': 0, 'cost': 0.0, 'calls': 0}
+
     system_prompt = """
 You are a data extraction expert for pharmaceutical formularies. Your task is to extract three types of information from the provided markdown and return it as a single, valid JSON object.
 
-Your response MUST be ONLY the JSON object. Do not include explanations or markdown fences.
+Your response MUST be ONLY the JSON object. Do not include explanations or markdown fences. Ignore "ACA Drug List" and "Index of Drug". 
 
 The JSON object must have three top-level keys: "drug_table", "acronyms", and "tiers". If a key's data is not present on the page, its value must be an empty list `[]`.
 **Strict JSON**: Ensure the output is valid JSON. Do not include any comments, markdown formatting, or extraneous text.
 
+**CRITICAL RULE: IGNORE preventative care tables.** When populating `acronyms` and `tiers`, completely ignore tables related to "ACA Drug List", "Preventative Medications", "Statins", "Aspirin", "Fluoride Products", or "Tobacco Cessation". Do not extract brand names like "Prenatal Forte" or "Aspirin 81" into the `acronyms` or `tiers` list.
+
 **English Only**: All extracted data must be in English.
+
+**IMPORTANT: Column names vary by payer. Common variations:**
+- drug_name: "Prescription Drug Name", "Drug Name", "Name of the Drug".
+- drug_tier: "Drug Tier", "Tier", "Preferred Status", "Status", "Tier Level", "What the drug will cost you", "Description of Formulary Change", "Formulary Status", "Brand or generic".
+- drug_requirements: "Coverage Requirements & Limits", "Restrictions/Limits", "Notes", "Drug Status", "Necessary actions", "Limits on use", "category".
+
 
 1.  **drug_table**: A list of objects. Each object needs three keys:
     *   `drug_name`: The drug's name.
     *   `drug_tier`: The assigned tier (e.g., "Tier 1", "3", "Specialty").
     *   `drug_requirements`: Any requirement codes (e.g., "PA", "QL", "ST").
+
+    *   **IMPORTANT**: If a single cell contains multiple distinct drugs, extract them as one record. Your code will handle splitting them later. For example, if you see "rosuvastatin 20mg (Crestor) simvastatin 10mg (Zocor)", extract this entire string as the `drug_name`.
 
 2.  **acronyms**: A list of objects for requirement codes found in a legend or key (e.g., PA, QL). Do NOT include tiers here. Each object must have:
     *   `acronym`: The code (e.g., "PA").
@@ -156,6 +295,8 @@ The JSON object must have three top-level keys: "drug_table", "acronyms", and "t
     *   `explanation`: The detailed description.
     *   **Crucial Rule**: **DO NOT** include "Tier 1", "Tier 2", "Specialty Tier", "ACA", "nivel 1/nivel 2/nivel 3/nivel 4/nivel 5/nivel 6" or plain numbers like "2", "3", "4". These are tiers must not include them in this table.
     *   **Crucial Rule**: **DO NOT** include "Nivel" or similar non-English terms.
+    *   **Crucial Rule**: **DO NOT** extract product brand names like "Prenatal and Iron", "Stuart Prenatal", or "Aspirin". These are not requirement acronyms.
+    *   **Crucial Rule**: **DO NOT** extract single letters like `p`, `P`, `np`, or codes containing symbols like `$p$`, `np+`. These are TIER CODES, not requirement acronyms.
 
 
 3.  **tiers**: A list of objects for tier definitions (e.g., Tier 1, Tier 2). Do NOT include requirement codes like PA or QL. Each object must have:
@@ -166,6 +307,7 @@ The JSON object must have three top-level keys: "drug_table", "acronyms", and "t
     *   **Crucial Rule**: **DO NOT** include "Nivel" or similar non-English terms.
     *   **Crucial Rule**: **DO NOT** include "Tier 1", "Tier 2", "Specialty Tier", "ACA", "nivel 1/nivel 2/nivel 3/nivel 4/nivel 5/nivel 6" or plain numbers like "2", "3", "4". These are tiers must not include them in this table.
      *   **Crucial Rule**: **DO NOT** include "Nivel" or similar non-English terms.
+     *   **Crucial Rule**: **DO NOT** extract items like "Specialty Tier" if it's being used as a simple drug tier. This list is for DEFINITIONS of tiers, not the tiers themselves.
     
 IMPORTANT: If the page is a table of contents or index (drug names followed by page numbers like "Aspirin.....5"), return JSON with empty lists for all keys.
 """
@@ -192,7 +334,7 @@ IMPORTANT: If the page is a table of contents or index (drug names followed by p
 
         logger.info(f"Successfully processed page. Extracted: {len(structured_data.get('drug_table', []))} drugs, {len(structured_data.get('acronyms', []))} acronyms, {len(structured_data.get('tiers', []))} tiers.")
         
-        # --- CHANGE: Defensive filtering to remove non-English terms the LLM might have missed. ---
+        # Defensive filtering to remove non-English terms the LLM might have missed.
         blocklist = {'nivel'}
         for key in ['acronyms', 'tiers']:
             if key in structured_data and isinstance(structured_data[key], list):
@@ -468,6 +610,32 @@ def process_single_pdf_worker(filename: str, pdf_folder_path: str):
         
         # **CRITICAL STEP**: Create the DataFrame from the unpacked list.
         structured_df = pd.DataFrame(drug_table_data)
+        if not structured_df.empty:
+            expanded_rows = []
+            for _, row in structured_df.iterrows():
+                drug_name_full = str(row.get('drug_name', ''))
+                drug_tier = row.get('drug_tier')
+                drug_requirements = row.get('drug_requirements')
+
+                # Use a more robust function to parse the complex drug name string
+                parsed_drugs = parse_complex_drug_name(drug_name_full)
+
+                for parsed_drug in parsed_drugs:
+                    # For each strength, create a new record
+                    for strength in parsed_drug['strengths']:
+                        # Reconstruct the full drug name with a single strength
+                        new_drug_name = f"{parsed_drug['base_name']} {strength}".strip()
+                        if parsed_drug['brand_name']:
+                            new_drug_name += f" ({parsed_drug['brand_name']})"
+
+                        expanded_rows.append({
+                            "drug_name": new_drug_name,
+                            "drug_tier": drug_tier,
+                            "drug_requirements": drug_requirements
+                        })
+            
+            # Overwrite the original DataFrame with the new, expanded one
+            structured_df = pd.DataFrame(expanded_rows)
 
         # **NOW THIS CHECK IS SAFE**:
         if structured_df.empty and not all_acronyms and not all_tiers:
@@ -484,6 +652,37 @@ def process_single_pdf_worker(filename: str, pdf_folder_path: str):
 
         dedup_acronyms = deduplicate_dicts(all_acronyms)
         dedup_tiers = deduplicate_dicts(all_tiers)
+
+        logger.info("Filtering out non-formulary definitions before insertion.")
+        
+        # List of keywords that are not true acronyms or tiers
+        blocklist_keywords = ['prenatal', 'aspirin', 'statin', 'fluoride', 'tobacco', 'nicotine']
+
+        def is_valid_formulary_definition(item):
+            acronym = str(item.get('acronym', '')).lower().strip()
+            if not acronym:
+                return False
+            # Rule 1: Check if the acronym starts with any blocked keyword.
+            if any(acronym.startswith(keyword) for keyword in blocklist_keywords):
+                return False
+            # Rule 2: Filter out items that are clearly drug names (long text without numbers/special chars).
+            if len(acronym.replace(' ', '')) > 20 and acronym.isalpha():
+                 return False
+            return True
+
+        filtered_acronyms = [item for item in dedup_acronyms if is_valid_formulary_definition(item)]
+        filtered_tiers = [item for item in dedup_tiers if is_valid_formulary_definition(item)]
+
+        acronyms_removed_count = len(dedup_acronyms) - len(filtered_acronyms)
+        tiers_removed_count = len(dedup_tiers) - len(filtered_tiers)
+
+        if acronyms_removed_count > 0 or tiers_removed_count > 0:
+            logger.warning(
+                f"Filtered out {acronyms_removed_count} invalid acronyms and "
+                f"{tiers_removed_count} invalid tiers based on keyword blocklist."
+            )
+
+        all_definitions = filtered_acronyms + filtered_tiers
 
         all_definitions = dedup_acronyms + dedup_tiers
         if all_definitions:
@@ -603,57 +802,48 @@ def process_single_pdf_url_worker(plan_info):
     log_prefix = f"[URL Worker for {plan_name}]"
     zero_costs = {'mistral_pages': 0, 'bedrock_tokens': 0, 'bedrock_cost': 0.0, 'bedrock_calls': 0}
     try:
-        proxies = {
-            "http": "http://apzevslp:mlc7veurxhp2@38.170.176.177:5572/",
-            "https": "http://apzevslp:mlc7veurxhp2@38.170.176.177:5572/"
-        }
-        
-        # 2. Define your headers (this part was correct).
+        if not formulary_url.startswith(('http://', 'https://')):
+            formulary_url = 'https://' + formulary_url
+            logger.info(f"{log_prefix} URL scheme was missing. Corrected to: {formulary_url}")
+
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
             "Accept-Language": "en-US,en;q=0.9",
         }
         
-        # 3. Use the 'proxies' variable in your request for the formulary_url.
-        #    The unnecessary test call has been removed.
-        logger.info(f"{log_prefix} Using proxy to download from {formulary_url}")
-        with requests.get(formulary_url, timeout=90, headers=headers, stream=True, proxies=proxies) as resp:
+        with requests.get(formulary_url, timeout=90, headers=headers, stream=True) as resp:
             resp.raise_for_status()
             content_type = resp.headers.get('Content-Type', '')
-            if 'application/pdf' not in content_type:
-                # Log the HTML content for easier debugging
-                error_details = f"Invalid content type: {content_type}."
+            if 'application/pdf' not in content_type and 'application/octet-stream' not in content_type:
+                error_details = f"Invalid content type: {content_type}"
+                # This logic is now reachable and helps debug non-PDF URLs.
                 try:
-                    # Try to get the first 500 characters of the HTML page
                     html_preview = resp.text[:500]
-                    error_details += f" Received HTML page starts with: '{html_preview}...'"
-                    logger.error(f"{log_prefix} {error_details}")
+                    error_details += f" | Received content starts with: '{html_preview}...'"
                 except Exception as log_e:
-                    # Fallback if we can't even read the text
-                    logger.error(f"{log_prefix} Could not read response text for debugging: {log_e}")
+                    logger.warning(f"{log_prefix} Could not read response text for debugging: {log_e}")
                 
-                return 'ERROR', plan_name, error_details, zero_costs
+                logger.error(f"{log_prefix} {error_details}")
+                return 'ERROR', plan_name, error_details, zero_costs 
             pdf_content_bytes = resp.content
             pdf_bytes_io = BytesIO(pdf_content_bytes)
 
         file_hash = calculate_bytes_hash(pdf_content_bytes)
         update_plan_file_hash(plan_id, file_hash)
 
-        # --- CORRECTED CACHING LOGIC ---
         cached_data, raw_content = get_cached_result(file_hash)
         costs = zero_costs
-        full_structured_data = None # Initialize
+        full_structured_data = None
 
-        if cached_data is None: # Cache MISS
+        if cached_data is None:
             logger.info(f"{log_prefix} Cache MISS. Starting full processing...")
             full_structured_data, raw_content, costs = process_pdf_with_mistral_ocr(pdf_bytes_io, payer_name)
             cache_result(file_hash, full_structured_data, raw_content)
-        else: # Cache HIT
+        else:
             logger.info(f"{log_prefix} Cache HIT. Using pre-processed data.")
             full_structured_data = cached_data
 
-        # --- UNPACK DATA FOR POST-PROCESSING ---
         if not isinstance(full_structured_data, dict):
             logger.error(f"{log_prefix} Corrupted cache or processing error. Expected a dictionary, got {type(full_structured_data)}")
             full_structured_data = {"drug_table": [], "acronyms": [], "tiers": []}
@@ -662,14 +852,33 @@ def process_single_pdf_url_worker(plan_info):
         all_acronyms = full_structured_data.get('acronyms', [])
         all_tiers = full_structured_data.get('tiers', [])
 
-        # **CRITICAL STEP**: Create the DataFrame from the unpacked list.
         structured_df = pd.DataFrame(drug_table_data)
 
-        # **NOW THIS CHECK IS SAFE**:
+        if not structured_df.empty:
+            expanded_rows = []
+            for _, row in structured_df.iterrows():
+                drug_name_full = str(row.get('drug_name', ''))
+                drug_tier = row.get('drug_tier')
+                drug_requirements = row.get('drug_requirements')
+                parsed_drugs = parse_complex_drug_name(drug_name_full)
+                if not parsed_drugs: # Handle cases where parsing yields nothing but we have an original name
+                    expanded_rows.append(row.to_dict())
+                    continue
+                for parsed_drug in parsed_drugs:
+                    for strength in parsed_drug['strengths']:
+                        new_drug_name = f"{parsed_drug['base_name']} {strength}".strip()
+                        if parsed_drug['brand_name']:
+                            new_drug_name += f" ({parsed_drug['brand_name']})"
+                        expanded_rows.append({
+                            "drug_name": new_drug_name,
+                            "drug_tier": drug_tier,
+                            "drug_requirements": drug_requirements
+                        })
+            structured_df = pd.DataFrame(expanded_rows)
+
         if structured_df.empty and not all_acronyms and not all_tiers:
             return 'SKIPPED', plan_name, "No structured data extracted from URL PDF.", costs
 
-        # --- Acronym and Tier processing (now works on cache hits) ---
         all_acronyms, all_tiers = _reclassify_definitions(all_acronyms, all_tiers)
         all_tiers = _parse_and_split_tier_definitions(all_tiers)
         
@@ -728,7 +937,7 @@ def process_single_pdf_url_worker(plan_info):
 def process_pdfs_from_urls_in_parallel():
     """Process PDFs by downloading from URLs in plan_details, in parallel."""
     logger.info("STEP 2: Processing PDF Files from URLs in plan_details")
-    all_processed_data = []
+    successfully_processed_plan_ids = []
 
     plans = get_all_plans_with_formulary_url()
     if not plans:
@@ -744,20 +953,48 @@ def process_pdfs_from_urls_in_parallel():
 
         for future in as_completed(future_to_plan):
             plan_info = future_to_plan[future]
-            plan_name_log = plan_info[2] # Get plan name for logging
+            plan_name_log = plan_info[2]
             try:
-                # Wait for the result, but no longer than the timeout
                 status, _, result_data, costs = future.result(timeout=URL_PROCESSING_TIMEOUT)
                 
                 if status == 'SUCCESS':
                     logger.info(f"Aggregating results for SUCCESSFUL plan: {plan_name_log}")
                     success_count += 1
+                    
+                    processed_records = result_data.get("processed_records", [])
+                    if processed_records:
+                        logger.info(f"Deduplicating {len(processed_records)} records before insertion for plan '{plan_name_log}'.")
+                        unique_records = {}
+                        for record in processed_records:
+                            # Create a key based on the database's UNIQUE constraint
+                            key = (
+                                record.get('plan_id'),
+                                record.get('drug_name'),
+                                record.get('drug_tier'),
+                                record.get('drug_requirements')
+                            )
+                            if key not in unique_records:
+                                unique_records[key] = record
+                        
+                        deduplicated_data = list(unique_records.values())
+                        records_removed = len(processed_records) - len(deduplicated_data)
+                        if records_removed > 0:
+                            logger.warning(f"Removed {records_removed} duplicate records from the batch for '{plan_name_log}'.")
+
+                        if deduplicated_data:
+                            logger.info(f"Inserting {len(deduplicated_data)} unique records for plan '{plan_name_log}' into the database.")
+                            insert_drug_formulary_data(deduplicated_data)
+                            
+                            plan_id = deduplicated_data[0].get('plan_id')
+                            if plan_id and plan_id not in successfully_processed_plan_ids:
+                                successfully_processed_plan_ids.append(plan_id)
+
                     payer_name = result_data['db_payer_name']
                     if costs['mistral_pages'] > 0:
                         track_mistral_cost(payer_name, costs['mistral_pages'])
                     if costs['bedrock_tokens'] > 0:
                         track_bedrock_cost_precalculated(payer_name, costs['bedrock_tokens'], costs['bedrock_cost'], costs['bedrock_calls'])
-                    all_processed_data.extend(result_data["processed_records"])
+                
                 elif status == 'SKIPPED':
                     logger.warning(f"Skipped plan: {plan_name_log}. Reason: {result_data}")
                     skipped_count += 1
@@ -774,8 +1011,7 @@ def process_pdfs_from_urls_in_parallel():
 
     logger.info("--- URL PDF Processing Complete ---")
     logger.info(f"Summary: {success_count} successful, {error_count} failed, {skipped_count} skipped")
-    logger.info(f"Total structured records aggregated: {len(all_processed_data)}")
-    return all_processed_data, {}
+    return successfully_processed_plan_ids, {}
 
 def _reclassify_definitions(acronyms_list: list, tiers_list: list) -> Tuple[list, list]:
     """
@@ -852,3 +1088,53 @@ def _parse_and_split_tier_definitions(tier_list: list) -> list:
         processed_tiers.append(tier_dict)
         
     return processed_tiers
+
+def is_valid_formulary_definition(item: dict) -> bool:
+    """
+    Automatically detects if an extracted item is a valid formulary definition
+    using a set of heuristic rules, avoiding hardcoded lists.
+
+    Args:
+        item: A dictionary with 'acronym' and 'expansion' keys.
+
+    Returns:
+        True if the item is a valid definition, False otherwise.
+    """
+    acronym = str(item.get('acronym', '')).strip()
+    expansion = str(item.get('expansion', '')).strip()
+
+    # --- Rule 1: Basic Sanity Checks ---
+    # A valid entry must have both an acronym and an expansion.
+    if not acronym or not expansion:
+        return False
+
+    # --- Rule 2: Automatically Detect and Reject Tier Shorthands ---
+    # Characteristics: very short acronym and an expansion containing common tier words.
+    tier_description_words = {'preferred', 'non-preferred', 'generic', 'brand', 'specialty'}
+    if len(acronym) <= 4 and any(word in expansion.lower() for word in tier_description_words):
+        # This is a strong signal for an entry like ('np', 'Non-Preferred Generic')
+        return False
+
+    # --- Rule 3: Automatically Detect and Reject Product/Brand Names ---
+    # Characteristic 1: Acronyms are codes, not long descriptive sentences.
+    # An "acronym" with more than 3 words is almost certainly a product name.
+    if len(acronym.split()) > 3:
+        return False
+        
+    # Characteristic 2: The acronym and expansion should be different concepts.
+    # If they are too similar, it's a product name being described.
+    # We use a similarity score to detect this automatically.
+    # Example: "Aspirin 81mg" vs "Aspirin 81mg tablet" will have a high similarity.
+    # "PA" vs "Prior Authorization" will have a low similarity.
+    sim_score = similarity(acronym, expansion)
+    if sim_score > 0.75:
+        # If over 75% similar, it's likely a product name, not a code.
+        return False
+        
+    # --- Rule 4: Reject Plain Numbers that Aren't Tiers ---
+    # Real acronyms are not just numbers. We allow "Tier 1", but reject "1", "2025", etc.
+    if acronym.isdigit():
+        return False
+
+    # If none of the above rules flagged it as invalid, it's a good entry.
+    return True

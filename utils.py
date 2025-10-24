@@ -206,15 +206,6 @@ def validate_required_files():
     """Validate that required files and directories exist"""
     if not os.path.exists(EXCEL_FILE_PATH):
         raise FileNotFoundError(f"Excel file not found: {EXCEL_FILE_PATH}")
-    
-    # Remove or comment out the PDF folder checks below:
-    # if not os.path.exists(PDF_FOLDER):
-    #     raise FileNotFoundError(f"PDF folder not found: {PDF_FOLDER}")
-    # pdf_files = [f for f in os.listdir(PDF_FOLDER) if f.endswith(".pdf")]
-    # if not pdf_files:
-    #     raise FileNotFoundError(f"No PDF files found in: {PDF_FOLDER}")
-    # logger.info(f"Validation passed: Found {len(pdf_files)} PDF files to process")
-
 
 def extract_requirements_from_drug_name(drug_name_cell):
     """
@@ -386,7 +377,6 @@ def determine_coverage_status(requirements_text, tier_text, conn, state_name, pa
     - Default to 'Covered' if no requirements
     - No hard-coding of requirement codes or statuses; all logic is table-driven.
     """
-    import re
 
     if not requirements_text and not tier_text:
         return "Covered"
@@ -623,10 +613,6 @@ def calculate_file_hash(filepath):
             sha256_hash.update(byte_block)
     return sha256_hash.hexdigest()
 
-
-import re
-from typing import Optional
-
 def clean_special_chars(cleaned_text):
     """Simple cleaning for special characters and formatting artifacts"""
     if not cleaned_text:
@@ -696,3 +682,67 @@ def infer_drug_tier_from_text(text: Optional[str]) -> Optional[str]:
 
     # If no "Tier X" pattern is found, return None to prevent incorrect inference.
     return None
+
+def parse_complex_drug_name(drug_name_full: str):
+    """
+    Parses a complex drug name string that may contain multiple drugs,
+    strengths, and brand names.
+    
+    Example: "rosuvastatin oral tablet 20 mg, 40 mg (Crestor) simvastatin oral tablet 10 mg, 20 mg, 40 mg (Zocor)"
+    Returns: A list of dictionaries, each representing a distinct drug.
+    """
+    if not drug_name_full:
+        return []
+
+    # Regex to find brand names and use them as delimiters for splitting drugs
+    # This pattern finds a brand name in parentheses, like (Crestor)
+    brand_pattern = r'\s*\([^)]+\)\s*'
+    
+    # Split the string by brand names, keeping the brand names
+    parts = re.split(f'({brand_pattern})', drug_name_full)
+    
+    # Process the string to correctly pair drugs with their brand names
+    drug_strings = []
+    temp_drug = ""
+    for part in parts:
+        if not part.strip():
+            continue
+        if re.match(brand_pattern, part):
+            # If we find a brand name, attach it to the preceding drug info
+            drug_strings.append(temp_drug + part)
+            temp_drug = ""
+        else:
+            # This is part of a drug name
+            if temp_drug: # If there was a previous drug without a brand name
+                drug_strings.append(temp_drug)
+            temp_drug = part
+
+    if temp_drug: # Add the last drug if it had no brand name
+        drug_strings.append(temp_drug)
+
+    # Now, parse each individual drug string
+    parsed_drugs = []
+    for drug_str in drug_strings:
+        # Extract brand name if present
+        brand_name_match = re.search(r'\(([^)]+)\)', drug_str)
+        brand_name = brand_name_match.group(1).strip() if brand_name_match else None
+        
+        # Remove brand name from string for easier parsing of strengths
+        base_str = re.sub(r'\s*\([^)]+\)', '', drug_str).strip()
+        
+        # Regex to find all strengths (e.g., "10 mg", "5 mg", "20 mcg")
+        strengths = re.findall(r'(\d+\s*(?:mg|mcg|ml|%|g)\b)', base_str, re.IGNORECASE)
+        
+        # The base name is whatever is left after removing the strengths
+        base_name = re.sub(r'(\d+\s*(?:mg|mcg|ml|%|g)\b,?)+', '', base_str, flags=re.IGNORECASE).strip()
+        # Clean up any trailing commas or whitespace
+        base_name = base_name.rstrip(',').strip()
+
+        if base_name and strengths:
+            parsed_drugs.append({
+                'base_name': base_name,
+                'strengths': [s.strip() for s in strengths],
+                'brand_name': brand_name
+            })
+            
+    return parsed_drugs
