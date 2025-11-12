@@ -271,10 +271,20 @@ def ensure_database_schema():
             logger.debug(f"Product mapping columns may already exist: {e}")
             conn.rollback()
 
+        try:
+            cursor.execute("""
+                ALTER TABLE drug_formulary_details
+                ADD COLUMN IF NOT EXISTS page_number INTEGER
+            """)
+            conn.commit()
+        except Exception as e:
+            logger.debug(f"page_number column may already exist in drug_formulary_details: {e}")
+            conn.rollback()
+
         # Add indexes for the new columns for better query performance
         _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_product_labeler_code ON drug_formulary_details(product_labeler_code)", "idx_product_labeler_code")
         _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_product_proprietaryname ON drug_formulary_details(product_proprietaryname)", "idx_product_proprietaryname")
-
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_page_number ON drug_formulary_details(page_number)", "idx_page_number")
         # Create partitions for better performance with 15-20M records
         # Create 8 partitions based on hash of plan_id
         for i in range(8):
@@ -432,10 +442,13 @@ def cache_result(file_hash, structured_data_dict, raw_content):
             logger.error(f"Failed to cache result for hash {file_hash}: {e}")
 
 
+# In database.py
+
 def insert_drug_formulary_data(processed_data):
     """
     Inserts a batch of processed drug formulary data into the database
-    with high efficiency and robust error handling.
+    with high efficiency and robust error handling. This version includes a
+    fix to prevent 'integer out of range' errors for the page_number column.
     """
     if not processed_data:
         logger.warning("No processed data provided to insert.")
@@ -449,34 +462,72 @@ def insert_drug_formulary_data(processed_data):
         # The columns must match the order of values in the data tuples
         cols = [
             "id", "plan_id", "payer_id", "drug_name", "ndc_code", "jcode",
-            "state_name", "coverage_status", "drug_tier", "drug_requirements",
+            "state_name", "coverage_status", "drug_tier", "drug_requirements", "page_number",
             "is_prior_authorization_required", "is_step_therapy_required", "is_quantity_limit_applied",
             "coverage_details", "confidence_score", "source_url", "plan_name", "payer_name", "file_name", "status"
         ]
 
-        # Prepare the data for execute_values, ensuring order matches `cols`
         data_tuples = []
         for record in processed_data:
-            # Defensive: skip records with missing plan_name or payer_name
+            # Defensive: skip records with missing essential info
             if not record.get("plan_name") or not record.get("payer_name"):
                 logger.warning(f"Skipping record with missing plan_name or payer_name: {record}")
                 continue
-            data_tuples.append(tuple(record.get(key) for key in cols))
+
+            page_number = record.get("page_number")
+            try:
+                # Ensure page_number is a valid integer or None
+                if page_number is not None:
+                    # int() can handle floats (e.g., 123.0) and string numbers ("123")
+                    page_number = int(page_number)
+                # If it's already None, it will be correctly inserted as NULL
+            except (ValueError, TypeError):
+                logger.warning(
+                    f"Invalid page number '{page_number}' for drug "
+                    f"'{record.get('drug_name')}'. Setting to NULL."
+                )
+                page_number = None
+
+
+            # Prepare tuple for insertion, ensuring the order matches `cols`
+            data_tuples.append((
+                record.get("id"),
+                record.get("plan_id"),
+                record.get("payer_id"),
+                record.get("drug_name"),
+                record.get("ndc_code"),
+                record.get("jcode"),
+                record.get("state_name"),
+                record.get("coverage_status"),
+                record.get("drug_tier"),
+                record.get("drug_requirements"),
+                page_number,  # Use the sanitized page number
+                record.get("is_prior_authorization_required"),
+                record.get("is_step_therapy_required"),
+                record.get("is_quantity_limit_applied"),
+                record.get("coverage_details"),
+                record.get("confidence_score"),
+                record.get("source_url"),
+                record.get("plan_name"),
+                record.get("payer_name"),
+                record.get("file_name"),
+                'processing'  # Set initial status for new records
+            ))
 
         # Using ON CONFLICT to prevent duplicates and update existing records
-        # This handles cases where a record might already exist from a previous run
         insert_query = f"""
             INSERT INTO drug_formulary_details ({', '.join(cols)})
             VALUES %s
             ON CONFLICT (plan_id, drug_name, drug_tier, drug_requirements)
             DO UPDATE SET
                 coverage_status = EXCLUDED.coverage_status,
+                page_number = EXCLUDED.page_number,
                 is_prior_authorization_required = EXCLUDED.is_prior_authorization_required,
                 is_step_therapy_required = EXCLUDED.is_step_therapy_required,
                 is_quantity_limit_applied = EXCLUDED.is_quantity_limit_applied,
                 source_url = EXCLUDED.source_url,
                 file_name = EXCLUDED.file_name,
-                status = 'completed',  -- Mark as completed on update
+                status = 'completed',
                 last_updated_date = CURRENT_TIMESTAMP;
         """
 
@@ -487,7 +538,7 @@ def insert_drug_formulary_data(processed_data):
                 insert_query,
                 data_tuples,
                 template=None,
-                page_size=500  # Adjust page size based on memory and performance
+                page_size=500
             )
             conn.commit()
             logger.info(f"Successfully inserted or updated {len(data_tuples)} records.")
@@ -495,8 +546,7 @@ def insert_drug_formulary_data(processed_data):
         except IntegrityError as e:
             conn.rollback()
             logger.error(f"Database integrity error during insertion: {e}")
-            # Optionally, you could add logic here to try inserting records one-by-one
-            # to identify the problematic row, but that would be much slower.
+            raise
         except Exception as e:
             conn.rollback()
             logger.error(f"An unexpected error occurred during data insertion: {e}")
@@ -694,4 +744,41 @@ def insert_acronyms_to_ref_table(acronyms, state_name, payer_name, plan_name, ta
         except Exception as e:
             conn.rollback()
             logger.error(f"Failed to insert acronyms into {table_name}: {e}")
+            raise
+
+def batch_determine_coverage_status(requirement_tier_pairs, conn, state_name, payer_name):
+    """
+    Batch lookup for coverage status for unique (requirement_code, drug_tier) pairs.
+    Returns a dict mapping (requirement_code, drug_tier) -> coverage_status.
+    """
+    from utils import determine_coverage_status  # Import here to avoid circular import
+    mapping = {}
+    for req_code, tier in requirement_tier_pairs:
+        status = determine_coverage_status(req_code, tier, conn, state_name, payer_name)
+        mapping[(req_code, tier)] = status
+    return mapping
+
+def delete_drug_formulary_records_for_plan(plan_id: str):
+    """
+    Deletes all records from the drug_formulary_details table for a specific plan_id.
+    This is used when a formulary file has been updated and needs to be replaced.
+    """
+    if not plan_id:
+        logger.warning("No plan_id provided for deletion. Aborting.")
+        return 0
+
+    logger.info(f"Preparing to delete all existing drug records for plan_id: {plan_id}")
+
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        try:
+            query = "DELETE FROM drug_formulary_details WHERE plan_id = %s"
+            cursor.execute(query, (plan_id,))
+            deleted_count = cursor.rowcount
+            conn.commit()
+            logger.info(f"Successfully deleted {deleted_count} records for plan_id: {plan_id}")
+            return deleted_count
+        except Exception as e:
+            conn.rollback()
+            logger.error(f"Failed to delete records for plan_id {plan_id}: {e}")
             raise

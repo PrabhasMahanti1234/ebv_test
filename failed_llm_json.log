@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 === JSON Parse Error ===
 =======
 yo=== JSON Parse Error ===
@@ -350054,10 +350055,2200 @@ Original String: {
     },
     {
       "drug_name": "bupropion hcl",
+=======
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 392 column 6 (char 10493)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "budesonide inhalation susp 0.25 mg/2 ml (Pulmicort)",
+      "drug_tier": "56",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "budesonide inhalation susp 0.5 mg/2 ml (Pulmicort)",
+      "drug_tier": "56",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "budesonide inhalation susp 1 mg/2 ml (Pulmicort)",
+      "drug_tier": "56",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "bumetanide tab 1 mg",
+      "drug_tier": "50",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "bumetanide tab 2 mg",
+      "drug_tier": "50",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "bumetanide tab 0.5 mg (Bumex)",
+      "drug_tier": "50",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "buprenorphine hcl-naloxone hcl sl film 2-0.5 mg (base equiv) (Suboxone)",
+      "drug_tier": "84",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "buprenorphine hcl-naloxone hcl
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 382 column 6 (char 10282)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "CAPVAXIVE -pneumococcal 21-valent conjugate vaccine soln pref syr 0.5 ml",
+      "drug_tier": "10",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "carbamazepine cap er 12hr 100 mg (Carbatrol)",
+      "drug_tier": "93",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "carbamazepine cap er 12hr 200 mg (Carbatrol)",
+      "drug_tier": "93",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "carbamazepine cap er 12hr 300 mg (Carbatrol)",
+      "drug_tier": "93",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "carbamazepine chew tab 100 mg",
+      "drug_tier": "93",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "carbamazepine susp $100 \\mathrm{mg} / 5 \\mathrm{ml}$ (Tegretol)",
+      "drug_tier": "93",
+      "drug_requirements": "$"
+    },
+    {
+      "drug_name": "carbamazepine tab er 12hr 100 mg (Tegretol-xr)",
+      "drug_tier": "93",
+      "drug_requirements": ""
+    }
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 397 column 6 (char 10376)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "CAPVAXIVE -pneumococcal 21-valent conjugate vaccine soln pref syr 0.5 ml",
+      "drug_tier": "10",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "carbamazepine cap er 12hr 100 mg (Carbatrol)",
+      "drug_tier": "93",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "carbamazepine cap er 12hr 200 mg (Carbatrol)",
+      "drug_tier": "93",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "carbamazepine cap er 12hr 300 mg (Carbatrol)",
+      "drug_tier": "93",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "carbamazepine chew tab 100 mg",
+      "drug_tier": "93",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "carbamazepine susp 100 mg/5 ml (Tegretol)",
+      "drug_tier": "93",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "carbamazepine tab er 12hr 100 mg (Tegretol-xr)",
+      "drug_tier": "93",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name"
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 377 column 6 (char 10318)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "chlorthalidone tab 25 mg",
+      "drug_tier": "50",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "chlorthalidone tab 50 mg",
+      "drug_tier": "50",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "chlorzoxazone tab 500 mg",
+      "drug_tier": "100",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "cholecalciferol cap 1.25 mg (50000 unit)",
+      "drug_tier": "101",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "cholestyramine light powder $4 \\mathrm{gm} /$ dose (Questran light)",
+      "drug_tier": "51",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "cholestyramine powder $4 \\mathrm{gm} /$ dose (Questran)",
+      "drug_tier": "51",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CHORIONIC GONADOTROPIN -chorionic gonadotropin for im inj 10000 unit",
+      "drug_tier": "37",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CIBINQO -ab
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 387 column 6 (char 10535)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "diclofenac sodium tab delayed release 50 mg",
+      "drug_tier": "89",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diclofenac sodium tab delayed release 75 mg",
+      "drug_tier": "89",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diclofenac w/ misoprostol tab delayed release 50-0.2 mg (Arthrotec 50)",
+      "drug_tier": "89",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diclofenac w/ misoprostol tab delayed release 75-0.2 mg (Arthrotec 75)",
+      "drug_tier": "89",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dicloxacillin sodium cap 250 mg",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dicloxacillin sodium cap 500 mg",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dicyclomine hcl cap 10 mg",
+      "drug_tier": "60",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dicycl
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 367 column 6 (char 10233)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "desipramine hcl tab 150 mg",
+      "drug_tier": "67",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "desipramine hcl tab 10 mg (Norpramin)",
+      "drug_tier": "67",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "desipramine hcl tab 25 mg (Norpramin)",
+      "drug_tier": "67",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "desloratadine tab 5 mg (Clarinex)",
+      "drug_tier": "55",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "DESMOPRESSIN ACETATE -desmopressin acetate nasal spray soln $0.01 \\%$",
+      "drug_tier": "37",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "desmopressin acetate inj $4 \\mathrm{mcg} / \\mathrm{ml}$ (Ddavp)",
+      "drug_tier": "37",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "desmopressin acetate nasal spray soln $0.01 \\%$ (refrigerated)",
+      "drug_tier": "37",
+      "drug_requirements": ""
+    },
+    {
+      
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 397 column 6 (char 10552)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "CREON -pancrelipase (lip-prot-amyl) dr cap 6000-19000-30000 unit",
+      "drug_tier": "61",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CREON -pancrelipase (lip-prot-amyl) dr cap 12000-38000-60000 unit",
+      "drug_tier": "61",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CREON -pancrelipase (lip-prot-amyl) dr cap 24000-76000-120000 unit",
+      "drug_tier": "61",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CREON -pancrelipase (lip-prot-amyl) dr cap 36000-114000-180000 unit",
+      "drug_tier": "61",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CRESEMBA -isavuconazonium sulfate cap 74.5 mg",
+      "drug_tier": "4",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CRESEMBA -isavuconazonium sulfate cap 186 mg",
+      "drug_tier": "4",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CROMOLYN SODIUM -cromolyn sodium ophth soln $4 %$",
+      "
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 382 column 6 (char 10405)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "chlorthalidone tab 25 mg",
+      "drug_tier": "50",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "chlorthalidone tab 50 mg",
+      "drug_tier": "50",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "chlorzoxazone tab 500 mg",
+      "drug_tier": "100",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "cholecalciferol cap 1.25 mg (50000 unit)",
+      "drug_tier": "101",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "cholestyramine light powder $4 \\mathrm{gm} /$ dose (Questran light)",
+      "drug_tier": "51",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "cholestyramine powder $4 \\mathrm{gm} /$ dose (Questran)",
+      "drug_tier": "51",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CHORIONIC GONADOTROPIN -chorionic gonadotropin for im inj 10000 unit",
+      "drug_tier": "37",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CIBINQO -ab
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 382 column 6 (char 10419)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "CREON -pancrelipase (lip-prot-amyl) dr cap 6000-19000-30000 unit",
+      "drug_tier": "61",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CREON -pancrelipase (lip-prot-amyl) dr cap 12000-38000-60000 unit",
+      "drug_tier": "61",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CREON -pancrelipase (lip-prot-amyl) dr cap 24000-76000-120000 unit",
+      "drug_tier": "61",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CREON -pancrelipase (lip-prot-amyl) dr cap 36000-114000-180000 unit",
+      "drug_tier": "61",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CRESEMBA -isavuconazonium sulfate cap 74.5 mg",
+      "drug_tier": "4",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CRESEMBA -isavuconazonium sulfate cap 186 mg",
+      "drug_tier": "4",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CROMOLYN SODIUM -cromolyn sodium ophth soln $4 \\%$",
+     
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 387 column 6 (char 10543)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "diclofenac sodium tab delayed release 50 mg",
+      "drug_tier": "89",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diclofenac sodium tab delayed release 75 mg",
+      "drug_tier": "89",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diclofenac w/ misoprostol tab delayed release 50-0.2 mg (Arthrotec 50)",
+      "drug_tier": "89",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diclofenac w/ misoprostol tab delayed release 75-0.2 mg (Arthrotec 75)",
+      "drug_tier": "89",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dicloxacillin sodium cap 250 mg",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dicloxacillin sodium cap 500 mg",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dicyclomine hcl cap 10 mg",
+      "drug_tier": "60",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dicycl
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 372 column 6 (char 10351)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "desipramine hcl tab 150 mg",
+      "drug_tier": "67",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "desipramine hcl tab 10 mg (Norpramin)",
+      "drug_tier": "67",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "desipramine hcl tab 25 mg (Norpramin)",
+      "drug_tier": "67",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "desloratadine tab 5 mg (Clarinex)",
+      "drug_tier": "55",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "DESMOPRESSIN ACETATE -desmopressin acetate nasal spray soln $0.01 \\%$",
+      "drug_tier": "37",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "desmopressin acetate inj $4 \\mathrm{mcg} / \\mathrm{ml}$ (Ddavp)",
+      "drug_tier": "37",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "desmopressin acetate nasal spray soln $0.01 \\%$ (refrigerated)",
+      "drug_tier": "37",
+      "drug_requirements": ""
+    },
+    {
+      
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 407 column 6 (char 10603)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "estradiol td patch weekly 0.025 mg/24 hr (Climara)",
+      "drug_tier": "26",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "estradiol td patch weekly 0.05 mg/24 hr (Climara)",
+      "drug_tier": "26",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "estradiol td patch weekly 0.06 mg/24 hr (Climara)",
+      "drug_tier": "26",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "estradiol td patch weekly 0.075 mg/24 hr (Climara)",
+      "drug_tier": "26",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "estradiol td patch weekly 0.1 mg/24 hr (Climara)",
+      "drug_tier": "26",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "estradiol td patch weekly 0.0375 mg/24 hr (37.5 mcg/24 hr ) (Climara)",
+      "drug_tier": "26",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "estradiol vaginal cream 0.01%",
+      "drug_tier": "65",
+      "drug_requirements": ""
+    },
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 382 column 6 (char 10609)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "fenofibrate tab 160 mg",
+      "drug_tier": "52",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fenofibrate tab 48 mg (Tricor)",
+      "drug_tier": "51",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fenofibrate tab 145 mg (Tricor)",
+      "drug_tier": "52",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fentanyl td patch 72hr 12 mcg/hr (Duragesic)",
+      "drug_tier": "85",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fentanyl td patch 72hr 25 mcg/hr (Duragesic)",
+      "drug_tier": "85",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fentanyl td patch 72hr 50 mcg/hr (Duragesic)",
+      "drug_tier": "85",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fentanyl td patch 72hr 75 mcg/hr (Duragesic)",
+      "drug_tier": "85",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fentanyl td patch 72hr 100 mcg/hr (Duragesic)",
+      "dru
+==================================================
+
+=== JSON Parse Error ===
+Error: Unterminated string starting at: line 319 column 20 (char 9997)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "HAEGARDA -c1 esterase inhibitor (human) for subcutaneous inj 3000 unit",
+      "drug_tier": "109",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "halcinonide cream $0.1 \\%$ (Halog)",
+      "drug_tier": "120",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "halobetasol propionate cream $0.05 \\%$",
+      "drug_tier": "120",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "haloperidol decanoate im soln $100 \\mathrm{mg} / \\mathrm{ml}$ (Haldol decanoate 100)",
+      "drug_tier": "71",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "haloperidol lactate inj $5 \\mathrm{mg} / \\mathrm{ml}$ (Haldol)",
+      "drug_tier": "71",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "haloperidol lactate oral conc $2 \\mathrm{mg} / \\mathrm{ml}$",
+      "drug_tier": "71",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "haloperidol tab 0.5 mg",
+      "drug_t
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 392 column 6 (char 10823)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "HUMIRA PEN-CD/UC/HS START -adalimumab autoinjector kit 80 mg/0.8 ml",
+      "drug_tier": "$80",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "HUMIRA PEN-PS/UV STARTER -adalimumab auto- injector kit 80 mg/0.8 ml & 40 mg/0.4 ml",
+      "drug_tier": "$80",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "HUMULIN 70/30 -insulin nph isophane & regular human inj 100 unit/ml (70-30)",
+      "drug_tier": null,
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "HUMULIN 70/30 KWIKPEN -insulin nph & regular susp pen-inj 100 unit/ml (70-30)",
+      "drug_tier": null,
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "HUMULIN N -insulin nph (human) (isophane) inj 100 unit/ ml",
+      "drug_tier": null,
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "HUMULIN N KWIKPEN -insulin nph (human) (isophane) susp pen-injector 100 unit/ml",
+      "drug_tier": null,
+      "drug_requirem
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 362 column 6 (char 10462)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "fenofibrate tab 160 mg",
+      "drug_tier": "52",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fenofibrate tab 48 mg (Tricor)",
+      "drug_tier": "51",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fenofibrate tab 145 mg (Tricor)",
+      "drug_tier": "52",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fentanyl td patch 72hr 12 mcg/hr (Duragesic)",
+      "drug_tier": "85",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fentanyl td patch 72hr 25 mcg/hr (Duragesic)",
+      "drug_tier": "85",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fentanyl td patch 72hr 50 mcg/hr (Duragesic)",
+      "drug_tier": "85",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fentanyl td patch 72hr 75 mcg/hr (Duragesic)",
+      "drug_tier": "85",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fentanyl td patch 72hr 100 mcg/hr (Duragesic)",
+      "dru
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 317 column 6 (char 9883)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "HAEGARDA -c1 esterase inhibitor (human) for subcutaneous inj 3000 unit",
+      "drug_tier": "109",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "halcinonide cream $0.1 \\%$ (Halog)",
+      "drug_tier": "120",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "halobetasol propionate cream $0.05 \\%$",
+      "drug_tier": "120",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "haloperidol decanoate im soln $100 \\mathrm{mg} / \\mathrm{ml}$ (Haldol decanoate 100)",
+      "drug_tier": "71",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "haloperidol lactate inj $5 \\mathrm{mg} / \\mathrm{ml}$ (Haldol)",
+      "drug_tier": "71",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "haloperidol lactate oral conc $2 \\mathrm{mg} / \\mathrm{ml}$",
+      "drug_tier": "71",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "haloperidol tab 0.5 mg",
+      "drug_tier": "71",
+
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 382 column 6 (char 10428)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "HUMIRA PEN-CD/UC/HS START -adalimumab autoinjector kit 80 mg/0.8 ml",
+      "drug_tier": "89",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "HUMIRA PEN-PS/UV STARTER -adalimumab auto- injector kit 80 mg/0.8 ml & 40 mg/0.4 ml",
+      "drug_tier": "89",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "HUMULIN 70/30 -insulin nph isophane & regular human inj 100 unit/ml (70-30)",
+      "drug_tier": "33",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "HUMULIN 70/30 KWIKPEN -insulin nph & regular susp pen-inj 100 unit/ml (70-30)",
+      "drug_tier": "33",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "HUMULIN N -insulin nph (human) (isophane) inj 100 unit/ ml",
+      "drug_tier": "33",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "HUMULIN N KWIKPEN -insulin nph (human) (isophane) susp pen-injector 100 unit/ml",
+      "drug_tier": "33",
+      "drug_requirements": ""
+  
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 367 column 6 (char 10400)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "JUXTAPID -lomitapide mesylate cap 5 mg (base equiv)",
+      "drug_tier": "52",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JUXTAPID -lomitapide mesylate cap 10 mg (base equiv)",
+      "drug_tier": "52",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JUXTAPID -lomitapide mesylate cap 20 mg (base equiv)",
+      "drug_tier": "52",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JUXTAPID -lomitapide mesylate cap 30 mg (base equiv)",
+      "drug_tier": "52",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JYNARQUE -tolvaptan tab 15 mg",
+      "drug_tier": "38",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JYNARQUE -tolvaptan tab 30 mg",
+      "drug_tier": "38",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JYNARQUE -tolvaptan tab therapy pack $30 \\& 15 \\mathrm{mg}$",
+      "drug_tier": "38",
+      "drug_requirements": ""
+    },
+    {
+      "drug
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 372 column 6 (char 10371)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "LAMICTAL XR -lamotrigine tab er 24hr 50 (14) & 100 mg(14) & 200 mg(7) kit",
+      "drug_tier": "95",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LAMICTAL XR -lamotrigine tab er 24hr 21 x 25 mg & 7 x 50 mg titration kit",
+      "drug_tier": "95",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lamivudine oral soln 10 mg/ml (Epivir)",
+      "drug_tier": "6",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lamivudine tab 150 mg (Epivir)",
+      "drug_tier": "6",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lamivudine tab 300 mg (Epivir)",
+      "drug_tier": "6",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lamivudine tab 100 mg (hbv) (Epivir hbv)",
+      "drug_tier": "6",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lamivudine-zidovudine tab 150-300 mg (Combivir)",
+      "drug_tier": "6",
+      "drug_requirements": ""
+    },
+    {
+      "drug
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 387 column 6 (char 10466)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "lithium carbonate cap 150 mg (Lithium carbonate)",
+      "drug_tier": "72",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lithium carbonate cap 600 mg (Lithium carbonate)",
+      "drug_tier": "72",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LITHIUM CARBONATE -lithium carbonate cap 150 mg",
+      "drug_tier": "72",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LITHIUM CARBONATE -lithium carbonate cap 300 mg",
+      "drug_tier": "72",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LITHIUM CARBONATE -lithium carbonate cap 600 mg",
+      "drug_tier": "72",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lithium carbonate tab er 450 mg",
+      "drug_tier": "72",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lithium carbonate tab er 300 mg (Lithobid)",
+      "drug_tier": "72",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lithium
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 402 column 6 (char 10616)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "MESTINON -pyridostigmine bromide oral soln 60 mg/5 ml",
+      "drug_tier": "101",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metaxalone tab 400 mg",
+      "drug_tier": "100",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metaxalone tab 800 mg (Skelaxin)",
+      "drug_tier": "100",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metformin hcl tab er 24 hr 500 mg",
+      "drug_tier": "30",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metformin hcl tab er 24 hr 750 mg",
+      "drug_tier": "30",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metformin hcl tab 500 mg",
+      "drug_tier": "30",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metformin hcl tab 850 mg",
+      "drug_tier": "30",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metformin hcl tab 1000 mg",
+      "drug_tier": "30",
+      "drug_requirements": ""
+    },
+    
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 367 column 6 (char 10400)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "JUXTAPID -lomitapide mesylate cap 5 mg (base equiv)",
+      "drug_tier": "52",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JUXTAPID -lomitapide mesylate cap 10 mg (base equiv)",
+      "drug_tier": "52",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JUXTAPID -lomitapide mesylate cap 20 mg (base equiv)",
+      "drug_tier": "52",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JUXTAPID -lomitapide mesylate cap 30 mg (base equiv)",
+      "drug_tier": "52",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JYNARQUE -tolvaptan tab 15 mg",
+      "drug_tier": "38",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JYNARQUE -tolvaptan tab 30 mg",
+      "drug_tier": "38",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JYNARQUE -tolvaptan tab therapy pack $30 \\& 15 \\mathrm{mg}$",
+      "drug_tier": "38",
+      "drug_requirements": ""
+    },
+    {
+      "drug
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 372 column 6 (char 10371)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "LAMICTAL XR -lamotrigine tab er 24hr 50 (14) & 100 mg(14) & 200 mg(7) kit",
+      "drug_tier": "95",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LAMICTAL XR -lamotrigine tab er 24hr 21 x 25 mg & 7 x 50 mg titration kit",
+      "drug_tier": "95",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lamivudine oral soln 10 mg/ml (Epivir)",
+      "drug_tier": "6",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lamivudine tab 150 mg (Epivir)",
+      "drug_tier": "6",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lamivudine tab 300 mg (Epivir)",
+      "drug_tier": "6",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lamivudine tab 100 mg (hbv) (Epivir hbv)",
+      "drug_tier": "6",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lamivudine-zidovudine tab 150-300 mg (Combivir)",
+      "drug_tier": "6",
+      "drug_requirements": ""
+    },
+    {
+      "drug
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 387 column 6 (char 10466)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "lithium carbonate cap 150 mg (Lithium carbonate)",
+      "drug_tier": "72",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lithium carbonate cap 600 mg (Lithium carbonate)",
+      "drug_tier": "72",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LITHIUM CARBONATE -lithium carbonate cap 150 mg",
+      "drug_tier": "72",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LITHIUM CARBONATE -lithium carbonate cap 300 mg",
+      "drug_tier": "72",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LITHIUM CARBONATE -lithium carbonate cap 600 mg",
+      "drug_tier": "72",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lithium carbonate tab er 450 mg",
+      "drug_tier": "72",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lithium carbonate tab er 300 mg (Lithobid)",
+      "drug_tier": "72",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lithium
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 402 column 6 (char 10594)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "MESTINON -pyridostigmine bromide oral soln 60 mg/5ml",
+      "drug_tier": "101",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metaxalone tab 400 mg",
+      "drug_tier": "100",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metaxalone tab 800 mg (Skelaxin)",
+      "drug_tier": "100",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metformin hcl tab er 24hr 500 mg",
+      "drug_tier": "30",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metformin hcl tab er 24hr 750 mg",
+      "drug_tier": "30",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metformin hcl tab 500 mg",
+      "drug_tier": "30",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metformin hcl tab 850 mg",
+      "drug_tier": "30",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metformin hcl tab 1000 mg",
+      "drug_tier": "30",
+      "drug_requirements": ""
+    },
+    {
+ 
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 357 column 6 (char 10169)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "NEORAL -cyclosporine modified cap 100 mg",
+      "drug_tier": "126",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NEORAL -cyclosporine modified oral soln $100 \\mathrm{mg} / \\mathrm{ml}$",
+      "drug_tier": "126",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NEO-SYNALAR -neomycin sulfate-fluocinolone acetonide cream 0.5-0.025%",
+      "drug_tier": "121",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NERLYNX -neratinib maleate tab 40 mg (base equivalent)",
+      "drug_tier": "20",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NEUPRO -rotigotine td patch $24 \\mathrm{hr} 1 \\mathrm{mg} / 24 \\mathrm{hr}$",
+      "drug_tier": "99",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NEUPRO -rotigotine td patch $24 \\mathrm{hr} 2 \\mathrm{mg} / 24 \\mathrm{hr}$",
+      "drug_tier": "99",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NEUPRO -rotig
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 327 column 6 (char 10078)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "NOVOLOG PENFILL -insulin aspart soln cartridge 100 unit/ml",
+      "drug_tier": "32",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NOVOLOG RELION -insulin aspart inj soln 100 unit/ ml",
+      "drug_tier": "32",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NOVOSEVEN RT -coagulation factor viia (recomb) for inj 1 mg ( 1000 mcg )",
+      "drug_tier": "111",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NOVOSEVEN RT -coagulation factor viia (recomb) for inj 2 mg ( 2000 mcg )",
+      "drug_tier": "111",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NOVOSEVEN RT -coagulation factor viia (recomb) for inj 5 mg ( 5000 mcg )",
+      "drug_tier": "111",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NOVOSEVEN RT -coagulation factor viia (recomb) for inj 8 mg ( 8000 mcg )",
+      "drug_tier": "111",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NOXAFI
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 367 column 6 (char 10434)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "OFEV -nintedanib esylate cap 100 mg (base equivalent)",
+      "drug_tier": "59",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "OFEV -nintedanib esylate cap 150 mg (base equivalent)",
+      "drug_tier": "59",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "OFLOXACIN -ofloxacin tab 300 mg",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "OFLOXACIN -ofloxacin tab 400 mg",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ofloxacin ophth soln $0.3 \\%$ (Ocuflox)",
+      "drug_tier": "115",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ofloxacin otic soln $0.3 \\%$",
+      "drug_tier": "116",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "OGSIVEO -nirogacestat hydrobromide tab 50 mg",
+      "drug_tier": "20",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "OGSIVEO -nirogacestat hydrobromide t
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 392 column 6 (char 10510)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "PERINDOPRIL ERBUMINE -perindopril erbumine tab 2 mg",
+      "drug_tier": "49",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PERINDOPRIL ERBUMINE -perindopril erbumine tab 8 mg",
+      "drug_tier": "49",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "perindopril erbumine tab 4 mg",
+      "drug_tier": "49",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "permethrin cream 5% (Elimite)",
+      "drug_tier": "121",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PERPHENAZINE/AMITRIPTYLIN -perphenazine- amitriptyline tab 2-10 mg.",
+      "drug_tier": "82",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PERPHENAZINE/AMITRIPTYLIN -perphenazine- amitriptyline tab 2-25 mg.",
+      "drug_tier": "82",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PERPHENAZINE/AMITRIPTYLIN -perphenazine- amitriptyline tab 4-10 mg.",
+      "drug_tier": "82",
+      "drug_requir
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 397 column 6 (char 10672)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "potassium chloride tab er 20 meq ( 1500 mg ) (K-tab)",
+      "drug_tier": "101",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "potassium citrate tab er 5 meq ( 540 mg ) (Urocit-k 5)",
+      "drug_tier": "65",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "potassium citrate tab er 10 meq ( 1080 mg ) (Urocit-k 10)",
+      "drug_tier": "65",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "potassium citrate tab er 15 meq ( 1620 mg ) (Urocit-k 15)",
+      "drug_tier": "65",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PRADAXA -dabigatran etexilate mesylate cap 75 mg (etexilate base eq)",
+      "drug_tier": "105",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PRADAXA -dabigatran etexilate mesylate cap 110 mg (etexilate base eq)",
+      "drug_tier": "105",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PRADAXA -dabigatran etexilate mesylate cap 150 m
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 402 column 6 (char 10740)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "primaquine phosphate tab 26.3 mg ( 15 mg base) (Primaquine phosphate)",
+      "drug_tier": "9",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PRIMIDONE -primidone tab 125 mg",
+      "drug_tier": "96",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "primidone tab 50 mg (Mysoline)",
+      "drug_tier": "96",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "primidone tab 250 mg (Mysoline)",
+      "drug_tier": "96",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PRIORIX -measles-mumps-rubella virus vaccines for subcutaneous susp.",
+      "drug_tier": "12",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "probenecid tab 500 mg",
+      "drug_tier": "93",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "prochlorperazine edisylate inj $10 mg/2ml",
+      "drug_tier": "73",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "prochlorperazine maleate ta
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 392 column 6 (char 10486)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "NEORAL -cyclosporine modified cap 100 mg",
+      "drug_tier": "126",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NEORAL -cyclosporine modified oral soln $100 mg / ml",
+      "drug_tier": "126",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NEO-SYNALAR -neomycin sulfate-fluocinolone acetonide cream 0.5-0.025%",
+      "drug_tier": "121",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NERLYNX -neratinib maleate tab 40 mg (base equivalent)",
+      "drug_tier": "20",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NEUPRO -rotigotine td patch $24 hr 1 mg/24 hr",
+      "drug_tier": "99",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NEUPRO -rotigotine td patch $24 hr 2 mg/24 hr",
+      "drug_tier": "99",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NEUPRO -rotigotine td patch $24 hr 3 mg/24 hr",
+      "drug_tier": "99",
+      "drug_requirements": 
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 397 column 6 (char 10635)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "PERINDOPRIL ERBUMINE -perindopril erbumine tab 2 mg",
+      "drug_tier": "49",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PERINDOPRIL ERBUMINE -perindopril erbumine tab 8 mg",
+      "drug_tier": "49",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "perindopril erbumine tab 4 mg",
+      "drug_tier": "49",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "permethrin cream 5% (Elimite)",
+      "drug_tier": "121",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PERPHENAZINE/AMITRIPTYLIN -perphenazine- amitriptyline tab 2-10 mg",
+      "drug_tier": "82",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PERPHENAZINE/AMITRIPTYLIN -perphenazine- amitriptyline tab 2-25 mg",
+      "drug_tier": "82",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PERPHENAZINE/AMITRIPTYLIN -perphenazine- amitriptyline tab 4-10 mg",
+      "drug_tier": "82",
+      "drug_requireme
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 397 column 6 (char 10665)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "potassium chloride tab er 20 meq ( 1500 mg ) (K-tab)",
+      "drug_tier": "101",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "potassium citrate tab er 5 meq ( 540 mg ) (Urocit-k 5)",
+      "drug_tier": "65",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "potassium citrate tab er 10 meq ( 1080 mg ) (Urocit-k 10)",
+      "drug_tier": "65",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "potassium citrate tab er 15 meq ( 1620 mg ) (Urocit-k 15)",
+      "drug_tier": "65",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PRADAXA -dabigatran etexilate mesylate cap 75 mg (etexilate base eq)",
+      "drug_tier": "105",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PRADAXA -dabigatran etexilate mesylate cap 110 mg (etexilate base eq)",
+      "drug_tier": "105",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PRADAXA -dabigatran etexilate mesylate cap 150 m
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 402 column 6 (char 10691)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "primaquine phosphate tab 26.3 mg (15 mg base) (Primaquine phosphate)",
+      "drug_tier": "9",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PRIMIDONE -primidone tab 125 mg",
+      "drug_tier": "96",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "primidone tab 50 mg (Mysoline)",
+      "drug_tier": "96",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "primidone tab 250 mg (Mysoline)",
+      "drug_tier": "96",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PRIORIX -measles-mumps-rubella virus vaccines for subcutaneous susp.",
+      "drug_tier": "12",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "probenecid tab 500 mg",
+      "drug_tier": "93",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "prochlorperazine edisylate inj 10 mg/2ml",
+      "drug_tier": "73",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "prochlorperazine maleate tab 
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 372 column 6 (char 10444)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "quetiapine fumarate tab er 24 hr 400 mg (Seroquel xr)",
+      "drug_tier": "73",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "quetiapine fumarate tab 25 mg (Seroquel)",
+      "drug_tier": "73",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "quetiapine fumarate tab 50 mg (Seroquel)",
+      "drug_tier": "73",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "quetiapine fumarate tab 100 mg (Seroquel)",
+      "drug_tier": "73",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "quetiapine fumarate tab 200 mg (Seroquel)",
+      "drug_tier": "73",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "quetiapine fumarate tab 300 mg (Seroquel)",
+      "drug_tier": "73",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "quetiapine fumarate tab 400 mg (Seroquel)",
+      "drug_tier": "73",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "QUINAPRIL/HYDROCHLOR
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 397 column 6 (char 10714)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "REVCOVI -elapegademase-lvlr im soln 2.4 mg/1.5 ml (1.6 mg/ml)",
+      "drug_tier": "40",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "REVLIMID -lenalidomide cap 5 mg",
+      "drug_tier": "126",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "REVLIMID -lenalidomide cap 10 mg",
+      "drug_tier": "126",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "REVLIMID -lenalidomide cap 15 mg",
+      "drug_tier": "126",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "REVLIMID -lenalidomide cap 20 mg",
+      "drug_tier": "126",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "REVLIMID -lenalidomide cap 25 mg",
+      "drug_tier": "126",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "REVLIMID -lenalidomide caps 2.5 mg",
+      "drug_tier": "126",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "REVUFORJ -revumenib citrate tab 25 mg",
+      "drug_tier"
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 392 column 6 (char 10528)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ropinirole hydrochloride tab 4 mg",
+      "drug_tier": "99",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ropinirole hydrochloride tab 5 mg",
+      "drug_tier": "99",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "rosuvastatin calcium tab 5 mg (Crestor)",
+      "drug_tier": "52",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "rosuvastatin calcium tab 10 mg (Crestor)",
+      "drug_tier": "52",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "rosuvastatin calcium tab 20 mg (Crestor)",
+      "drug_tier": "52",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "rosuvastatin calcium tab 40 mg (Crestor)",
+      "drug_tier": "52",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ROTARIX -rotavirus vaccine, live oral susp",
+      "drug_tier": "12",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ROTATEQ -rotavirus vaccine, live oral pentavalent 
+==================================================
+
+=== JSON Parse Error ===
+Error: Unterminated string starting at: line 349 column 20 (char 10224)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "SOLTAMOX -tamoxifen citrate oral soln $10 \\mathrm{mg} / 5 \\mathrm{ml}$ (base equivalent)",
+      "drug_tier": "21",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SOMAVERT -pegvisomant for inj 10 mg (as protein)",
+      "drug_tier": "41",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SOMAVERT -pegvisomant for inj 15 mg (as protein)",
+      "drug_tier": "41",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SOMAVERT -pegvisomant for inj 20 mg (as protein)",
+      "drug_tier": "41",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SOMAVERT -pegvisomant for inj 25 mg (as protein)",
+      "drug_tier": "41",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SOMAVERT -pegvisomant for inj 30 mg (as protein)",
+      "drug_tier": "41",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sorafenib tosylate tab 200 mg (base equivalent) (Nexavar)",
+      "drug_tier":
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 412 column 6 (char 10581)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "TAVALISSE -fostamatinib disodium tab 150 mg (base equivalent)",
+      "drug_tier": "113",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tazarotene cream 0.05% (Tazorac)",
+      "drug_tier": "121",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tazarotene cream 0.1% (Tazorac)",
+      "drug_tier": "121",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tazarotene gel 0.05% (Tazorac)",
+      "drug_tier": "122",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tazarotene gel 0.1% (Tazorac)",
+      "drug_tier": "122",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "TAZVERIK -tazemetostat hbr tab 200 mg",
+      "drug_tier": "22",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "TEGRETOL -carbamazepine susp 100 mg/5ml",
+      "drug_tier": "97",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "TEGRETOL -carbamazepine tab 200 mg",
+      "drug_tier
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 392 column 6 (char 10528)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ropinirole hydrochloride tab 4 mg",
+      "drug_tier": "99",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ropinirole hydrochloride tab 5 mg",
+      "drug_tier": "99",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "rosuvastatin calcium tab 5 mg (Crestor)",
+      "drug_tier": "52",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "rosuvastatin calcium tab 10 mg (Crestor)",
+      "drug_tier": "52",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "rosuvastatin calcium tab 20 mg (Crestor)",
+      "drug_tier": "52",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "rosuvastatin calcium tab 40 mg (Crestor)",
+      "drug_tier": "52",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ROTARIX -rotavirus vaccine, live oral susp",
+      "drug_tier": "12",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ROTATEQ -rotavirus vaccine, live oral pentavalent 
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 372 column 6 (char 10432)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "quetiapine fumarate tab er 24 hr 400 mg (Seroquel xr)",
+      "drug_tier": "73",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "quetiapine fumarate tab 25 mg (Seroquel)",
+      "drug_tier": "73",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "quetiapine fumarate tab 50 mg (Seroquel)",
+      "drug_tier": "73",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "quetiapine fumarate tab 100 mg (Seroquel)",
+      "drug_tier": "73",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "quetiapine fumarate tab 200 mg (Seroquel)",
+      "drug_tier": "73",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "quetiapine fumarate tab 300 mg (Seroquel)",
+      "drug_tier": "73",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "quetiapine fumarate tab 400 mg (Seroquel)",
+      "drug_tier": "73",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "QUINAPRIL/HYDROCHLOR
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 397 column 6 (char 10714)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "REVCOVI -elapegademase-lvlr im soln 2.4 mg/1.5 ml (1.6 mg/ml)",
+      "drug_tier": "40",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "REVLIMID -lenalidomide cap 5 mg",
+      "drug_tier": "126",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "REVLIMID -lenalidomide cap 10 mg",
+      "drug_tier": "126",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "REVLIMID -lenalidomide cap 15 mg",
+      "drug_tier": "126",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "REVLIMID -lenalidomide cap 20 mg",
+      "drug_tier": "126",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "REVLIMID -lenalidomide cap 25 mg",
+      "drug_tier": "126",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "REVLIMID -lenalidomide caps 2.5 mg",
+      "drug_tier": "126",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "REVUFORJ -revumenib citrate tab 25 mg",
+      "drug_tier"
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 347 column 6 (char 10227)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "SOLTAMOX -tamoxifen citrate oral soln $10 \\mathrm{mg} / 5 \\mathrm{ml}$ (base equivalent)",
+      "drug_tier": "21",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SOMAVERT -pegvisomant for inj 10 mg (as protein)",
+      "drug_tier": "41",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SOMAVERT -pegvisomant for inj 15 mg (as protein)",
+      "drug_tier": "41",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SOMAVERT -pegvisomant for inj 20 mg (as protein)",
+      "drug_tier": "41",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SOMAVERT -pegvisomant for inj 25 mg (as protein)",
+      "drug_tier": "41",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SOMAVERT -pegvisomant for inj 30 mg (as protein)",
+      "drug_tier": "41",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sorafenib tosylate tab 200 mg (base equivalent) (Nexavar)",
+      "drug_tier":
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 407 column 6 (char 10509)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "TAVALISSE -fostamatinib disodium tab 150 mg (base equivalent)",
+      "drug_tier": "113",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tazarotene cream $0.05 \\%$ (Tazorac)",
+      "drug_tier": "121",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tazarotene cream $0.1 \\%$ (Tazorac)",
+      "drug_tier": "121",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tazarotene gel $0.05 \\%$ (Tazorac)",
+      "drug_tier": "122",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tazarotene gel $0.1 \\%$ (Tazorac)",
+      "drug_tier": "122",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "TAZVERIK -tazemetostat hbr tab 200 mg",
+      "drug_tier": "22",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "TEGRETOL -carbamazepine susp $100 mg/5ml",
+      "drug_tier": "97",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "TEGRETOL -carbamazepine tab 200 
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 367 column 6 (char 10176)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "tramadol hcl tab er 24hr 200 mg",
+      "drug_tier": "87",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tramadol hcl tab er 24hr 300 mg",
+      "drug_tier": "87",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tramadol hcl tab 50 mg (Ultram)",
+      "drug_tier": "88",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "trandolapril tab 1 mg",
+      "drug_tier": "49",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "trandolapril tab 2 mg",
+      "drug_tier": "50",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "trandolapril tab 4 mg",
+      "drug_tier": "50",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tranexamic acid tab 650 mg (Lysteda)",
+      "drug_tier": "106",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tranylcypromine sulfate tab 10 mg (Parnate)",
+      "drug_tier": "69",
+      "drug_requirements": ""
+    },
+    {
+      "dru
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 372 column 6 (char 10353)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "varenicline tartrate tab $11 \\times 0.5 \\mathrm{mg} \\& 42 \\times 1 \\mathrm{mg}$ start pack",
+      "drug_tier": "84",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "VARIVAX -varicella virus vac live for inj 1350 pfu/0.5ml",
+      "drug_tier": "12",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "VARUBI -rolapitant hcl tab therapy pack $2 \\times 90 \\mathrm{mg}$ (base equiv)",
+      "drug_tier": "61",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "VASCEPA -icosapent ethyl cap 0.5 gm",
+      "drug_tier": "52",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "VASCEPA -icosapent ethyl cap 1 gm",
+      "drug_tier": "52",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "VAXELIS -diph-tet tox-ac pert ad-polio ipv-hib-hepatitis b recmb susp",
+      "drug_tier": "13",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "VAXELIS -diph-tet tox-ac pert ad-polio i
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 342 column 6 (char 9932)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "XYNTHA SOLOFUSE -antihemophil fact rcmb (bdd-rfviii,mor) for inj kit 250 unit",
+      "drug_tier": "113",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "XYNTHA SOLOFUSE -antihemophil fact rcmb (bdd-rfviii,mor) for inj kit 500 unit",
+      "drug_tier": "113",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "XYWAV -calcium, mag, potassium, & sod oxybates oral soln $500 \\mathrm{mg} / \\mathrm{ml}$",
+      "drug_tier": "84",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "YESINTEK -ustekinumab-kfce soln prefilled syringe 45 \\mathrm{mg} / 0.5 \\mathrm{ml}$",
+      "drug_tier": "122",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "YESINTEK -ustekinumab-kfce soln prefilled syringe 90 \\mathrm{mg} / \\mathrm{ml}$",
+      "drug_tier": "122",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "YESINTEK -ustekinumab-kfce subcutaneous soln 45 \\mathrm{mg} / 0.5 \\mathrm{ml}$",
+  
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 377 column 6 (char 10291)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "tramadol hcl tab er 24hr 200 mg",
+      "drug_tier": "87",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tramadol hcl tab er 24hr 300 mg",
+      "drug_tier": "87",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tramadol hcl tab 50 mg (Ultram)",
+      "drug_tier": "88",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "trandolapril tab 1 mg",
+      "drug_tier": "49",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "trandolapril tab 2 mg",
+      "drug_tier": "50",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "trandolapril tab 4 mg",
+      "drug_tier": "50",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tranexamic acid tab 650 mg (Lysteda)",
+      "drug_tier": "106",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tranylcypromine sulfate tab 10 mg (Parnate)",
+      "drug_tier": "69",
+      "drug_requirements": ""
+    },
+    {
+      "dru
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 387 column 6 (char 10539)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "varenicline tartrate tab 0.5mg & 1mg start pack",
+      "drug_tier": "84",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "VARIVAX -varicella virus vac live for inj 1350 pfu/0.5ml",
+      "drug_tier": "12",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "VARUBI -rolapitant hcl tab therapy pack 2 x 90mg (base equiv)",
+      "drug_tier": "61",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "VASCEPA -icosapent ethyl cap 0.5 gm",
+      "drug_tier": "52",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "VASCEPA -icosapent ethyl cap 1 gm",
+      "drug_tier": "52",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "VAXELIS -diph-tet tox-ac pert ad-polio ipv-hib-hepatitis b recmb susp",
+      "drug_tier": "13",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "VAXELIS -diph-tet tox-ac pert ad-polio ipv-hib-hep b rec susp pre syr",
+      "drug_tier": "13",
+      "dru
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 517 column 6 (char 10981)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "abacavir sulfate",
+      "drug_tier": "21",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "abacavir sulfate-lamivudine",
+      "drug_tier": "24",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Abigale Lo",
+      "drug_tier": "88",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "abiraterone acetate",
+      "drug_tier": "32,33",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "acamprosate calcium",
+      "drug_tier": "47",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "acarbose",
+      "drug_tier": "68",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ACCU-CHEK AVIVA PLUS",
+      "drug_tier": "85",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ACCU-CHEK GUIDE TEST",
+      "drug_tier": "85",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ACCU-CHEK SMARTVIEW",
+      "drug_tier": "85",
+      "drug_requirements": ""
+    },
+
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 517 column 6 (char 11004)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "balsalazide disodium",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_tier": "94",
       "drug_requirements": ""
     },
     {
+<<<<<<< HEAD
       "drug_name": "bupropion hcl er (smoking det)",
       "drug_tier": "46, 94",
       "drug_requirements": ""
@@ -350229,10 +352420,14 @@ Original String: {
     },
     {
       "drug_name": "CAMZYOS",
+=======
+      "drug_name": "Balziva",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_tier": "74",
       "drug_requirements": ""
     },
     {
+<<<<<<< HEAD
       "drug_name": "CANASA",
       "drug_tier": "172",
       "drug_requirements": ""
@@ -355909,10 +358104,130 @@ Original String: {
     },
     {
       "drug_name": "KRINTAFEL",
+=======
+      "drug_name": "BARACLUDE",
+      "drug_tier": "28",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BASAGLAR KWIKPEN",
+      "drug_tier": "70",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BASAGLAR TEMPO PEN",
+      "drug_tier": "70",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BAXDELA",
+      "drug_tier": "28",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BD VEO INSULIN SYR ULTRAFINE",
+      "drug_tier": "85",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BELSOMRA",
+      "drug_tier": "60",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "benazepril hcl",
+      "drug_tier": "38",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "benazepr
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 527 column 6 (char 10995)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "EMCYT",
+      "drug_tier": "31",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "EMGALITY",
+      "drug_tier": "61",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "EMGALITY (300 MG DOSE)",
+      "drug_tier": "61",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "emtricitabine",
+      "drug_tier": "22",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "emtricitabine-tenofovir df",
+      "drug_tier": "24,25",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "emtricitab-rilpivir-tenofov $d f$",
+      "drug_tier": "25",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "EMTRIVA",
+      "drug_tier": "22",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "EMVERM",
+      "drug_tier": "20",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Emzahh",
+      "drug_tier": "76",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "enalap
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 517 column 6 (char 11045)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "clotrimazole-betamethasone",
+      "drug_tier": "121",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clozapine",
+      "drug_tier": "54",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "COARTEM",
+      "drug_tier": "21",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "codeine sulfate",
+      "drug_tier": "15",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "colchicine",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_tier": "13",
       "drug_requirements": ""
     },
     {
+<<<<<<< HEAD
       "drug_name": "KRYSTEXXA",
       "drug_tier": "236",
       "drug_requirements": ""
@@ -357485,25 +359800,180 @@ Original String: {
     {
       "drug_name": "MIRALAX",
       "drug_tier": "Tier 1",
+=======
+      "drug_name": "colchicine-probenecid",
+      "drug_tier": "13",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "colesevelam hcl",
+      "drug_tier": "40",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "colestipol hcl",
+      "drug_tier": "40",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Compro",
+      "drug_tier": "93",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "condoms",
+ 
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 512 column 6 (char 10889)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "LENVIMA (10 MG DAILY DOSE)",
+      "drug_tier": "35",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LENVIMA (12 MG DAILY DOSE)",
+      "drug_tier": "35",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LENVIMA (14 MG DAILY DOSE)",
+      "drug_tier": "35",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LENVIMA (18 MG DAILY DOSE)",
+      "drug_tier": "35",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LENVIMA (20 MG DAILY DOSE)",
+      "drug_tier": "35",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LENVIMA (24 MG DAILY DOSE)",
+      "drug_tier": "36",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LENVIMA (4 MG DAILY DOSE)",
+      "drug_tier": "36",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LENVIMA (8 MG DAILY DOSE)",
+      "drug_tier": "36",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Lessina",
+      "dru
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 517 column 6 (char 11045)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ondansetron",
+      "drug_tier": "93",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ondansetron hcl",
+      "drug_tier": "93",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ONGENTYS",
+      "drug_tier": "53",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "OPCICON ONE-STEP",
+      "drug_tier": "82",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "OPILL",
+      "drug_tier": "82",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "OPSUMIT",
+      "drug_tier": "46",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "OPTION 2",
+      "drug_tier": "82",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "OPTIONS GYNOL II CONTRACEPTIVE",
+      "drug_tier": "99",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Oralone",
+      "drug_tier": "126",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ORAVIG",
+      "drug_tier":
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 512 column 6 (char 10875)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "minoxidil",
+      "drug_tier": "45",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Minzoya",
+      "drug_tier": "80",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_requirements": ""
     },
     {
       "drug_name": "MIRCERA",
+<<<<<<< HEAD
       "drug_tier": "Specialty Tier",
+=======
+      "drug_tier": "102",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_requirements": ""
     },
     {
       "drug_name": "MIRENA (52 MG)",
+<<<<<<< HEAD
       "drug_tier": "Tier 3",
       "drug_requirements": "PA"
     },
     {
       "drug_name": "mirtazapine",
       "drug_tier": "Tier 1",
+=======
+      "drug_tier": "80",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mirtazapine",
+      "drug_tier": "51",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_requirements": ""
     },
     {
       "drug_name": "misoprostol",
+<<<<<<< HEAD
       "drug_tier": "Tier 1",
       "drug_requirements": ""
     },
@@ -357530,10 +360000,14 @@ Original String: {
     {
       "drug_name": "mitoxantrone hcl",
       "drug_tier": "Specialty Tier",
+=======
+      "drug_tier": "96",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_requirements": ""
     },
     {
       "drug_name": "MIUDELLA INTRAUTERINE COPPER",
+<<<<<<< HEAD
       "drug_tier": "Tier 3",
       "drug_requirements": ""
     },
@@ -357580,10 +360054,14 @@ Original String: {
     {
       "drug_name": "MOBILE LANCETS 30G",
       "drug_tier": "Tier 1",
+=======
+      "drug_tier": "80",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_requirements": ""
     },
     {
       "drug_name": "modafinil",
+<<<<<<< HEAD
       "drug_tier": "Tier 2",
       "drug_requirements": "PA, QL"
     },
@@ -357595,10 +360073,19 @@ Original String: {
     {
       "drug_name": "molindone hcl",
       "drug_tier": "Tier 2",
+=======
+      "drug_tier": "65",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "moexipril hcl",
+      "drug_tier": "38",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_requirements": ""
     },
     {
       "drug_name": "mometasone furoate",
+<<<<<<< HEAD
       "drug_tier": "Tier 1",
       "drug_requirements": ""
     },
@@ -377259,10 +379746,22 @@ Original String: {
     },
     {
       "drug_name": "VIVOTIF DR CAP",
+=======
+    
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 512 column 6 (char 10933)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "glycopyrrolate",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_tier": "92",
       "drug_requirements": ""
     },
     {
+<<<<<<< HEAD
       "drug_name": "VIZIMPRO 15MG TAB",
       "drug_tier": "40",
       "drug_requirements": ""
@@ -377424,15 +379923,48 @@ Original String: {
     },
     {
       "drug_name": "wixela 100-50mcg powder inhaler",
+=======
+      "drug_name": "GLYXAMBI",
+      "drug_tier": "72",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "GOJJI BLOOD KETONE",
+      "drug_tier": "86",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "TEST",
+      "drug_tier": "86",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "goodsense aspirin",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_tier": "20",
       "drug_requirements": ""
     },
     {
+<<<<<<< HEAD
       "drug_name": "wixela 250-50mcg powder inhaler",
+=======
+      "drug_name": "goodsense nicotine",
+      "drug_tier": "66",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "granisetron hcl",
+      "drug_tier": "93",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "griseofulvin microsize",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_tier": "20",
       "drug_requirements": ""
     },
     {
+<<<<<<< HEAD
       "drug_name": "wixela 500-50mcg powder inhaler",
       "drug_tier": "20",
       "drug_requirements": ""
@@ -382201,71 +384733,724 @@ Original String: {
     },
     {
       "drug_name": "Ocaliva ${ }^{\text {TM }}$",
+=======
+      "drug_name": "griseofulvin ultramicrosize",
+      "drug_tier": "20",
+      "drug_requirements": ""
+    },
+    {
+      "drug_
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 522 column 6 (char 10993)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "THALOMID",
+      "drug_tier": "32",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "theophylline",
+      "drug_tier": "119",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "theophylline er",
+      "drug_tier": "119",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "thioridazine hcl",
+      "drug_tier": "54",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "thiothixene",
+      "drug_tier": "54",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tiagabine hcl",
+      "drug_tier": "57",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Tilia Fe",
+      "drug_tier": "83",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "timolol hemihydrate",
+      "drug_tier": "110",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "timolol maleate",
+      "drug_tier": "43,110",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "timolol mal
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 467 column 6 (char 10406)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "abacavir sulfate",
+      "drug_tier": "Tier 2",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "abacavir sulfate-lamivudine",
+      "drug_tier": "Tier 2",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "Abigale Lo",
+      "drug_tier": "Tier 2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "abiraterone acetate",
+      "drug_tier": "Tier 5",
+      "drug_requirements": "PA; QL"
+    },
+    {
+      "drug_name": "acamprosate calcium",
+      "drug_tier": "Tier 2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "acarbose",
+      "drug_tier": "Tier 2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ACCU-CHEK AVIVA PLUS",
+      "drug_tier": "Tier 2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ACCU-CHEK GUIDE TEST",
+      "drug_tier": "Tier 2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ACCU-CHEK SMARTVIEW",
+      "drug_tier": "Tie
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 517 column 6 (char 11003)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "balsalazide disodium",
+      "drug_tier": "94",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Balziva",
+      "drug_tier": "74",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BARACLUDE",
+      "drug_tier": "28",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BASAGLAR KWIKPEN",
+      "drug_tier": "70",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BASAGLAR TEMPO PEN",
+      "drug_tier": "70",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BAXDELA",
+      "drug_tier": "28",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BD VEO INSULIN SYR ULTRAFINE",
+      "drug_tier": "85",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BELSOMRA",
+      "drug_tier": "60",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "benazepril hcl",
+      "drug_tier": "38",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "benazepr
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 512 column 6 (char 10889)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "LENVIMA (10 MG DAILY DOSE)",
+      "drug_tier": "35",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LENVIMA (12 MG DAILY DOSE)",
+      "drug_tier": "35",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LENVIMA (14 MG DAILY DOSE)",
+      "drug_tier": "35",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LENVIMA (18 MG DAILY DOSE)",
+      "drug_tier": "35",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LENVIMA (20 MG DAILY DOSE)",
+      "drug_tier": "35",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LENVIMA (24 MG DAILY DOSE)",
+      "drug_tier": "36",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LENVIMA (4 MG DAILY DOSE)",
+      "drug_tier": "36",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LENVIMA (8 MG DAILY DOSE)",
+      "drug_tier": "36",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Lessina",
+      "dru
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 517 column 6 (char 11045)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "clotrimazole-betamethasone",
+      "drug_tier": "121",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clozapine",
+      "drug_tier": "54",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "COARTEM",
+      "drug_tier": "21",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "codeine sulfate",
+      "drug_tier": "15",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "colchicine",
+      "drug_tier": "13",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "colchicine-probenecid",
+      "drug_tier": "13",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "colesevelam hcl",
+      "drug_tier": "40",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "colestipol hcl",
+      "drug_tier": "40",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Compro",
+      "drug_tier": "93",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "condoms",
+ 
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 512 column 6 (char 10945)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "glycopyrrolate",
+      "drug_tier": "92",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "GLYXAMBI",
+      "drug_tier": "72",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "GOJJI BLOOD KETONE",
+      "drug_tier": "86",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "TEST",
+      "drug_tier": "86",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "goodsense aspirin",
+      "drug_tier": "20",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "goodsense nicotine",
+      "drug_tier": "66",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "granisetron hcl",
+      "drug_tier": "93",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "griseofulvin microsize",
+      "drug_tier": "20",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "griseofulvin ultramicrosize",
+      "drug_tier": "20",
+      "drug_requirements": ""
+    },
+    {
+      "drug_
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 527 column 6 (char 10992)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "EMCYT",
+      "drug_tier": "31",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "EMGALITY",
+      "drug_tier": "61",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "EMGALITY (300 MG DOSE)",
+      "drug_tier": "61",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "emtricitabine",
+      "drug_tier": "22",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "emtricitabine-tenofovir df",
+      "drug_tier": "24,25",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "emtricitab-rilpivir-tenofov $d f$",
+      "drug_tier": "25",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "EMTRIVA",
+      "drug_tier": "22",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "EMVERM",
+      "drug_tier": "20",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Emzahh",
+      "drug_tier": "76",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "enalap
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 517 column 6 (char 11045)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ondansetron",
+      "drug_tier": "93",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ondansetron hcl",
+      "drug_tier": "93",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ONGENTYS",
+      "drug_tier": "53",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "OPCICON ONE-STEP",
+      "drug_tier": "82",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "OPILL",
+      "drug_tier": "82",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "OPSUMIT",
+      "drug_tier": "46",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "OPTION 2",
+      "drug_tier": "82",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "OPTIONS GYNOL II CONTRACEPTIVE",
+      "drug_tier": "99",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Oralone",
+      "drug_tier": "126",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ORAVIG",
+      "drug_tier":
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 512 column 6 (char 10874)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "minoxidil",
+      "drug_tier": "45",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Minzoya",
+      "drug_tier": "80",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "MIRCERA",
+      "drug_tier": "102",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "MIRENA (52 MG)",
+      "drug_tier": "80",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mirtazapine",
+      "drug_tier": "51",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "misoprostol",
+      "drug_tier": "96",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "MIUDELLA INTRAUTERINE COPPER",
+      "drug_tier": "80",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "modafinil",
+      "drug_tier": "65",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "moexipril hcl",
+      "drug_tier": "38",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mometasone furoate",
+    
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 522 column 6 (char 10995)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "THALOMID",
+      "drug_tier": "32",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "theophylline",
+      "drug_tier": "119",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "theophylline er",
+      "drug_tier": "119",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "thioridazine hcl",
+      "drug_tier": "54",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "thiothixene",
+      "drug_tier": "54",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tiagabine hcl",
+      "drug_tier": "57",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Tilia Fe",
+      "drug_tier": "83",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "timolol hemihydrate",
+      "drug_tier": "110",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "timolol maleate",
+      "drug_tier": "43,110",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "timolol mal
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 557 column 6 (char 11596)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ORILISSA",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dexamethasone",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fludrocortisone",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "hydrocortisone",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "methylprednisolone",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "prednisolone solution (except prednisolone solution $10 mg/5 mL, 20 mg/5 mL)",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "prednisone",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "glucagon, human recombinant",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BAQSIMI",
+      "drug_tier": "",
+      "drug_requirements": "
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 527 column 6 (char 11576)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "neomycin-polymyxin b-bacitracin-hydrocortisone",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_tier": null,
       "drug_requirements": null
     },
     {
+<<<<<<< HEAD
       "drug_name": "Lialda ${ }^{\circledR}$ DR",
+=======
+      "drug_name": "neomycin-polymyxin b-dexamethasone",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_tier": null,
       "drug_requirements": null
     },
     {
+<<<<<<< HEAD
       "drug_name": "metformin 750 mg",
+=======
+      "drug_name": "tobramycin-dexamethasone",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_tier": null,
       "drug_requirements": null
     },
     {
+<<<<<<< HEAD
       "drug_name": "Natesto ${ }^{\text {TM }}$",
+=======
+      "drug_name": "TOBRADEX OINTMENT",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_tier": null,
       "drug_requirements": null
     },
     {
+<<<<<<< HEAD
       "drug_name": "Odactra ${ }^{\circledR}$ SL",
+=======
+      "drug_name": "ciprofloxacin",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_tier": null,
       "drug_requirements": null
     },
     {
+<<<<<<< HEAD
       "drug_name": "Libervant ${ }^{\text {TM }}$",
+=======
+      "drug_name": "erythromycin",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_tier": null,
       "drug_requirements": null
     },
     {
+<<<<<<< HEAD
       "drug_name": "Metformin HCL ER (OSM)",
+=======
+      "drug_name": "gentamicin",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_tier": null,
       "drug_requirements": null
     },
     {
+<<<<<<< HEAD
       "drug_name": "Natpara ${ }^{\circledR}$",
+=======
+      "drug_name": "levofloxacin",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_tier": null,
       "drug_requirements": null
     },
     {
+<<<<<<< HEAD
       "drug_name": "Odomzo ${ }^{\circledR}$",
+=======
+      "drug_name": "moxifloxacin",
+      "drug_tier": null,
+  
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 522 column 6 (char 11561)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "lovastatin",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_tier": null,
       "drug_requirements": null
     },
     {
+<<<<<<< HEAD
       "drug_name": "Librax ${ }^{\circledR}$",
+=======
+      "drug_name": "lubiprostone",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_tier": null,
       "drug_requirements": null
     },
     {
+<<<<<<< HEAD
       "drug_name": "metformin HCL 500 mg/5 ml soln",
+=======
+      "drug_name": "LUMIGAN",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_tier": null,
       "drug_requirements": null
     },
     {
+<<<<<<< HEAD
       "drug_name": "Nayzilam ${ }^{\circledR}$",
+=======
+      "drug_name": "lurasidone",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_tier": null,
       "drug_requirements": null
     },
     {
+<<<<<<< HEAD
       "drug_name": "Ofev ${ }^{\circledR}$",
+=======
+      "drug_name": "medroxyprogesterone medroxyprogesterone megestrol acetate megestrol acetate meloxicam tablet memantine mesalamine delayed-rel mesalamine enema mesalamine ext-rel mesalamine suppository metformin",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_tier": null,
       "drug_requirements": null
     },
     {
+<<<<<<< HEAD
       "drug_name": "Licart ${ }^{\text {TM }}$",
+=======
+      "drug_name": "metformin ext-rel (except generics for FORTAMET and GLUMETZA)",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_tier": null,
       "drug_requirements": null
     },
@@ -382275,6 +385460,7 @@ Original String: {
       "drug_requirements": null
     },
     {
+<<<<<<< HEAD
       "drug_name": "Neffy ${ }^{\circledR}$",
       "drug_tier": null,
       "drug_requirements": null
@@ -384043,10 +387229,65 @@ Original String: {
     },
     {
       "drug_name": "levetiracetam ER tab",
+=======
+      "drug_name": "
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 377 column 6 (char 10111)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "abacavir sulfate-lamivudine tab 600-300 mg",
+      "drug_tier": "3",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "abacavir sulfate soln $20 \\mathrm{mg} / \\mathrm{ml}$ (base equiv)",
+      "drug_tier": "3",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "abacavir sulfate tab 300 mg (base equiv)",
+      "drug_tier": "3",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "abiraterone acetate tab 250 mg",
+      "drug_tier": "6",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "abiraterone acetate tab 500 mg",
+      "drug_tier": "6",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "acamprosate calcium tab delayed release 333 mg",
+      "drug_tier": "30",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "acarbose tab $25 \\mathrm{mg}, 50 \\mathrm{mg}, 100 \\mathrm{mg}$",
+      "drug_tier": "12",
+      "drug_requirements": null
+    },
+    {
+      "d
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 422 column 6 (char 10577)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ARANESP ALBUMIN FREE",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_tier": "38",
       "drug_requirements": ""
     },
     {
+<<<<<<< HEAD
       "drug_name": "levetiracetam soln",
       "drug_tier": "38",
       "drug_requirements": ""
@@ -384168,10 +387409,29 @@ Original String: {
     },
     {
       "drug_name": "lidocaine/hydrocortisone cream",
+=======
+      "drug_name": "aripiprazole tab 2 mg, 5 mg",
+      "drug_tier": "28",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "aripiprazole tab 10 mg, 15 mg, 20 mg, 30 mg",
+      "drug_tier": "28",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "armodafinil tab 50 mg, 150 mg, 200 mg, 250 mg",
+      "drug_tier": "30",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ARNUITY ELLIPTA",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_tier": "22",
       "drug_requirements": ""
     },
     {
+<<<<<<< HEAD
       "drug_name": "lidocaine/prilocaine cream",
       "drug_tier": "156",
       "drug_requirements": ""
@@ -384223,10 +387483,455 @@ Original String: {
     },
     {
       "drug_name": "liraglutide (weight mngmt) soln pen-inj",
+=======
+      "drug_name": "ASMANEX HFA",
+      "drug_tier": "22",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ASMANEX TWISTHALER 120 ME",
+      "drug_tier": "22",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ASMANEX TWISTHALER 30 MET",
+      "drug_tier": "22",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ASMANEX TWISTHA
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 407 column 6 (char 10370)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "cabergoline tab 0.5 mg",
+      "drug_tier": "15",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CABOMETYX",
+      "drug_tier": "6",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "caffeine citrate oral soln 60 mg/3ml (10 mg/ml base equiv)",
+      "drug_tier": "30",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "calcipotriene cream 0.005%",
+      "drug_tier": "44",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "calcitonin (salmon) nasal soln 200 unit/act",
+      "drug_tier": "15",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "calcitriol cap 0.25 mcg, 0.5 mcg",
+      "drug_tier": "15",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "calcium acetate (phosphate binder) cap 667 mg (169 mg ca)",
+      "drug_tier": "25",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "calcium acetate (phosphate binder) tab 667 mg",
+      "drug_tier": "25"
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 382 column 6 (char 9894)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "clonidine td patch weekly $0.3 \\mathrm{mg} / 24 \\mathrm{hr}$",
+      "drug_tier": "18",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clopidogrel bisulfate tab 75 mg (base equiv)",
+      "drug_tier": "40",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clotrimazole troche 10 mg",
+      "drug_tier": "43",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clozapine tab 25 mg",
+      "drug_tier": "28",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clozapine tab 50 mg",
+      "drug_tier": "28",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clozapine tab 100 mg",
+      "drug_tier": "28",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clozapine tab 200 mg",
+      "drug_tier": "28",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "COAGADEX",
+      "drug_tier": "40",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "codeine s
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 417 column 6 (char 10554)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "diltiazem hcl tab 90 mg",
+      "drug_tier": "17",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diltiazem hcl tab 30 mg, 60 mg, 120 mg",
+      "drug_tier": "17",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dimethyl fumarate capsule delayed release 120 mg",
+      "drug_tier": "31",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dimethyl fumarate capsule delayed release 240 mg",
+      "drug_tier": "31",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dimethyl fumarate capsule dr starter pack 120 mg & 240 mg",
+      "drug_tier": "31",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diphenoxylate w/ atropine tab 2.5-0.025 mg",
+      "drug_tier": "24",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dipyridamole tab 25 mg, 50 mg, 75 mg",
+      "drug_tier": "40",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "disopyramide phosphate ca
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 397 column 6 (char 10063)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "gemfibrozil tab 600 mg",
+      "drug_tier": "20",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "GENOTROPIN",
+      "drug_tier": "15",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "GENOTROPIN MINIQUICK",
+      "drug_tier": "15",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "gentamicin sulfate cream $0.1 \\%$",
+      "drug_tier": "45",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "gentamicin sulfate oint $0.1 \\%$",
+      "drug_tier": "45",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "gentamicin sulfate ophth soln $0.3 \\%$",
+      "drug_tier": "42",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "GENVOYA",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "glatiramer acetate soln prefilled syringe $20 \\mathrm{mg} / \\mathrm{ml}$",
+      "drug_tier": "31",
+      "drug_requirements": ""
+    },
+    {
+      "d
+==================================================
+
+=== JSON Parse Error ===
+Error: Unterminated string starting at: line 394 column 20 (char 9914)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "INSULIN GLARGINE-YFGN",
+      "drug_tier": "14",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "INSULIN PEN NEEDLES - VARIOUS",
+      "drug_tier": "47",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "INSULIN SYRINGES - VARIOUS",
+      "drug_tier": "47",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "INTELENCE",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ipratropium-albuterol nebu soln $0.5-2.5(3) \\mathrm{mg} / 3 \\mathrm{ml}$",
+      "drug_tier": "22",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ipratropium bromide inhal soln $0.02 \\%$",
+      "drug_tier": "22",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ipratropium bromide nasal soln $0.03 \\%$ ( $21 \\mathrm{mcg} /$ spray), $0.06 \\%$ ( $42 \\mathrm{mcg} /$ spray)",
+      "drug_tier": "21",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "irbes
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 427 column 6 (char 10370)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "levothyroxine sodium tab 25 mcg, 50 mcg, 75 mcg, 88 mcg, 100 mcg, 112 mcg, 125 mcg, 137 mcg, 150 mcg, 175 mcg, 200 mcg, 300 mcg",
+      "drug_tier": "15",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lidocaine hcl soln 4%",
+      "drug_tier": "45",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lidocaine hcl viscous soln 2%",
+      "drug_tier": "43",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lidocaine oint 5%",
+      "drug_tier": "45",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lidocaine patch 5%",
+      "drug_tier": "45",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lidocaine-prilocaine cream 2.5-2.5%",
+      "drug_tier": "45",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "linezolid for susp 100 mg/5ml",
+      "drug_tier": "5",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "linezolid tab 600 mg",
+      "drug_tier": 
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 422 column 6 (char 10494)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "OZEMPIC",
+      "drug_tier": "12",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "pantoprazole sodium ec tab 20 mg (base equiv), 40 mg (base equiv)",
+      "drug_tier": "24",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "paroxetine hcl tab er 24 hr 12.5 mg , 25 mg, 37.5 mg",
+      "drug_tier": "28",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "paroxetine hcl tab 10 mg, 20 mg, 30 mg, 40 mg",
+      "drug_tier": "28",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PAXLOVID",
+      "drug_tier": "4",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "pazopanib hcl tab 200 mg (base equiv)",
+      "drug_tier": "8",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PEGASYS",
+      "drug_tier": "4",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "peg 3350-kcl-na bicarb-nacl-na sulfate for soln 236 gm",
+      "drug_tier": "24",
+      "drug_requi
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 427 column 6 (char 10311)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "norethindrone ace & ethinyl estradiol-fe tab 1.5 mg-30 mcg",
+      "drug_tier": "11",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "norethindrone ace & ethinyl estradiol tab 1 mg-20 mcg",
+      "drug_tier": "11",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "norethindrone ace & ethinyl estradiol tab 1.5 mg-30 mcg",
+      "drug_tier": "11",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "norethindrone acetate-ethinyl estradiol tab 0.5 mg-2.5 mcg",
+      "drug_tier": "10",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "norethindrone acetate-ethinyl estradiol tab 1 mg-5 mcg",
+      "drug_tier": "10",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "norethindrone acetate tab 5 mg",
+      "drug_tier": "12",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "norethindrone ac-ethinyl estrad-fe tab 1-20/1-30/1-35 mg -mcg",
+      "drug_tier": "11",
+      "drug
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 412 column 6 (char 10361)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "metoprolol & hydrochlorothiazide tab 100-25 mg, 100-50 mg",
+      "drug_tier": "18",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metoprolol succinate tab er 24 hr 25 mg (tartrate equiv), 50 mg (tartrate equiv), 100 mg (tartrate equiv), 200 mg (tartrate equiv)",
+      "drug_tier": "16",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metoprolol tartrate tab 25 mg",
+      "drug_tier": "17",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metoprolol tartrate tab 50 mg, 100 mg",
+      "drug_tier": "17",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metronidazole cream 0.75%",
+      "drug_tier": "45",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metronidazole gel 0.75%",
+      "drug_tier": "45",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metronidazole gel 1%",
+      "drug_tier": "45",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 452 column 6 (char 10593)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "propranolol hcl cap er 24hr 60 mg, 80 mg, 120 mg, 160 mg",
+      "drug_tier": "17",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "propranolol hcl tab 10 mg, 20 mg, 40 mg, 60 mg, 80 mg",
+      "drug_tier": "17",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "propylthiouracil tab 50 mg",
+      "drug_tier": "15",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PULMOZYME",
+      "drug_tier": "23",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "pyrazinamide tab 500 mg",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_tier": "2",
       "drug_requirements": ""
     },
     {
+<<<<<<< HEAD
       "drug_name": "liraglutide soln pen-injector",
       "drug_tier": "52",
       "drug_requirements": ""
@@ -384589,20 +388294,1234 @@ Original String: {
     },
     {
       "drug_name": "REYATAZ ORAL PACKET",
+=======
+      "drug_name": "pyridostigmine bromide tab 60 mg",
+      "drug_tier": "38",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "pyrimethamine tab 25 mg",
       "drug_tier": "5",
       "drug_requirements": ""
     },
     {
+      "drug_name": "PYRUKYND",
+      "drug_tier": "41",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name":
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 432 column 6 (char 10521)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "TIVICAY PD",
+      "drug_tier": "4",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tizanidine hcl tab 2 mg (base equivalent)",
+      "drug_tier": "38",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tizanidine hcl tab 4 mg (base equivalent)",
+      "drug_tier": "38",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tobramycin-dexamethasone ophth susp $0.3-0.1%$",
+      "drug_tier": "42",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tobramycin nebu soln $300 mg/5 ml$",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tobramycin ophth soln $0.3%$",
+      "drug_tier": "42",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tolterodine tartrate cap er $24 hr 2 mg, 4 mg$",
+      "drug_tier": "26",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tolterodine tartrate tab $1 mg, 2 mg$",
+      "drug_tier": "26",
+      "d
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 422 column 6 (char 10577)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ARANESP ALBUMIN FREE",
+      "drug_tier": "38",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "aripiprazole tab 2 mg, 5 mg",
+      "drug_tier": "28",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "aripiprazole tab 10 mg, 15 mg, 20 mg, 30 mg",
+      "drug_tier": "28",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "armodafinil tab 50 mg, 150 mg, 200 mg, 250 mg",
+      "drug_tier": "30",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ARNUITY ELLIPTA",
+      "drug_tier": "22",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ASMANEX HFA",
+      "drug_tier": "22",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ASMANEX TWISTHALER 120 ME",
+      "drug_tier": "22",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ASMANEX TWISTHALER 30 MET",
+      "drug_tier": "22",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ASMANEX TWISTHA
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 417 column 6 (char 10555)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "diltiazem hcl tab 90 mg",
+      "drug_tier": "17",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diltiazem hcl tab 30 mg, 60 mg, 120 mg",
+      "drug_tier": "17",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dimethyl fumarate capsule delayed release 120 mg",
+      "drug_tier": "31",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dimethyl fumarate capsule delayed release 240 mg",
+      "drug_tier": "31",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dimethyl fumarate capsule dr starter pack 120 mg & 240 mg",
+      "drug_tier": "31",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diphenoxylate w/ atropine tab 2.5-0.025 mg",
+      "drug_tier": "24",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dipyridamole tab 25 mg, 50 mg, 75 mg",
+      "drug_tier": "40",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "disopyramide phosphate ca
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 377 column 6 (char 9961)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "abacavir sulfate-lamivudine tab 600-300 mg",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "abacavir sulfate soln $20 \\mathrm{mg} / \\mathrm{ml}$ (base equiv)",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "abacavir sulfate tab 300 mg (base equiv)",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "abiraterone acetate tab 250 mg",
+      "drug_tier": "6",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "abiraterone acetate tab 500 mg",
+      "drug_tier": "6",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "acamprosate calcium tab delayed release 333 mg",
+      "drug_tier": "30",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "acarbose tab $25 \\mathrm{mg}, 50 \\mathrm{mg}, 100 \\mathrm{mg}$",
+      "drug_tier": "12",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ac
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 407 column 6 (char 10370)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "cabergoline tab 0.5 mg",
+      "drug_tier": "15",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CABOMETYX",
+      "drug_tier": "6",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "caffeine citrate oral soln 60 mg/3ml (10 mg/ml base equiv)",
+      "drug_tier": "30",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "calcipotriene cream 0.005%",
+      "drug_tier": "44",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "calcitonin (salmon) nasal soln 200 unit/act",
+      "drug_tier": "15",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "calcitriol cap 0.25 mcg, 0.5 mcg",
+      "drug_tier": "15",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "calcium acetate (phosphate binder) cap 667 mg (169 mg ca)",
+      "drug_tier": "25",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "calcium acetate (phosphate binder) tab 667 mg",
+      "drug_tier": "25"
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 432 column 6 (char 10410)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "clonidine td patch weekly 0.3 mg/24 hr",
+      "drug_tier": "18",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clopidogrel bisulfate tab 75 mg (base equiv)",
+      "drug_tier": "40",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clotrimazole troche 10 mg",
+      "drug_tier": "43",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clozapine tab 25 mg",
+      "drug_tier": "28",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clozapine tab 50 mg",
+      "drug_tier": "28",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clozapine tab 100 mg",
+      "drug_tier": "28",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clozapine tab 200 mg",
+      "drug_tier": "28",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "COAGADEX",
+      "drug_tier": "40",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "codeine sulfate tab 30 mg",
+     
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 432 column 6 (char 10490)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "gemfibrozil tab 600 mg",
+      "drug_tier": "20",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "GENOTROPIN",
+      "drug_tier": "15",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "GENOTROPIN MINIQUICK",
+      "drug_tier": "15",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "gentamicin sulfate cream $0.1 %$",
+      "drug_tier": "45",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "gentamicin sulfate oint $0.1 %$",
+      "drug_tier": "45",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "gentamicin sulfate ophth soln $0.3 %$",
+      "drug_tier": "42",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "GENVOYA",
+      "drug_tier": "3",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "glatiramer acetate soln prefilled syringe $20 mg/ml$",
+      "drug_tier": "31",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "
+==================================================
+
+=== JSON Parse Error ===
+Error: Unterminated string starting at: line 424 column 20 (char 10187)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "INSULIN GLARGINE-YFGN",
+      "drug_tier": "14",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "INSULIN PEN NEEDLES - VARIOUS",
+      "drug_tier": "47",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "INSULIN SYRINGES - VARIOUS",
+      "drug_tier": "47",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "INTELENCE",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ipratropium-albuterol nebu soln $0.5-2.5(3) mg / 3 ml",
+      "drug_tier": "22",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ipratropium bromide inhal soln $0.02 \\%$",
+      "drug_tier": "22",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ipratropium bromide nasal soln $0.03 \\% (21 mcg/spray), $0.06 \\% (42 mcg/spray)",
+      "drug_tier": "21",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "irbesartan-hydrochlorothiazide tab 150-12.5 mg, 300-12.5 m
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 412 column 6 (char 10361)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "metoprolol & hydrochlorothiazide tab 100-25 mg, 100-50 mg",
+      "drug_tier": "18",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metoprolol succinate tab er 24 hr 25 mg (tartrate equiv), 50 mg (tartrate equiv), 100 mg (tartrate equiv), 200 mg (tartrate equiv)",
+      "drug_tier": "16",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metoprolol tartrate tab 25 mg",
+      "drug_tier": "17",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metoprolol tartrate tab 50 mg, 100 mg",
+      "drug_tier": "17",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metronidazole cream 0.75%",
+      "drug_tier": "45",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metronidazole gel 0.75%",
+      "drug_tier": "45",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metronidazole gel 1%",
+      "drug_tier": "45",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 422 column 6 (char 10249)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "levothyroxine sodium tab 25 mcg, 50 mcg, 75 mcg, 88 mcg, 100 mcg, 112 mcg, 125 mcg, 137 mcg, 150 mcg, 175 mcg, 200 mcg, 300 mcg",
+      "drug_tier": "15",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lidocaine hcl soln 4%",
+      "drug_tier": "45",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lidocaine hcl viscous soln 2%",
+      "drug_tier": "43",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lidocaine oint 5%",
+      "drug_tier": "45",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lidocaine patch 5%",
+      "drug_tier": "45",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lidocaine-prilocaine cream 2.5-2.5%",
+      "drug_tier": "45",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "linezolid for susp 100 mg/5 ml",
+      "drug_tier": "5",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "linezolid tab 600 mg",
+      "drug_tier":
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 452 column 6 (char 10593)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "propranolol hcl cap er 24hr 60 mg, 80 mg, 120 mg, 160 mg",
+      "drug_tier": "17",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "propranolol hcl tab 10 mg, 20 mg, 40 mg, 60 mg, 80 mg",
+      "drug_tier": "17",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "propylthiouracil tab 50 mg",
+      "drug_tier": "15",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PULMOZYME",
+      "drug_tier": "23",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "pyrazinamide tab 500 mg",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "pyridostigmine bromide tab 60 mg",
+      "drug_tier": "38",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "pyrimethamine tab 25 mg",
+      "drug_tier": "5",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PYRUKYND",
+      "drug_tier": "41",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name":
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 427 column 6 (char 10318)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "norethindrone ace & ethinyl estradiol-fe tab 1.5 mg -30 mcg",
+      "drug_tier": "11",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "norethindrone ace & ethinyl estradiol tab 1 mg -20 mcg",
+      "drug_tier": "11",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "norethindrone ace & ethinyl estradiol tab 1.5 mg -30 mcg",
+      "drug_tier": "11",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "norethindrone acetate-ethinyl estradiol tab 0.5 mg -2.5 mcg",
+      "drug_tier": "10",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "norethindrone acetate-ethinyl estradiol tab 1 mg -5 mcg",
+      "drug_tier": "10",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "norethindrone acetate tab 5 mg",
+      "drug_tier": "12",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "norethindrone ac-ethinyl estrad-fe tab 1-20/1-30/1-35 mg -mcg",
+      "drug_tier": "11",
+      
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 422 column 6 (char 10509)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "pantoprazole sodium ec tab 20 mg (base equiv), 40 mg (base equiv)",
+      "drug_tier": "24",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "paroxetine hcl tab er 24 hr 12.5 mg, 25 mg, 37.5 mg",
+      "drug_tier": "28",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "paroxetine hcl tab 10 mg, 20 mg, 30 mg, 40 mg",
+      "drug_tier": "28",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "pazopanib hcl tab 200 mg (base equiv)",
+      "drug_tier": "8",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "peg 3350-kcl-na bicarb-nacl-na sulfate for soln 236 gm",
+      "drug_tier": "24",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "peg 3350-kcl-sod bicarb-nacl for soln 420 gm",
+      "drug_tier": "24",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "penicillamine tab 250 mg",
+      "drug_tier": "48",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name":
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 437 column 6 (char 10536)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "SIMLANDI 2-PEN KIT",
+      "drug_tier": "35",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SIMPONI",
+      "drug_tier": "35",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "simvastatin tab 5 mg, 10 mg, 20 mg, 40 mg, 80 mg",
+      "drug_tier": "20",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sirolimus oral soln 1 mg/ml",
+      "drug_tier": "48",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sirolimus tab 0.5 mg, 1 mg, 2 mg",
+      "drug_tier": "48",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SIRTURO",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SKYRIZI",
+      "drug_tier": "26",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SKYRIZI PEN",
+      "drug_tier": "46",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sodium chloride soln nebu 3%",
+      "drug_tier": "21",
+      "drug_re
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 397 column 6 (char 10150)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "TIVICAY PD",
+      "drug_tier": "4",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tizanidine hcl tab 2 mg (base equivalent)",
+      "drug_tier": "38",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tizanidine hcl tab 4 mg (base equivalent)",
+      "drug_tier": "38",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tobramycin-dexamethasone ophth susp $0.3-0.1 \\%$",
+      "drug_tier": "42",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tobramycin nebu soln $300 \\mathrm{mg} / 5 \\mathrm{ml}$",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tobramycin ophth soln $0.3 \\%$",
+      "drug_tier": "42",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tolterodine tartrate cap er $24 \\mathrm{hr} 2 \\mathrm{mg}, 4 \\mathrm{mg}$",
+      "drug_tier": "26",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tolterodine tar
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 427 column 6 (char 10493)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ashlyna - levonorg-eth est tab 0.15-0.03mg(84) & eth est tab 0.01 mg(7)",
+      "drug_tier": "4",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ASMANEX HFA",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ASMANEX TWISTHALER 120 METERED DOSES",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ASMANEX TWISTHALER 14 METERED DOSES",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ASMANEX TWISTHALER 30 METERED DOSES",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ASMANEX TWISTHALER 60 METERED DOSES",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ASPARLAS",
+      "drug_tier": "5",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "aspirin-dipyridamole cap er 12hr 25-200 mg",
+      "drug_tier": "4",
+      "drug_requirements
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 432 column 6 (char 10581)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "benazepril hcl tab 5 mg",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "benazepril hcl tab 10 mg",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "benazepril hcl tab 20 mg",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "benazepril hcl tab 40 mg",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "bendamustine hcl for iv soln 25 mg",
+      "drug_tier": "5",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "bendamustine hcl for iv soln 100 mg",
+      "drug_tier": "5",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BENDEKA",
+      "drug_tier": "5",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BENLYSTA",
+      "drug_tier": "5",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "benzoyl peroxide-erythromycin gel 5-3%",
+      "drug_
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 412 column 6 (char 10627)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "buprenorphine hcl-naloxone hcl sl film 4-1 mg (base equiv)",
+      "drug_tier": "4",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "buprenorphine hcl-naloxone hcl sl film 8-2 mg (base equiv)",
+      "drug_tier": "4",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "buprenorphine hcl-naloxone hcl sl film 12-3 mg (base equiv)",
+      "drug_tier": "4",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "buprenorphine hcl-naloxone hcl sl tab 2-0.5 mg (base equiv)",
+      "drug_tier": "4",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "buprenorphine hcl-naloxone hcl sl tab 8-2 mg (base equiv)",
+      "drug_tier": "4",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "buprenorphine hcl sl tab 2 mg (base equiv)",
+      "drug_tier": "4",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "buprenorphine hcl sl tab 8 mg (base equiv)",
+      "drug_tier": "4",
+      "drug_
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 432 column 6 (char 10538)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "fluvoxamine maleate tab 25 mg",
+      "drug_tier": "4",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fluvoxamine maleate tab 50 mg",
+      "drug_tier": "4",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "FOLOTYN",
+      "drug_tier": "5",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fomepizole inj $1 gm/ml (for iv infusion)",
+      "drug_tier": "6",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fondaparinux sodium subcutaneous inj 2.5 mg/0.5 ml",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fondaparinux sodium subcutaneous inj 5 mg/0.4 ml",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fondaparinux sodium subcutaneous inj 7.5 mg/0.6 ml",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fondaparinux sodium subcutaneous inj 10 mg/0.8 ml",
+      "drug_tier":
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 432 column 6 (char 10733)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "meloxicam tab 7.5 mg",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "melphalan hcl for inj 50 mg (base equiv)",
+      "drug_tier": "26",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "memantine hcl cap er 24hr 7 mg",
+      "drug_tier": "13",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "memantine hcl cap er 24hr 14 mg",
+      "drug_tier": "13",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "memantine hcl cap er 24hr 21 mg",
+      "drug_tier": "13",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "memantine hcl cap er 24hr 28 mg",
+      "drug_tier": "13",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "memantine hcl oral solution 2 mg/ml",
+      "drug_tier": "13",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "memantine hcl tab 28 x 5 mg & 21 x 10 mg titration pack",
+      "drug_tier": "13",
+      "drug_requi
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 442 column 6 (char 10644)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "liothyronine sodium tab 5 mcg",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "liothyronine sodium tab 25 mcg",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "liothyronine sodium tab 50 mcg",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lisinopril & hydrochlorothiazide tab 10-12.5 mg",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lisinopril & hydrochlorothiazide tab 20-12.5 mg",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lisinopril & hydrochlorothiazide tab 20-25 mg",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lisinopril tab 2.5 mg",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lisinopril tab 5 mg",
+      "drug_tier": "1",
+      "drug_requirements": ""
+==================================================
+
+=== JSON Parse Error ===
+Error: Unterminated string starting at: line 319 column 20 (char 9510)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "larin fe $1 / 20$ - norethindrone ace & ethinyl estradiolfe tab $1 \\mathrm{mg}-20 \\mathrm{mcg}$",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "larin fe 1.5/30 - norethindrone ace & ethinylestradiol-fe tab $1.5 \\mathrm{mg}-30 \\mathrm{mcg}$",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "latanoprost ophth soln $0.005 \\%$",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LAZCLUZE",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "leena - norethindrone-eth estradiol tab 0.5-35/1-35/0.5-35 mg-mcg",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "leflunomide tab $10 \\mathrm{mg}, 20 \\mathrm{mg}$",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lenalidomide cap $15 \\mathrm{mg}, 20 \\mathrm{mg}, 25 \\mathrm
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 442 column 6 (char 10633)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "paraplatin - carboplatin iv soln 450 mg/45 ml, 600 mg/60 ml",
+      "drug_tier": "5",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "paricalcitol cap 1 mcg, 2 mcg, 4 mcg",
+      "drug_tier": "5",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "paricalcitol iv soln 2 mcg/ml, 5 mcg/ml",
+      "drug_tier": "5",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "paroxetine hcl oral susp 10 mg/5 ml (base equiv)",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "paroxetine hcl tab 10 mg",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "paroxetine hcl tab 20 mg",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "paroxetine hcl tab 30 mg",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "paroxetine hcl tab 40 mg",
+      "drug_tier": "2",
+      "drug_require
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 437 column 6 (char 10554)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "pioglitazone hcl tab 30 mg (base equiv)",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "pioglitazone hcl tab 45 mg (base equiv)",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "piperacillin sod-tazobactam na for inj 3.375 gm (3-0.375 gm)",
+      "drug_tier": "6",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "piperacillin sod-tazobactam sod for inj 2.25 gm (2-0.25 gm)",
+      "drug_tier": "6",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "piperacillin sod-tazobactam sod for inj 4.5 gm (4-0.5 gm)",
+      "drug_tier": "6",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PIQRAY 200MG DAILY DOSE",
+      "drug_tier": "5",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PIQRAY 250MG DAILY DOSE",
+      "drug_tier": "5",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PIQRAY 300MG DAILY DOSE"
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 437 column 6 (char 10490)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "silver sulfadiazine cream 1%",
+      "drug_tier": "4",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SIMBRINZA",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "simliya - desogest-eth estrad & eth estrad tab 0.15-0.02/0.01 mg(21/5)",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "simpesse - levonorg-eth est tab 0.15-0.03mg(84) & eth est tab 0.01 mg (7)",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SIMULECT",
+      "drug_tier": "BD",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "simvastatin tab 20 mg",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "simvastatin tab 5 mg",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "simvastatin tab 10 mg",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+   
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 432 column 6 (char 10496)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "valacyclovir hcl tab 500 mg",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "valacyclovir hcl tab 1 gm",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "VALCHLOR",
+      "drug_tier": "5",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "valganciclovir hcl for soln 50 mg/ml (base equiv)",
+      "drug_tier": "5",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "valganciclovir hcl tab 450 mg (base equivalent)",
+      "drug_tier": "5",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "valproate sodium inj 100 mg/ml",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "valproate sodium oral soln 250 mg/5ml (base equiv)",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "valproic acid cap 250 mg",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 442 column 6 (char 10363)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "VINCRISTINE SULFATE",
+      "drug_tier": "BD",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "vinorelbine tartrate inj 10 mg/ml (base equiv)",
+      "drug_tier": "BD",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "vinorelbine tartrate inj 50 mg/5ml (10 mg/ml) (base equiv)",
+      "drug_tier": "BD",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "viorele - desogest-eth estrad & eth estrad tab 0.15-0.02/0.01 mg(21/5)",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "VIRACEPT",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
+      "drug_tier": "5",
+      "drug_requirements": ""
+    },
+    {
+<<<<<<< HEAD
       "drug_name": "RITONAVIR",
       "drug_tier": "3",
       "drug_requirements": ""
     },
     {
       "drug_name": "VIRACEPT ORAL TABLET",
+=======
+      "drug_name": "VIREAD",
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
       "drug_tier": "5",
       "drug_requirements": ""
     },
     {
+<<<<<<< HEAD
       "drug_name": "oseltamivir phosphate oral capsule",
       "drug_tier": "3",
       "drug_requirements": ""
@@ -384743,5 +389662,64 @@ Original String: {
     }
   ]
 }
+=======
+      "drug_name": "VITRAKVI",
+      "drug_tier": "5",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "VIVITROL",
+      "drug_tier": "5",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "VIVOTIF"
+>>>>>>> 25380a7 (Added Page number logic and Prompt Logic)
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 462 column 6 (char 11785)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ROTATEQ",
+      "drug_tier": "Not Specified",
+      "drug_requirements": "Not Specified"
+    },
+    {
+      "drug_name": "roweepra",
+      "drug_tier": "Not Specified",
+      "drug_requirements": "Not Specified"
+    },
+    {
+      "drug_name": "ROZLYTREK",
+      "drug_tier": "Not Specified",
+      "drug_requirements": "Not Specified"
+    },
+    {
+      "drug_name": "RUBRACA",
+      "drug_tier": "Not Specified",
+      "drug_requirements": "Not Specified"
+    },
+    {
+      "drug_name": "rufinamide",
+      "drug_tier": "Not Specified",
+      "drug_requirements": "Not Specified"
+    },
+    {
+      "drug_name": "RUKOBIA",
+      "drug_tier": "Not Specified",
+      "drug_requirements": "Not Specified"
+    },
+    {
+      "drug_name": "RYBELSUS",
+      "drug_tier": "Not Specified",
+      "drug_requirements": "Not Specified"
+    },
+    {
+      "drug_name": "RYDAPT",
+      "drug_tier": "Not Specified",
+      "drug_requirements": "Not Specified"
+    }
 ==================================================
 

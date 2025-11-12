@@ -194,7 +194,7 @@ def populate_payer_and_plan_tables():
     
     validate_required_files()
     
-    df = pd.read_excel(EXCEL_FILE_PATH, sheet_name="Sheet6")
+    df = pd.read_excel(EXCEL_FILE_PATH, sheet_name="Sheet1")
     logger.info(f"Loaded {len(df)} records from Excel")
     
     # Clean the column names
@@ -256,6 +256,14 @@ def populate_payer_and_plan_tables():
                     # This now works because the column is a proper Timestamp
                     'created_at': str(row.get('Captured Date', '')).strip() or None,
                 
+                    'payer_name': str(row.get('Company Name', '')).strip() or None,
+                    'contact_phone': str(row.get('Contact Phone', '')).strip() or None,
+                    'address_line_1': str(row.get('Communication Address Line 1', '')).strip() or None,
+                    'address_line_2': str(row.get('Communication Address Line 2', '')).strip() or None,
+                    'city': str(row.get('City', '')).strip() or None,
+                    'state': str(row.get('States Covered', '')).strip() or None,
+                    'zip_code': str(row.get('Zip', '')).strip() or None,
+                    'created_at': get_date_for_db(row.get('Captured Date')), # CORRECTED
                 }
                 
                 # Skip if essential data is missing
@@ -278,6 +286,13 @@ def populate_payer_and_plan_tables():
                     'source_link': str(row['Source Link']).strip() if pd.notna(row['Source Link']) else None,
                     'formulary_date': str(row.get('Formulary Date', '')).strip() or None,
                     'created_at': str(row.get('Captured Date', '')).strip() or None,
+                    'plan_name': str(row.get('Plan Name', '')).strip() or None,
+                    'state_name': str(row.get('States Covered', '')).strip() or None,
+                    'payer_name': payer_data['payer_name'],
+                    'formulary_url': str(row.get('Formulary URL', '')).strip() or None,
+                    'source_link': str(row.get('Source Link', '')).strip() or None,
+                    'formulary_date': get_date_for_db(row.get('Formulary Date')), # CORRECTED
+                    'created_at': get_date_for_db(row.get('Captured Date')), # CORRECTED
                 }
                 
                 # Skip if essential plan data is missing

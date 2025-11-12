@@ -21,12 +21,12 @@ logger = logging.getLogger(__name__)
 # -----------------------------
 
 
-EXCEL_FILE_PATH = "Insurance Card Formulary.xlsx"
+EXCEL_FILE_PATH = "errors.xlsx"
 PDF_FOLDER = "druglist1"
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
-PROCESS_COUNT = 8 #No of PDFS
-LLM_PAGE_WORKERS = 10 #No of pages
-
+PROCESS_COUNT = 16 #No of PDFS
+LLM_PAGE_WORKERS = 8 #No of pages
+BEDROCK_MODEL_ID = "anthropic.claude-3-haiku-20240307-v1:0"
 
 
 DB_CONFIG = {
