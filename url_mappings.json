@@ -1,0 +1,7 @@
+[
+  {
+    "name": "UPMC Widen Viewer",
+    "pattern": "https://upmc\\.widen\\.net/view/pdf/([^/]+)/([^?]+)",
+    "replacement": "https://upmc.widen.net/content/{group1}/pdf/{group2}?download=true"
+  }
+]

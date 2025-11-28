@@ -397645,3 +397645,2672 @@ Original String: {
 }
 ==================================================
 
+=== JSON Parse Error ===
+Original String: {
+  "drug_table": [
+    {
+      "drug_name": "etodolac oral tablet extended release 24 hr",
+      "drug_tier": "4",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "flurbiprofen oral tablet 100 mg",
+      "drug_tier": "3",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "ibu oral tablet",
+      "drug_tier": "2",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "ibuprofen oral suspension",
+      "drug_tier": "2",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "ibuprofen oral tablet $400 \\\\mathrm{mg}, 800 \\\\mathrm{mg}$",
+      "drug_tier": "2",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "ibuprofen oral tablet 600 mg",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "indomethacin oral capsule",
+      "drug_tier": "3",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "indomethacin oral capsule, extended release",
+      "drug_tier": "3",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "KLOXXADO NASAL SPRAY,NON-AEROSOL",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "lofexidine oral tablet",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO; QL (224 per\\n30 days)"
+    },
+    {
+      "drug_name": "meloxicam oral tablet",
+      "drug_tier": "2",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "nabumetone oral tablet",
+      "drug_tier": "3",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "naloxone injection solution",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "naloxone injection syringe $0.4 \\\\mathrm{mg} / \\\\mathrm{ml}$ (prefilled syringe)",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "naloxone injection syringe $0.4 \\\\mathrm{mg} / \\\\mathrm{ml}, 1 \\\\mathrm{mg} / \\\\mathrm{ml}$",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "naloxone nasal spray,non-aerosol",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "naltrexone oral tablet",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "naproxen oral tablet",
+      "drug_tier": "2",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "OPVEE NASAL SPRAY,NON-AEROSOL",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "oxaprozin oral tablet",
+      "drug_tier": "4",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "piroxicam oral capsule",
+      "drug_tier": "3",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "PRIALT INTRATHECAL SOLUTION",
+      "drug_tier": "5",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "salsalate oral tablet",
+      "drug_tier": "4",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "sulindac oral tablet",
+      "drug_tier": "2",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "tramadol oral tablet 50 mg",
+      "drug_tier": "3",
+      "drug_requirements": "MO; MME; QL (240\\nper 30 days)"
+    },
+    {
+      "drug_name": "tramadol oral tablet extended release 24 hr",
+      "drug_tier": "3",
+      "drug_requirements": "PA; MO; MME; QL\\n(30 per 30 days)"
+    },
+    {
+      "drug_name": "tramadol-acetaminophen oral tablet",
+      "drug_tier": "3",
+      "drug_requirements": "MO; MME; QL (240\\nper 30 days)"
+    }
+  ],
+  "acronyms": [
+    {
+      "acronym": "MO",
+      "expansion": "Maintenance Only",
+      "explanation": "Certain drugs are available from a limited network of specialty pharmacies. These drugs are identified as "Specialty" and the network of pharmacies that provide these drugs are referred to as Specialty Pharmacies."
+    },
+    {
+      "acronym": "PA",
+      "expansion": "Prior Authorization",
+      "explanation": "The Plan requires you or your doctor to get prior authorization for certain drugs. This means that you will need to get approval before you fill your prescriptions. If you don't get approval, we may not cover the drug."
+    },
+    {
+      "acronym": "QL",
+      "expansion": "Quantity Limits",
+      "explanation": "The Plan limits the amount of certain drugs that we will cover. This is to make sure the drugs are used correctly and safely. If your prescription is for an amount that is more than the limit, we may not cover the entire prescription."
+    },
+    {
+      "acronym": "MME",
+      "expansion": "Morphine Milligram Equivalent",
+      "explanation": "The Plan has limits on the amount of certain opioid drugs that we will cover. This is to make sure the drugs are used correctly and safely. If your prescription is for an amount that is more than the limit, we may not cover the entire prescription."
+    }
+  ],
+  "tiers": [
+    {
+      "acronym": "Tier 1",
+      "expansion": "Single Tier system, meaning all covered drugs will be covered at the same cost sharing amount.",
+      "explanation": "Single Tier system, meaning all covered drugs will be covered at the same cost sharing amount."
+    }
+  ]
+}
+==================================================
+
+=== JSON Parse Error ===
+Original String: {
+  "drug_table": [
+    {
+      "drug_name": "haloperidol oral tablet",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "HETLIOZ LQ ORAL SUSPENSION",
+      "drug_tier": "1",
+      "drug_requirements": "PA; MO; QL (158 per 30 days); NEDS"
+    },
+    {
+      "drug_name": "imipramine hcl oral tablet",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "INVEGA HAFYERA INTRAMUSCULAR SYRINGE 1,092 MG/3.5 ML",
+      "drug_tier": "1",
+      "drug_requirements": "MO; QL (3.5 per 180 days); NEDS"
+    },
+    {
+      "drug_name": "INVEGA HAFYERA INTRAMUSCULAR SYRINGE 1,560 MG/5 ML",
+      "drug_tier": "1",
+      "drug_requirements": "MO; QL (5 per 180 days); NEDS"
+    },
+    {
+      "drug_name": "INVEGA SUSTENNA INTRAMUSCULAR SYRINGE 117 MG/0.75 ML",
+      "drug_tier": "1",
+      "drug_requirements": "MO; QL (0.75 per 28 days); NEDS"
+    },
+    {
+      "drug_name": "INVEGA SUSTENNA INTRAMUSCULAR SYRINGE 156 MG/ML",
+      "drug_tier": "1",
+      "drug_requirements": "MO; QL (1 per 28 days); NEDS"
+    },
+    {
+      "drug_name": "INVEGA SUSTENNA INTRAMUSCULAR SYRINGE 234 MG/1.5 ML",
+      "drug_tier": "1",
+      "drug_requirements": "MO; QL (1.5 per 28 days); NEDS"
+    },
+    {
+      "drug_name": "INVEGA SUSTENNA INTRAMUSCULAR SYRINGE 39 MG/0.25 ML",
+      "drug_tier": "1",
+      "drug_requirements": "MO; QL (0.25 per 28 days)"
+    },
+    {
+      "drug_name": "INVEGA SUSTENNA INTRAMUSCULAR SYRINGE 78 MG/0.5 ML",
+      "drug_tier": "1",
+      "drug_requirements": "MO; QL (0.5 per 28 days); NEDS"
+    },
+    {
+      "drug_name": "INVEGA TRINZA INTRAMUSCULAR SYRINGE 273 MG/0.88 ML",
+      "drug_tier": "1",
+      "drug_requirements": "MO; QL (0.875 per 84 days); NEDS"
+    },
+    {
+      "drug_name": "INVEGA TRINZA INTRAMUSCULAR SYRINGE 410 MG/1.32 ML",
+      "drug_tier": "1",
+      "drug_requirements": "MO; QL (1.315 per 84 days); NEDS"
+    },
+    {
+      "drug_name": "INVEGA TRINZA INTRAMUSCULAR SYRINGE 546 MG/1.75 ML",
+      "drug_tier": "1",
+      "drug_requirements": "MO; QL (1.75 per 84 days); NEDS"
+    },
+    {
+      "drug_name": "INVEGA TRINZA INTRAMUSCULAR SYRINGE 819 MG/2.63 ML",
+      "drug_tier": "1",
+      "drug_requirements": "MO; QL (2.625 per 84 days); NEDS"
+    },
+    {
+      "drug_name": "lisdexamfetamine oral capsule",
+      "drug_tier": "1",
+      "drug_requirements": "MO; QL (30 per 30 days)"
+    },
+    {
+      "drug_name": "lithium carbonate oral capsule",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "lithium carbonate oral tablet",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "lithium carbonate oral tablet extended release",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "lithium citrate oral solution",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lorazepam injection solution",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "lorazepam intensol oral concentrate",
+      "drug_tier": "1",
+      "drug_requirements": "QL (150 per 30 days)"
+    },
+    {
+      "drug_name": "lorazepam oral concentrate",
+      "drug_tier": "1",
+      "drug_requirements": "MO; QL (150 per 30 days)"
+    }
+  ],
+  "acronyms": [
+    {
+      "acronym": "MO",
+      "expansion": "Maintenance Only",
+      "explanation": "The drug requires members to get the medication from a designated Maintenance Network pharmacy."
+    },
+    {
+      "acronym": "PA",
+      "expansion": "Prior Authorization",
+      "explanation": "The Plan requires you or your doctor to get prior authorization for certain drugs. This means that you will need to get approval before you fill your prescriptions. If you don't get approval, we may not cover the drug."
+    },
+    {
+      "acronym": "QL",
+      "expansion": "Quantity Limits",
+      "explanation": "For certain drugs, we limit the amount of the drug that we will cover. For example, we may only cover up to 30 tablets of a certain drug per prescription. This is called \\"quantity limits\\". If you need to receive more than the quantity limit, you or your doctor can request an exception."
+    },
+    {
+      "acronym": "NEDS",
+      "expansion": "Non-Excepted Drug Supply",
+      "explanation": "This drug requires a Non-Excepted Drug Supply, which means it must be obtained from a specialty pharmacy or other designated provider."
+    }
+  ],
+  "tiers": [
+    {
+      "acronym": "Tier 1",
+      "expansion": "Single Tier system, meaning all covered drugs will be covered at the same cost sharing amount.",
+      "explanation": "Single Tier system, meaning all covered drugs will be covered at the same cost sharing amount."
+    }
+  ]
+}
+==================================================
+
+=== JSON Parse Error ===
+Original String: {
+  "drug_table": [
+    {
+      "drug_name": "methimazole oral tablet $10 \\mathrm{mg}, 5 \\mathrm{mg}$",
+      "drug_tier": "2",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "propylthiouracil oral tablet",
+      "drug_tier": "3",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "acarbose oral tablet",
+      "drug_tier": "2",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "alcohol pads topical pads, medicated",
+      "drug_tier": "3",
+      "drug_requirements": "PA; MO"
+    },
+    {
+      "drug_name": "BAQSIMI NASAL SPRAY,NON-AEROSOL",
+      "drug_tier": "3",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "diazoxide oral suspension",
+      "drug_tier": "5",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "FARXIGA ORAL TABLET 10 MG",
+      "drug_tier": "3",
+      "drug_requirements": "MO; QL (30 per 30 days)"
+    },
+    {
+      "drug_name": "FARXIGA ORAL TABLET 5 MG",
+      "drug_tier": "3",
+      "drug_requirements": "MO; QL (60 per 30 days)"
+    },
+    {
+      "drug_name": "glimepiride oral tablet 1 mg",
+      "drug_tier": "1",
+      "drug_requirements": "MO; QL (240 per 30 days)"
+    },
+    {
+      "drug_name": "glimepiride oral tablet 2 mg",
+      "drug_tier": "1",
+      "drug_requirements": "MO; QL (120 per 30 days)"
+    },
+    {
+      "drug_name": "glimepiride oral tablet 4 mg",
+      "drug_tier": "1",
+      "drug_requirements": "MO; QL (60 per 30 days)"
+    },
+    {
+      "drug_name": "glipizide oral tablet 10 mg",
+      "drug_tier": "1",
+      "drug_requirements": "MO; QL (120 per 30 days)"
+    },
+    {
+      "drug_name": "GLIPIZIDE ORAL TABLET 2.5 MG",
+      "drug_tier": "4",
+      "drug_requirements": "MO; QL (30 per 30 days)"
+    },
+    {
+      "drug_name": "glipizide oral tablet 5 mg",
+      "drug_tier": "1",
+      "drug_requirements": "MO; QL (240 per 30 days)"
+    },
+    {
+      "drug_name": "glipizide oral tablet extended release 24hr 10 mg",
+      "drug_tier": "1",
+      "drug_requirements": "MO; QL (60 per 30 days)"
+    },
+    {
+      "drug_name": "glipizide oral tablet extended release 24hr 2.5 mg",
+      "drug_tier": "1",
+      "drug_requirements": "MO; QL (240 per 30 days)"
+    },
+    {
+      "drug_name": "glipizide oral tablet extended release 24hr 5 mg",
+      "drug_tier": "1",
+      "drug_requirements": "MO; QL (120 per 30 days)"
+    },
+    {
+      "drug_name": "glipizide-metformin oral tablet 2.5-250 mg",
+      "drug_tier": "1",
+      "drug_requirements": "MO; QL (240 per 30 days)"
+    },
+    {
+      "drug_name": "glipizide-metformin oral tablet 2.5-500 mg, 5-500 mg",
+      "drug_tier": "1",
+      "drug_requirements": "MO; QL (120 per 30 days)"
+    },
+    {
+      "drug_name": "GLUCAGON (HCL) EMERGENCY KIT INJECTION RECON SOLN",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    }
+  ],
+  "acronyms": [
+    {
+      "acronym": "MO",
+      "expansion": "Maintenance Only",
+      "explanation": "Maintenance Only - a supply limit that allows you to receive up to a 90-day supply at retail pharmacies and a 90-day supply through mail order."
+    },
+    {
+      "acronym": "PA",
+      "expansion": "Prior Authorization",
+      "explanation": "The Plan requires you or your doctor to get prior authorization for certain drugs. This means that you will need to get approval before you fill your prescriptions. If you don't get approval, we may not cover the drug."
+    },
+    {
+      "acronym": "QL",
+      "expansion": "Quantity Limit",
+      "explanation": "In some cases, the Plan limits the amount of the drug that will be covered. For example, the plan might cover a maximum of 30 capsules per prescription for a given drug. \\"QL (30 per 30 days)\\" means that the plan will cover up to 30 capsules in a 30-day period."
+    }
+  ],
+  "tiers": [
+    {
+      "acronym": "Tier 1",
+      "expansion": "Single Tier system, meaning all covered drugs will be covered at the same cost sharing amount.",
+      "explanation": "Single Tier system, meaning all covered drugs will be covered at the same cost sharing amount."
+    }
+  ]
+}
+==================================================
+
+=== JSON Parse Error ===
+Original String: {
+  "drug_table": [
+    {
+      "drug_name": "GENOTROPIN MINIQUICK SUBCUTANEOUS SYRINGE 0.4 MG/0.25 ML, 0.6 MG/0.25 ML, 0.8 MG/0.25 ML, 1 MG/0.25 ML, 1.2 MG/0.25 ML, 1.4 MG/0.25 ML, 1.6 MG/0.25 ML, 1.8 MG/0.25 ML, 2 MG/0.25 ML",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO"
+    },
+    {
+      "drug_name": "GENOTROPIN SUBCUTANEOUS CARTRIDGE",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO"
+    },
+    {
+      "drug_name": "GRANIX SUBCUTANEOUS SOLUTION 300 MCG/ML",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO"
+    },
+    {
+      "drug_name": "GRANIX SUBCUTANEOUS SYRINGE",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO"
+    },
+    {
+      "drug_name": "ILARIS (PF) SUBCUTANEOUS SOLUTION",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO; QL (2 per 28 days)"
+    },
+    {
+      "drug_name": "LEUKINE INJECTION RECON SOLN",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO"
+    },
+    {
+      "drug_name": "NEULASTA ONPRO SUBCUTANEOUS SYRINGE, W/ WEARABLE INJECTOR",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO"
+    },
+    {
+      "drug_name": "NEULASTA SUBCUTANEOUS SYRINGE",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO"
+    },
+    {
+      "drug_name": "NORDITROPIN FLEXPRO SUBCUTANEOUS PEN INJECTOR 10 MG/1.5 ML (6.7 MG/ML), 15 MG/1.5 ML (10 MG/ML), 5 MG/1.5 ML(3.3 MG/ML)",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO"
+    },
+    {
+      "drug_name": "NORDITROPIN FLEXPRO SUBCUTANEOUS PEN INJECTOR 30 MG/3 ML (10 MG/ML)",
+      "drug_tier": "5",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "PEGASYS SUBCUTANEOUS SOLUTION",
+      "drug_tier": "5",
+      "drug_requirements": "MO; QL (4 per 28 days)"
+    },
+    {
+      "drug_name": "PEGASYS SUBCUTANEOUS SYRINGE",
+      "drug_tier": "5",
+      "drug_requirements": "MO; QL (2 per 28 days)"
+    },
+    {
+      "drug_name": "PLEGRIDY INTRAMUSCULAR SYRINGE",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO; QL (1 per 28 days)"
+    },
+    {
+      "drug_name": "PLEGRIDY SUBCUTANEOUS PEN INJECTOR 125 MCG/0.5 ML",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO; QL (1 per 28 days)"
+    },
+    {
+      "drug_name": "PLEGRIDY SUBCUTANEOUS PEN INJECTOR 63 MCG/0.5 ML- 94 MCG/0.5 ML",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO; QL (2 per 365 days)"
+    },
+    {
+      "drug_name": "PLEGRIDY SUBCUTANEOUS SYRINGE 125 MCG/0.5 ML",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO; QL (1 per 28 days)"
+    },
+    {
+      "drug_name": "PLEGRIDY SUBCUTANEOUS SYRINGE 63 MCG/0.5 ML$94 MCG/0.5 ML",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO; QL (2 per 365 days)"
+    },
+    {
+      "drug_name": "plerixafor subcutaneous solution",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO"
+    },
+    {
+      "drug_name": "PROCRIT INJECTION SOLUTION 10,000 UNIT/ML, 2,000 UNIT/ML, 3,000 UNIT/ML, 4,000 UNIT/ML",
+      "drug_tier": "3",
+      "drug_requirements": "PA; MO"
+    },
+    {
+      "drug_name": "PROCRIT INJECTION SOLUTION 20,000 UNIT/2 ML, 20,000 UNIT/ML, 40,000 UNIT/ML",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO"
+    }
+  ],
+  "acronyms": [
+    {
+      "acronym": "PA",
+      "expansion": "Prior Authorization",
+      "explanation": "The Plan requires you or your doctor to get prior authorization for certain drugs. This means that you will need to get approval before you fill your prescriptions. If you don't get approval, we may not cover the drug."
+    },
+    {
+      "acronym": "MO",
+      "expansion": "Maintenance Only",
+      "explanation": "For drugs marked "MO", the plan will only cover the drug if it is a maintenance medication. This means the drug must be prescribed for an ongoing condition, not a short-term need."
+    },
+    {
+      "acronym": "QL",
+      "expansion": "Quantity Limits",
+      "explanation": "For drugs marked "QL", the plan will only cover up to a certain amount of the drug within a certain time period. For example, the plan may only cover 30 pills of a certain drug per 30 days."
+    }
+  ],
+  "tiers": [
+    {
+      "acronym": "Tier 1",
+      "expansion": "Single Tier system, meaning all covered drugs will be covered at the same cost sharing amount.",
+      "explanation": "Single Tier system, meaning all covered drugs will be covered at the same cost sharing amount."
+    }
+  ]
+}
+==================================================
+
+=== JSON Parse Error ===
+Original String: {
+  "drug_table": [
+    {
+      "drug_name": "HUMIRA(CF) PEN (ONLY NDCS STARTING WITH 00074) SUBCUTANEOUS PEN INJECTOR KIT 80 MG/0.8 ML",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO; QL (2 per 28 days)"
+    },
+    {
+      "drug_name": "HUMIRA(CF) PEN CROHNS-UC-HS (ONLY NDCS STARTING WITH 00074) SUBCUTANEOUS PEN INJECTOR KIT",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO; QL (6 per 365 days)"
+    },
+    {
+      "drug_name": "HUMIRA(CF) PEN PSOR-UV-ADOL HS (ONLY NDCS STARTING WITH 00074) SUBCUTANEOUS PEN INJECTOR KIT",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO; QL (6 per 365 days)"
+    },
+    {
+      "drug_name": "KEVZARA SUBCUTANEOUS PEN INJECTOR",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO; QL (2.28 per 28 days)"
+    },
+    {
+      "drug_name": "KEVZARA SUBCUTANEOUS SYRINGE",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO; QL (2.28 per 28 days)"
+    },
+    {
+      "drug_name": "KINERET SUBCUTANEOUS SYRINGE",
+      "drug_tier": "5",
+      "drug_requirements": "PA; QL (18.76 per 28 days)"
+    },
+    {
+      "drug_name": "leflunomide oral tablet",
+      "drug_tier": "3",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "LEQSELVI ORAL TABLET",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO; QL (60 per 30 days)"
+    },
+    {
+      "drug_name": "OLUMIANT ORAL TABLET",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO; QL (30 per 30 days)"
+    },
+    {
+      "drug_name": "ORENCIA (WITH MALTOSE) INTRAVENOUS RECON SOLN",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO"
+    },
+    {
+      "drug_name": "ORENCIA CLICKJECT SUBCUTANEOUS AUTO-INJECTOR",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO; QL (4 per 28 days)"
+    },
+    {
+      "drug_name": "ORENCIA SUBCUTANEOUS SYRINGE 125 MG/ML",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO; QL (4 per 28 days)"
+    },
+    {
+      "drug_name": "ORENCIA SUBCUTANEOUS SYRINGE 50 MG/0.4 ML",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO; QL (1.6 per 28 days)"
+    },
+    {
+      "drug_name": "ORENCIA SUBCUTANEOUS SYRINGE 87.5 MG/0.7 ML",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO; QL (2.8 per 28 days)"
+    },
+    {
+      "drug_name": "OTEZLA ORAL TABLET",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO; QL (60 per 30 days)"
+    },
+    {
+      "drug_name": "OTEZLA STARTER ORAL TABLETS,DOSE PACK 10 MG (4)- 20 MG (51), 10 MG (4)-20 MG (4)-30 MG (47)",
+      "drug_tier": "5",
+      "drug_requirements": "PA; MO; QL (110 per 365 days)"
+    }
+  ],
+  "acronyms": [
+    {
+      "acronym": "PA",
+      "expansion": "Prior Authorization",
+      "explanation": "The Plan requires you or your doctor to get prior authorization for certain drugs. This means that you will need to get approval before you fill your prescriptions. If you don't get approval, we may not cover the drug."
+    },
+    {
+      "acronym": "MO",
+      "expansion": "Maintenance Only",
+      "explanation": "This drug is only covered if you have been taking it for a certain period of time (also called \\"maintenance\\" drug). Speak with your doctor or pharmacist for more details."
+    },
+    {
+      "acronym": "QL",
+      "expansion": "Quantity Limit",
+      "explanation": "There are limits on the amount of the drug that will be covered. This is usually a limit on the amount of the drug you can receive at one time."
+    }
+  ],
+  "tiers": [
+    {
+      "acronym": "Tier 1",
+      "expansion": "Single Tier system, meaning all covered drugs will be covered at the same cost sharing amount.",
+      "explanation": "Single Tier system, meaning all covered drugs will be covered at the same cost sharing amount."
+    }
+  ]
+}
+==================================================
+
+=== JSON Parse Error ===
+Original String: {
+  "drug_table": [
+    {
+      "drug_name": "VERKAZIA OPHTHALMIC (EYE) DROPPERETTE",
+      "drug_tier": "1",
+      "drug_requirements": "PA; QL (120 per 30 days); NEDS"
+    },
+    {
+      "drug_name": "XDEMVY OPHTHALMIC (EYE) DROPS",
+      "drug_tier": "1",
+      "drug_requirements": "QL (10 per 42 days); NEDS"
+    },
+    {
+      "drug_name": "XIIDRA OPHTHALMIC (EYE) DROPPERETTE",
+      "drug_tier": "1",
+      "drug_requirements": "MO; QL (60 per 30 days)"
+    },
+    {
+      "drug_name": "bromfenac ophthalmic (eye) drops 0.09 %",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "diclofenac sodium ophthalmic (eye) drops",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "flurbiprofen sodium ophthalmic (eye) drops",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "ketorolac ophthalmic (eye) drops 0.4 %",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "ketorolac ophthalmic (eye) drops 0.5 %",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "acetazolamide oral capsule, extended release",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "acetazolamide oral tablet",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "methazolamide oral tablet",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "bimatoprost ophthalmic (eye) drops",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "brimonidine-timolol ophthalmic (eye) drops",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "dorzolamide ophthalmic (eye) drops",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "dorzolamide-timolol (pf) ophthalmic (eye) dropperette",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "dorzolamide-timolol ophthalmic (eye) drops",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "DURYSTA INTRACAMERAL IMPLANT",
+      "drug_tier": "1",
+      "drug_requirements": "PA; MO; QL (2 per 365 days)"
+    },
+    {
+      "drug_name": "latanoprost ophthalmic (eye) drops",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "LUMIGAN OPHTHALMIC (EYE) DROPS 0.01 %",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "RHOPRESSA OPHTHALMIC (EYE) DROPS",
+      "drug_tier": "1",
+      "drug_requirements": "ST"
+    },
+    {
+      "drug_name": "ROCKLATAN OPHTHALMIC (EYE) DROPS",
+      "drug_tier": "1",
+      "drug_requirements": "ST"
+    },
+    {
+      "drug_name": "SIMBRINZA OPHTHALMIC (EYE) DROPS,SUSPENSION",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "neomycin-bacitracin-poly-hc ophthalmic (eye) ointment",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    },
+    {
+      "drug_name": "neomycin-polymyxin b-dexameth ophthalmic (eye) drops,suspension",
+      "drug_tier": "1",
+      "drug_requirements": "MO"
+    }
+  ],
+  "acronyms": [
+    {
+      "acronym": "PA",
+      "expansion": "Prior Authorization",
+      "explanation": "The Plan requires you or your doctor to get prior authorization for certain drugs. This means that you will need to get approval before you fill your prescriptions. If you don't get approval, we may not cover the drug."
+    },
+    {
+      "acronym": "QL",
+      "expansion": "Quantity Limit",
+      "explanation": "The Plan covers a certain quantity of the medication within a certain time period. If you need more of the medication than is allowed, you or your doctor will need to request an exception."
+    },
+    {
+      "acronym": "NEDS",
+      "expansion": "New Enhanced Delivery System",
+      "explanation": "This medication is considered a \\"new enhanced delivery system\\" and may have a higher cost or require additional approval."
+    },
+    {
+      "acronym": "MO",
+      "expansion": "Maintenance Only",
+      "explanation": "This medication is only covered if used for maintenance treatment of a chronic condition. It may not be covered for acute, short-term use."
+    },
+    {
+      "acronym": "ST",
+      "expansion": "Step Therapy",
+      "explanation": "In some cases, the Plan requires you to first try certain drugs to treat your medical condition that costs less. For example, if Drug A and Drug B both treat your medical condition, we may not cover Drug B unless you first try Drug A."
+    }
+  ],
+  "tiers": [
+    {
+      "acronym": "Tier 1",
+      "expansion": "Single Tier system, meaning all covered drugs will be covered at the same cost sharing amount.",
+      "explanation": "Single Tier system, meaning all covered drugs will be covered at the same cost sharing amount."
+    }
+  ]
+}
+==================================================
+
+=== JSON Parse Error ===
+Original String: {
+  "drug_table": [
+    {
+      "drug_name": "clorazepate dipotassium tab 7.5 mg",
+      "drug_tier": "4",
+      "drug_requirements": "PA (>=65 yr), QL (360 tablets/30 days)"
+    },
+    {
+      "drug_name": "clorazepate dipotassium tab 15 mg",
+      "drug_tier": "4",
+      "drug_requirements": "PA (>=65 yr), QL (180 tablets/30 days)"
+    },
+    {
+      "drug_name": "diazepam oral soln 1 mg/ml",
+      "drug_tier": "4",
+      "drug_requirements": "PA (>=65 yr), QL (1200 mls/30 days)"
+    },
+    {
+      "drug_name": "diazepam tab 2 mg",
+      "drug_tier": "2",
+      "drug_requirements": "PA (>=65 yr), QL (120 tablets/30 days)"
+    },
+    {
+      "drug_name": "diazepam tab 5 mg",
+      "drug_tier": "2",
+      "drug_requirements": "PA (>=65 yr), QL (120 tablets/30 days)"
+    },
+    {
+      "drug_name": "diazepam tab 10 mg",
+      "drug_tier": "2",
+      "drug_requirements": "PA (>=65 yr), QL (120 tablets/30 days)"
+    },
+    {
+      "drug_name": "hydroxyzine hcl tab 25 mg",
+      "drug_tier": "3",
+      "drug_requirements": "PA (>=65 yr)"
+    },
+    {
+      "drug_name": "hydroxyzine hcl tab 50 mg",
+      "drug_tier": "3",
+      "drug_requirements": "PA (>=65 yr)"
+    },
+    {
+      "drug_name": "lorazepam conc 2 mg/ml",
+      "drug_tier": "2",
+      "drug_requirements": "PA (>=65 yr), QL (150 mls/30 days)"
+    },
+    {
+      "drug_name": "lorazepam intensol - lorazepam conc 2 mg/ml",
+      "drug_tier": "2",
+      "drug_requirements": "PA (>=65 yr), QL (150 mls/30 days)"
+    },
+    {
+      "drug_name": "lorazepam tab 0.5 mg",
+      "drug_tier": "2",
+      "drug_requirements": "PA (>=65 yr), QL (120 tablets/30 days)"
+    },
+    {
+      "drug_name": "lorazepam tab 1 mg",
+      "drug_tier": "2",
+      "drug_requirements": "PA (>=65 yr), QL (120 tablets/30 days)"
+    },
+    {
+      "drug_name": "lorazepam tab 2 mg",
+      "drug_tier": "2",
+      "drug_requirements": "PA (>=65 yr), QL (150 tablets/30 days)"
+    },
+    {
+      "drug_name": "lithium carbonate cap 600 mg",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "lithium carbonate cap 150 mg",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "lithium carbonate cap 300 mg",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "lithium carbonate tab er 300 mg",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "lithium carbonate tab er 450 mg",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "lithium carbonate tab 300 mg",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "lithium oral solution 8 meq/5 ml",
+      "drug_tier": "4",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "acarbose tab 25 mg",
+      "drug_tier": "3",
+      "drug_requirements": "QL (360 tablets/30 days)"
+    },
+    {
+      "drug_name": "acarbose tab 50 mg",
+      "drug_tier": "3",
+      "drug_requirements": "QL (180 tablets/30 days)"
+    },
+    {
+      "drug_name": "acarbose tab 100 mg",
+      "drug_tier": "3",
+      "drug_requirements": "QL (90 tablets/30 days)"
+    },
+    {
+      "drug_name": "ALCOHOL SWABS",
+      "drug_tier": "3",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "diazoxide susp 50 mg/ml",
+      "drug_tier": "4",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "FARXIGA - dapagliflozin propanediol tab 5 mg (base equivalent)",
+      "drug_tier": "3",
+      "drug_requirements": "QL (60 tablets/30 days)"
+    },
+    {
+      "drug_name": "FARXIGA - dapagliflozin propanediol tab 10 mg (base equivalent)",
+      "drug_tier": "3",
+      "drug_requirements": "QL (30 tablets/30 days)"
+    },
+    {
+      "drug_name": "GAUZE PADS 2\\" X 2\\"",
+      "drug_tier": "3",
+      "drug_requirements": "PA"
+    }
+  ],
+  "acronyms": [
+    {
+      "acronym": "PA",
+      "expansion": "Prior authorization",
+      "explanation": "Prior authorization"
+    },
+    {
+      "acronym": "QL",
+      "expansion": "Quantity Limits",
+      "explanation": "Quantity Limits"
+    }
+  ],
+  "tiers": [
+    {
+      "acronym": "2",
+      "expansion": "Preferred Generic",
+      "explanation": "Preferred Generic"
+    },
+    {
+      "acronym": "3",
+      "expansion": "Non-Preferred Generic",
+      "explanation": "Non-Preferred Generic"
+    },
+    {
+      "acronym": "4",
+      "expansion": "Preferred Brand",
+      "explanation": "Preferred Brand"
+    }
+  ]
+}
+==================================================
+
+=== JSON Parse Error ===
+Original String: {
+  "drug_table": [
+    {
+      "drug_name": "hydroxyzine hcl tab 10 mg",
+      "drug_tier": "3",
+      "drug_requirements": "PA (>=65 yr)"
+    },
+    {
+      "drug_name": "hydroxyzine hcl tab 25 mg",
+      "drug_tier": "3",
+      "drug_requirements": "PA (>=65 yr)"
+    },
+    {
+      "drug_name": "hydroxyzine hcl tab 50 mg",
+      "drug_tier": "3",
+      "drug_requirements": "PA (>=65 yr)"
+    },
+    {
+      "drug_name": "lorazepam conc 2 mg/ml",
+      "drug_tier": "2",
+      "drug_requirements": "PA (>=65 yr); QL (150 mls/30 days)"
+    },
+    {
+      "drug_name": "lorazepam intensol - lorazepam conc 2 mg/ml",
+      "drug_tier": "2",
+      "drug_requirements": "PA (>=65 yr); QL (150 mls/30 days)"
+    },
+    {
+      "drug_name": "lorazepam tab 0.5 mg",
+      "drug_tier": "2",
+      "drug_requirements": "PA (>=65 yr); QL (120 tablets/30 days)"
+    },
+    {
+      "drug_name": "lorazepam tab 1 mg",
+      "drug_tier": "2",
+      "drug_requirements": "PA (>=65 yr); QL (120 tablets/30 days)"
+    },
+    {
+      "drug_name": "lorazepam tab 2 mg",
+      "drug_tier": "2",
+      "drug_requirements": "PA (>=65 yr); QL (150 tablets/30 days)"
+    },
+    {
+      "drug_name": "oxazepam cap 10 mg",
+      "drug_tier": "4",
+      "drug_requirements": "PA (>=65 yr); QL (120 capsules/30 days)"
+    },
+    {
+      "drug_name": "oxazepam cap 15 mg",
+      "drug_tier": "4",
+      "drug_requirements": "PA (>=65 yr); QL (120 capsules/30 days)"
+    },
+    {
+      "drug_name": "oxazepam cap 30 mg",
+      "drug_tier": "4",
+      "drug_requirements": "PA (>=65 yr); QL (120 capsules/30 days)"
+    },
+    {
+      "drug_name": "lithium carbonate cap 600 mg",
+      "drug_tier": "1",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "lithium carbonate cap 150 mg",
+      "drug_tier": "1",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "lithium carbonate cap 300 mg",
+      "drug_tier": "1",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "lithium carbonate tab er 300 mg",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "lithium carbonate tab er 450 mg",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "lithium carbonate tab 300 mg",
+      "drug_tier": "1",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "lithium oral solution 8 meq/5 ml",
+      "drug_tier": "4",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "acarbose tab 25 mg",
+      "drug_tier": "3",
+      "drug_requirements": "QL (360 tablets/30 days)"
+    },
+    {
+      "drug_name": "acarbose tab 50 mg",
+      "drug_tier": "3",
+      "drug_requirements": "QL (180 tablets/30 days)"
+    },
+    {
+      "drug_name": "acarbose tab 100 mg",
+      "drug_tier": "3",
+      "drug_requirements": "QL (90 tablets/30 days)"
+    },
+    {
+      "drug_name": "ALCOHOL SWABS",
+      "drug_tier": "3",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "BAQSIMI ONE PACK - glucagon nasal powder 3 mg/dose",
+      "drug_tier": "4",
+      "drug_requirements": "QL (4 devices/30 days)"
+    },
+    {
+      "drug_name": "BAQSIMI TWO PACK - glucagon nasal powder 3 mg/dose",
+      "drug_tier": "4",
+      "drug_requirements": "QL (4 devices/30 days)"
+    },
+    {
+      "drug_name": "CYCLOSET - bromocriptine mesylate tab 0.8 mg (base equivalent)",
+      "drug_tier": "4",
+      "drug_requirements": "QL (180 tablets/30 days)"
+    },
+    {
+      "drug_name": "diazoxide susp 50 mg/ml",
+      "drug_tier": "4",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "FARXIGA - dapagliflozin propanediol tab 5 mg (base equivalent)",
+      "drug_tier": "3",
+      "drug_requirements": "QL (60 tablets/30 days)"
+    },
+    {
+      "drug_name": "FARXIGA - dapagliflozin propanediol tab 10 mg (base equivalent)",
+      "drug_tier": "3",
+      "drug_requirements": "QL (30 tablets/30 days)"
+    },
+    {
+      "drug_name": "GAUZE PADS 2\\" X 2\\"",
+      "drug_tier": "3",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "glimepiride tab 1 mg",
+      "drug_tier": "1",
+      "drug_requirements": "QL (240 tablets/30 days)"
+    }
+  ],
+  "acronyms": [
+    {
+      "acronym": "PA",
+      "expansion": "Prior authorization",
+      "explanation": "Prior authorization"
+    },
+    {
+      "acronym": "QL",
+      "expansion": "Quantity Limits",
+      "explanation": "Quantity Limits"
+    }
+  ],
+  "tiers": [
+    {
+      "acronym": "1",
+      "expansion": "Preferred Generic",
+      "explanation": "Preferred Generic"
+    },
+    {
+      "acronym": "2",
+      "expansion": "Preferred Brand",
+      "explanation": "Preferred Brand"
+    },
+    {
+      "acronym": "3",
+      "expansion": "Non-Preferred Generic; Non-Preferred Brand",
+      "explanation": "Non-Preferred Generic; Non-Preferred Brand"
+    },
+    {
+      "acronym": "4",
+      "expansion": "Specialty",
+      "explanation": "Specialty"
+    }
+  ]
+}
+==================================================
+
+=== JSON Parse Error ===
+Original String: {
+  "drug_table": [
+    {
+      "drug_name": "GAUZE PADS 2\\" X 2\\"",
+      "drug_tier": "3",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "glimepiride tab 1 mg",
+      "drug_tier": "6",
+      "drug_requirements": "QL (240 tablets/30 days)"
+    },
+    {
+      "drug_name": "glimepiride tab 2 mg",
+      "drug_tier": "6",
+      "drug_requirements": "QL (120 tablets/30 days)"
+    },
+    {
+      "drug_name": "glimepiride tab 4 mg",
+      "drug_tier": "6",
+      "drug_requirements": "QL (60 tablets/30 days)"
+    },
+    {
+      "drug_name": "glipizide tab er 24 hr 2.5 mg",
+      "drug_tier": "6",
+      "drug_requirements": "QL (240 tablets/30 days)"
+    },
+    {
+      "drug_name": "glipizide tab er 24 hr 5 mg",
+      "drug_tier": "6",
+      "drug_requirements": "QL (120 tablets/30 days)"
+    },
+    {
+      "drug_name": "glipizide tab er 24 hr 10 mg",
+      "drug_tier": "6",
+      "drug_requirements": "QL (60 tablets/30 days)"
+    },
+    {
+      "drug_name": "glipizide tab 5 mg",
+      "drug_tier": "6",
+      "drug_requirements": "QL (240 tablets/30 days)"
+    },
+    {
+      "drug_name": "glipizide tab 10 mg",
+      "drug_tier": "6",
+      "drug_requirements": "QL (120 tablets/30 days)"
+    },
+    {
+      "drug_name": "glipizide xl - glipizide tab er 24 hr 2.5 mg",
+      "drug_tier": "6",
+      "drug_requirements": "QL (240 tablets/30 days)"
+    },
+    {
+      "drug_name": "glipizide xl - glipizide tab er 24 hr 5 mg",
+      "drug_tier": "6",
+      "drug_requirements": "QL (120 tablets/30 days)"
+    },
+    {
+      "drug_name": "glipizide xl - glipizide tab er 24 hr 10 mg",
+      "drug_tier": "6",
+      "drug_requirements": "QL (60 tablets/30 days)"
+    },
+    {
+      "drug_name": "glipizide-metformin hcl tab 2.5-250 mg",
+      "drug_tier": "6",
+      "drug_requirements": "QL (240 tablets/30 days)"
+    },
+    {
+      "drug_name": "glipizide-metformin hcl tab 2.5-500 mg",
+      "drug_tier": "6",
+      "drug_requirements": "QL (120 tablets/30 days)"
+    },
+    {
+      "drug_name": "glipizide-metformin hcl tab 5-500 mg",
+      "drug_tier": "6",
+      "drug_requirements": "QL (120 tablets/30 days)"
+    },
+    {
+      "drug_name": "glyburide micronized tab 1.5 mg",
+      "drug_tier": "6",
+      "drug_requirements": "QL (240 tablets/30 days)"
+    },
+    {
+      "drug_name": "glyburide micronized tab 3 mg",
+      "drug_tier": "6",
+      "drug_requirements": "QL (120 tablets/30 days)"
+    },
+    {
+      "drug_name": "glyburide micronized tab 6 mg",
+      "drug_tier": "6",
+      "drug_requirements": "QL (60 tablets/30 days)"
+    },
+    {
+      "drug_name": "glyburide tab 1.25 mg",
+      "drug_tier": "6",
+      "drug_requirements": "QL (480 tablets/30 days)"
+    },
+    {
+      "drug_name": "glyburide tab 2.5 mg",
+      "drug_tier": "6",
+      "drug_requirements": "QL (240 tablets/30 days)"
+    },
+    {
+      "drug_name": "glyburide tab 5 mg",
+      "drug_tier": "6",
+      "drug_requirements": "QL (120 tablets/30 days)"
+    },
+    {
+      "drug_name": "glyburide-metformin tab 1.25-250 mg",
+      "drug_tier": "6",
+      "drug_requirements": "QL (240 tablets/30 days)"
+    },
+    {
+      "drug_name": "glyburide-metformin tab 2.5-500 mg",
+      "drug_tier": "6",
+      "drug_requirements": "QL (120 tablets/30 days)"
+    },
+    {
+      "drug_name": "glyburide-metformin tab 5-500 mg",
+      "drug_tier": "6",
+      "drug_requirements": "QL (120 tablets/30 days)"
+    },
+    {
+      "drug_name": "GLYXAMBI - empagliflozin-linagliptin tab 10-5 mg",
+      "drug_tier": "4",
+      "drug_requirements": "QL (30 tablets/30 days)"
+    },
+    {
+      "drug_name": "GLYXAMBI - empagliflozin-linagliptin tab 25-5 mg",
+      "drug_tier": "4",
+      "drug_requirements": "QL (30 tablets/30 days)"
+    },
+    {
+      "drug_name": "GVOKE HYPOPEN 1-PACK - glucagon subcutaneous solution auto-injector 0.5 mg/0.1 ml",
+      "drug_tier": "3",
+      "drug_requirements": "QL (4 syringes/30 days)"
+    },
+    {
+      "drug_name": "GVOKE HYPOPEN 1-PACK - glucagon subcutaneous solution auto-injector 1 mg/0.2 ml",
+      "drug_tier": "3",
+      "drug_requirements": "QL (4 syringes/30 days)"
+    },
+    {
+      "drug_name": "GVOKE HYPOPEN 2-PACK - glucagon subcutaneous solution auto-injector 0.5 mg/0.1 ml",
+      "drug_tier": "3",
+      "drug_requirements": "QL (4 syringes/30 days)"
+    },
+    {
+      "drug_name": "GVOKE HYPOPEN 2-PACK - glucagon subcutaneous solution auto-injector 1 mg/0.2 ml",
+      "drug_tier": "3",
+      "drug_requirements": "QL (4 syringes/30 days)"
+    },
+    {
+      "drug_name": "GVOKE KIT - glucagon subcutaneous soln 1 mg/0.2 ml",
+      "drug_tier": "3",
+      "drug_requirements": "QL (4 vials/30 days)"
+    },
+    {
+      "drug_name": "GVOKE PFS - glucagon subcutaneous soln pref syringe 1 mg/0.2 ml",
+      "drug_tier": "3",
+      "drug_requirements": "QL (4 syringes/30 days)"
+    },
+    {
+      "drug_name": "HUMALOG - insulin lispro inj soln 100 unit/ml",
+      "drug_tier": "3",
+      "drug_requirements": "QL (60 mls/30 days)"
+    },
+    {
+      "drug_name": "HUMALOG - insulin lispro soln cartridge 100 unit/ml",
+      "drug_tier": "3",
+      "drug_requirements": "QL (20 cartridges/30 days)"
+    }
+  ],
+  "acronyms": [
+    {
+      "acronym": "PA",
+      "expansion": "Prior authorization",
+      "explanation": "Prior authorization"
+    },
+    {
+      "acronym": "QL",
+      "expansion": "Quantity Limits",
+      "explanation": "Quantity Limits"
+    }
+  ],
+  "tiers": [
+    {
+      "acronym": "3",
+      "expansion": "Tier 3",
+      "explanation": "Tier 3"
+    },
+    {
+      "acronym": "4",
+      "expansion": "Tier 4",
+      "explanation": "Tier 4"
+    },
+    {
+      "acronym": "6",
+      "expansion": "Tier 6",
+      "explanation": "Tier 6"
+    }
+  ]
+}
+==================================================
+
+=== JSON Parse Error ===
+Original String: {
+  "drug_table": [
+    {
+      "drug_name": "procto-med hc",
+      "drug_tier": "2",
+      "drug_requirements": "QL(90 GM per 90 days)"
+    },
+    {
+      "drug_name": "proctosol hc",
+      "drug_tier": "2",
+      "drug_requirements": "QL(90 GM per 90 days)"
+    },
+    {
+      "drug_name": "proctozone-hc",
+      "drug_tier": "2",
+      "drug_requirements": "QL(90 GM per 90 days)"
+    },
+    {
+      "drug_name": "alendronate sodium tablet 35 mg, 70 mg",
+      "drug_tier": "2",
+      "drug_requirements": "QL(12 EA per 84 days)"
+    },
+    {
+      "drug_name": "alendronate sodium tablet 10 mg",
+      "drug_tier": "2",
+      "drug_requirements": "QL(90 EA per 90 days)"
+    },
+    {
+      "drug_name": "calcitonin-salmon solution",
+      "drug_tier": "3",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "calcitriol capsule",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "calcitriol solution",
+      "drug_tier": "4",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "cinacalcet hydrochloride tablet 30mg",
+      "drug_tier": "3",
+      "drug_requirements": "QL(360 EA per 90 days)"
+    },
+    {
+      "drug_name": "cinacalcet hydrochloride tablet 90mg",
+      "drug_tier": "4",
+      "drug_requirements": "QL(124 EA per 31 days)"
+    },
+    {
+      "drug_name": "cinacalcet hydrochloride tablet 60mg",
+      "drug_tier": "4",
+      "drug_requirements": "QL(62 EA per 31 days)"
+    },
+    {
+      "drug_name": "ibandronate sodium tablet",
+      "drug_tier": "3",
+      "drug_requirements": "QL(3 EA per 84 days)"
+    },
+    {
+      "drug_name": "paricalcitol capsule",
+      "drug_tier": "4",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "PROLIA",
+      "drug_tier": "4",
+      "drug_requirements": "QL(1 ML per 180 days); PA"
+    },
+    {
+      "drug_name": "TYMLOS",
+      "drug_tier": "5",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "WYOST",
+      "drug_tier": "5",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "XGEVA",
+      "drug_tier": "5",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "ALCOHOL PREP PADS",
+      "drug_tier": "2",
+      "drug_requirements": "ST"
+    },
+    {
+      "drug_name": "B-D INSULIN SYRINGE ULTRAFINE II/0.3ML/31G X 5/16\\"",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "BD INSULIN SYRINGE SAFETYGLIDE/1ML/29G X 1/2\\"",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "BD INSULIN SYRINGE ULTRA-FINE/0.5ML/30G X 12.7MM",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "BD INSULIN SYRINGE ULTRA-FINE/1ML/31G X 8MM",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "BD PEN NEEDLE/ORIGINAL/ULTRA-FINE/29G X 12.7MM",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "CEQUR SIMPLICITY 2U",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "CURITY GAUZE PADS 2\\"X2\\" 12 PLY",
+      "drug_tier": "2",
+      "drug_requirements": "ST"
+    },
+    {
+      "drug_name": "EASY COMFORT INSULIN SYRINGE/0.3ML/31G X 1/2\\"",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "INPEN 100/BLUE/LILLY/HUMALOG",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "INPEN 100/BLUE/NOVOLOG/FIASP",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "INPEN 100/GREY/LILLY/HUMALOG",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "INPEN 100/GREY/NOVOLOG/FIASP",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "INPEN 100/PINK/LILLY/HUMALOG",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "INPEN 100/PINK/NOVOLOG/FIASP",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "INTRALIPID INJECTION 20GM/100ML, 30GM/100ML",
+      "drug_tier": "4",
+      "drug_requirements": "B/D"
+    },
+    {
+      "drug_name": "levocarnitine tablet",
+      "drug_tier": "3",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "levocarnitine solution",
+      "drug_tier": "4",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "NOVOFINE AUTOCOVER PEN NEEDLE 30G X 8MM",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "NOVOFINE PEN NEEDLE 32G X 6MM",
+      "drug_tier": "2",
+      "drug_requirements": null
+    }
+  ],
+  "acronyms": [
+    {
+      "acronym": "QL",
+      "expansion": "Quantity Limits",
+      "explanation": "Quantity Limits"
+    },
+    {
+      "acronym": "PA",
+      "expansion": "Prior Authorization",
+      "explanation": "Prior Authorization"
+    },
+    {
+      "acronym": "ST",
+      "expansion": "Step Therapy",
+      "explanation": "Step Therapy"
+    },
+    {
+      "acronym": "B/D",
+      "expansion": "Benefit/Diagnosis",
+      "explanation": "Benefit/Diagnosis"
+    }
+  ],
+  "tiers": [
+    {
+      "acronym": "1",
+      "expansion": "Preferred Generic",
+      "explanation": "Preferred Generic"
+    },
+    {
+      "acronym": "2",
+      "expansion": "Generic",
+      "explanation": "Generic"
+    },
+    {
+      "acronym": "3",
+      "expansion": "Preferred Brand",
+      "explanation": "Preferred Brand"
+    },
+    {
+      "acronym": "4",
+      "expansion": "Non-Preferred Brand",
+      "explanation": "Non-Preferred Brand"
+    },
+    {
+      "acronym": "5",
+      "expansion": "Specialty",
+      "explanation": "Specialty"
+    }
+  ]
+}
+==================================================
+
+=== JSON Parse Error ===
+Original String: {
+  "drug_table": [
+    {
+      "drug_name": "mesalamine enema",
+      "drug_tier": "4",
+      "drug_requirements": "QL(5400 ML per 90 days)"
+    },
+    {
+      "drug_name": "PENTASA CAPSULE EXTENDED RELEASE 250MG",
+      "drug_tier": "4",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "sulfasalazine tablet, tablet delayed release",
+      "drug_tier": "1",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "budesonide er",
+      "drug_tier": "5",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "budesonide capsule delayed release particles 3mg",
+      "drug_tier": "3",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "HYDROCORTISONE CREAM 1%",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "hydrocortisone cream 2.5%",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "hydrocortisone enema 100 mg/60 ml",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "procto-med hc",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "proctosol hc",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "proctozone-hc",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "alendronate sodium solution",
+      "drug_tier": "2",
+      "drug_requirements": "QL(900 ML per 84 days)"
+    },
+    {
+      "drug_name": "alendronate sodium tablet 35 mg, 70 mg",
+      "drug_tier": "1",
+      "drug_requirements": "QL(12 EA per 84 days)"
+    },
+    {
+      "drug_name": "alendronate sodium tablet 10 mg",
+      "drug_tier": "1",
+      "drug_requirements": "QL(90 EA per 90 days)"
+    },
+    {
+      "drug_name": "BONSITY",
+      "drug_tier": "5",
+      "drug_requirements": "QL(2.4 ML per 28 days); PA"
+    },
+    {
+      "drug_name": "calcitonin-salmon solution",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "calcitriol capsule 0.25 mcg, 0.5 mcg",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "calcitriol solution 1 mcg/ml",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "cinacalcet hydrochloride tablet 30mg",
+      "drug_tier": "3",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "cinacalcet hydrochloride tablet 60 mg, 90 mg",
+      "drug_tier": "4",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "DOXERCALCIFEROL CAPSULE 2.5MCG",
+      "drug_tier": "4",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "doxercalciferol injection",
+      "drug_tier": "4",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "FORTEO INJECTION 560MCG/2.24ML",
+      "drug_tier": "5",
+      "drug_requirements": "QL(2.4 ML per 28 days); PA"
+    },
+    {
+      "drug_name": "ibandronate sodium tablet",
+      "drug_tier": "2",
+      "drug_requirements": "QL(3 EA per 84 days)"
+    },
+    {
+      "drug_name": "paricalcitol capsule",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "PROLIA",
+      "drug_tier": "4",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "risedronate sodium tablet 30 mg, 5 mg",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "risedronate sodium tablet 35 mg",
+      "drug_tier": "2",
+      "drug_requirements": "QL(12 EA per 84 days)"
+    },
+    {
+      "drug_name": "risedronate sodium tablet 150 mg",
+      "drug_tier": "2",
+      "drug_requirements": "QL(3 EA per 84 days)"
+    },
+    {
+      "drug_name": "TERIPARATIDE",
+      "drug_tier": "5",
+      "drug_requirements": "QL(2.48 ML per 28 days); PA"
+    },
+    {
+      "drug_name": "TYMLOS",
+      "drug_tier": "5",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "WYOST",
+      "drug_tier": "5",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "XGEVA",
+      "drug_tier": "5",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "ZOLEDRONIC ACID INJECTION 4MG/100ML",
+      "drug_tier": "1",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "ALCOHOL PREP PADS",
+      "drug_tier": "1",
+      "drug_requirements": "ST"
+    },
+    {
+      "drug_name": "B-D INSULIN SYRINGE ULTRAFINE II/0.3ML/31G X 5/16\\"",
+      "drug_tier": "1",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "BD INSULIN SYRINGE SAFETYGLIDE/1ML/29G X 1/2\\"",
+      "drug_tier": "1",
+      "drug_requirements": null
+    }
+  ],
+  "acronyms": [
+    {
+      "acronym": "PA",
+      "expansion": "Prior Authorization",
+      "explanation": "Prior Authorization"
+    },
+    {
+      "acronym": "QL",
+      "expansion": "Quantity Limits",
+      "explanation": "Quantity Limits"
+    },
+    {
+      "acronym": "ST",
+      "expansion": "Step Therapy",
+      "explanation": "Step Therapy"
+    }
+  ],
+  "tiers": [
+    {
+      "acronym": "1",
+      "expansion": "Preferred Generic",
+      "explanation": "Preferred Generic"
+    },
+    {
+      "acronym": "2",
+      "expansion": "Nonpreferred Generic; Preferred Brand",
+      "explanation": "Nonpreferred Generic; Preferred Brand"
+    },
+    {
+      "acronym": "3",
+      "expansion": "Nonpreferred Brand; Specialty Drugs",
+      "explanation": "Nonpreferred Brand; Specialty Drugs"
+    },
+    {
+      "acronym": "4",
+      "expansion": "Nonpreferred Brand; Specialty Drugs",
+      "explanation": "Nonpreferred Brand; Specialty Drugs"
+    },
+    {
+      "acronym": "5",
+      "expansion": "Specialty Drugs",
+      "explanation": "Specialty Drugs"
+    }
+  ]
+}
+==================================================
+
+=== JSON Parse Error ===
+Original String: {
+  "drug_table": [
+    {
+      "drug_name": "BD INSULIN SYRINGE ULTRA-FINE/0.5ML/30G X 12.7MM",
+      "drug_tier": "1",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "BD INSULIN SYRINGE ULTRA-FINE/1ML/31G X 8MM",
+      "drug_tier": "1",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "BD PEN NEEDLE/ORIGINAL/ULTRA-FINE/29G X 12.7MM",
+      "drug_tier": "1",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "CEQUR SIMPLICITY 2U",
+      "drug_tier": "3",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "CEQUR SIMPLICITY INSERTER",
+      "drug_tier": "3",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "CURITY GAUZE PADS 2\\"X2\\" 12 PLY",
+      "drug_tier": "2",
+      "drug_requirements": "ST"
+    },
+    {
+      "drug_name": "easy comfort insulin syringe/0.3ml/31g x 1/2\\"",
+      "drug_tier": "1",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "fomepizole injection $1.5 \\\\mathrm{gm} / 1.5 \\\\mathrm{ml}$",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "INPEN 100/BLUE/LILLY/HUMALOG",
+      "drug_tier": "1",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "INPEN 100/BLUE/NOVOLOG/FIASP",
+      "drug_tier": "1",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "INPEN 100/GREY/LILLY/HUMALOG",
+      "drug_tier": "1",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "INPEN 100/GREY/NOVOLOG/FIASP",
+      "drug_tier": "1",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "INPEN 100/PINK/LILLY/HUMALOG",
+      "drug_tier": "1",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "INPEN 100/PINK/NOVOLOG/FIASP",
+      "drug_tier": "1",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "INTRALIPID INJECTION 20GM/100ML, 30GM/100ML",
+      "drug_tier": "4",
+      "drug_requirements": "B/D"
+    },
+    {
+      "drug_name": "levocarnitine solution, tablet",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "NOVOFINE AUTOCOVER PEN NEEDLE 30G X 8MM",
+      "drug_tier": "1",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "NOVOFINE PEN NEEDLE 32G X 6MM",
+      "drug_tier": "1",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "NOVOFINE PLUS PEN NEEDLE 32G X 4MM",
+      "drug_tier": "1",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "NOVOPEN ECHO",
+      "drug_tier": "1",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "OMNIPOD 5 DEXCOM G7G6 INTRO KIT (GEN 5)",
+      "drug_tier": "3",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "OMNIPOD 5 DEXCOM G7G6 PODS (GEN 5)",
+      "drug_tier": "3",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "OMNIPOD 5 G7 INTRO KIT (GEN 5)",
+      "drug_tier": "3",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "OMNIPOD 5 G7 PODS (GEN 5)",
+      "drug_tier": "3",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "OMNIPOD 5 LIBRE2 PLUS G6 INTRO GEN 5",
+      "drug_tier": "3",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "OMNIPOD 5 LIBRE2 PLUS G6 PODS",
+      "drug_tier": "3",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "OMNIPOD CLASSIC PDM STARTER KIT (GEN 3)",
+      "drug_tier": "3",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "OMNIPOD CLASSIC PODS (GEN 3)",
+      "drug_tier": "3",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "OMNIPOD DASH INTRO KIT (GEN 4)",
+      "drug_tier": "3",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "OMNIPOD DASH PDM KIT (GEN 4)",
+      "drug_tier": "3",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "OMNIPOD DASH PODS (GEN 4)",
+      "drug_tier": "3",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "PROTOPAM CHLORIDE INJECTION",
+      "drug_tier": "4",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "RIVFLOZA INJECTION 128MG/0.8ML",
+      "drug_tier": "5",
+      "drug_requirements": "QL(0.8 ML per 28 days); PA"
+    },
+    {
+      "drug_name": "RIVFLOZA INJECTION 160MG/ML, 80MG/0.5ML",
+      "drug_tier": "5",
+      "drug_requirements": "QL(1 ML per 28 days); PA"
+    },
+    {
+      "drug_name": "SKYCLARYS",
+      "drug_tier": "5",
+      "drug_requirements": "QL(93 EA per 31 days); PA"
+    },
+    {
+      "drug_name": "sodium chloride $0.9 \\\\%$",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "V-GO 20",
+      "drug_tier": "1",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "V-GO 30",
+      "drug_tier": "1",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "V-GO 40",
+      "drug_tier": "1",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "atropine sulfate solution $1 \\\\%$",
+      "drug_tier": "2",
+      "drug_requirements": null
+    }
+  ],
+  "acronyms": [],
+  "tiers": []
+}
+==================================================
+
+=== JSON Parse Error ===
+Original String: {
+  "drug_table": [
+    {
+      "drug_name": "AEROCHAMBER PLUS FLO-VU LARGE DEVICE",
+      "drug_tier": "Preferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "AEROCHAMBER PLUS FLO-VU MEDIUM DEVICE",
+      "drug_tier": "Preferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "AEROCHAMBER PLUS FLO-VU SMALL DEVICE",
+      "drug_tier": "Preferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "AEROCHAMBER PLUS FLOW VU",
+      "drug_tier": "Preferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "AEROCHAMBER2GO ANTI-STATIC",
+      "drug_tier": "Preferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "AQNEURSA",
+      "drug_tier": "Preferred brand specialty",
+      "drug_requirements": "PA; SP; QL"
+    },
+    {
+      "drug_name": "AQUASTAT",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "AQUASTAT SFR",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "BD AUTOSHIELD DUO PEN NEEDLES",
+      "drug_tier": "Preferred brand",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "BD PEN NEEDLE MICRO ULTRAFINE",
+      "drug_tier": "Preferred brand",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "BD PEN NEEDLE MINI ULTRAFINE",
+      "drug_tier": "Preferred brand",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "BD PEN NEEDLE NANO ULTRAFINE",
+      "drug_tier": "Preferred brand",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "BD PEN NEEDLE ORIG ULTRAFINE",
+      "drug_tier": "Preferred brand",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "BD PEN NEEDLE SHORT ULTRAFINE",
+      "drug_tier": "Preferred brand",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "BD POSIFLUSH",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "BD POSIFLUSH SAFESCRUB",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "BD ULTRA-FINE INSULIN SYRINGES 30G X 1/2\\" 0.3 ML, 30G X 1/2\\" 0.5 ML, 30G X 1/2\\" 1 ML, 31G X 15/64\\" 0.3 ML, 31G X 5/16\\" 0.3 ML, 31G X 5/16\\" 0.5 ML, 31G X 5/16\\" 1 ML, 31G X 6MM 0.5 ML",
+      "drug_tier": "Preferred brand",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "BD ULTRA-FINE PEN NEEDLES",
+      "drug_tier": "Preferred brand",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "BD VEO INSULIN SYR ULTRAFINE",
+      "drug_tier": "Preferred brand",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "BREATHE COMFORT CHAMBER/ADULT",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "BREATHE COMFORT CHAMBER/CHILD",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "BREATHE EASE LARGE",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "BREATHE EASE MEDIUM",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "BREATHE EASE SMALL",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "BREATHERITE VALVED MDI CHAMBER",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "CAYA",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "PV2"
+    },
+    {
+      "drug_name": "CLEVER CHOICE HOLDING CHAMBER",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "COMPACT SPACE CHAMBER",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "COMPACT SPACE CHAMBER/LG MASK",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "COMPACT SPACE CHAMBER/MED MASK",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "COMPACT SPACE CHAMBER/SM MASK",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    }
+  ],
+  "acronyms": [
+    {
+      "acronym": "PA",
+      "expansion": "Prior authorization",
+      "explanation": "Prior authorization"
+    },
+    {
+      "acronym": "SP",
+      "expansion": "Specialty",
+      "explanation": "Specialty"
+    },
+    {
+      "acronym": "QL",
+      "expansion": "Quantity Limits",
+      "explanation": "Quantity Limits"
+    },
+    {
+      "acronym": "PV2",
+      "expansion": "Preventive 2",
+      "explanation": "Preventive 2"
+    }
+  ],
+  "tiers": [
+    {
+      "acronym": "Preferred brand",
+      "expansion": "Preferred brand",
+      "explanation": "Preferred brand"
+    },
+    {
+      "acronym": "Preferred brand specialty",
+      "expansion": "Preferred brand specialty",
+      "explanation": "Preferred brand specialty"
+    },
+    {
+      "acronym": "Nonpreferred brand",
+      "expansion": "Nonpreferred brand",
+      "explanation": "Nonpreferred brand"
+    }
+  ]
+}
+==================================================
+
+=== JSON Parse Error ===
+Original String: {
+  "drug_table": [
+    {
+      "drug_name": "BD ULTRA-FINE INSULIN SYRINGES 30G X 1/2\\" 0.3 ML, 30G X 1/2\\" 0.5 ML, 30G X 1/2\\" 1 ML, 31G X 15/64\\" 0.3 ML, 31G X 5/16\\" 0.3 ML, 31G X 5/16\\" 0.5 ML, 31G X 5/16\\" 1 ML, 31G X 6MM 0.5 ML",
+      "drug_tier": "Preferred brand",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "BD ULTRA-FINE PEN NEEDLES",
+      "drug_tier": "Preferred brand",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "BD VEO INSULIN SYR ULTRAFINE",
+      "drug_tier": "Preferred brand",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "BREATHE COMFORT CHAMBER/ADULT",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "BREATHE COMFORT CHAMBER/CHILD",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "BREATHE EASE LARGE",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "BREATHE EASE MEDIUM",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "BREATHE EASE SMALL",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "BREATHERITE VALVED MDI CHAMBER",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "CAYA",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "PV2"
+    },
+    {
+      "drug_name": "CLEVER CHOICE HOLDING CHAMBER",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "COMPACT SPACE CHAMBER",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "COMPACT SPACE CHAMBER/LG MASK",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "COMPACT SPACE CHAMBER/MED MASK",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "COMPACT SPACE CHAMBER/SM MASK",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "CONDOMS",
+      "drug_tier": "Preventive",
+      "drug_requirements": "PV1; QL"
+    },
+    {
+      "drug_name": "deferoxamine mesylate",
+      "drug_tier": "Nonpreferred generic",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "DOJOLVI",
+      "drug_tier": "Preferred specialty",
+      "drug_requirements": "PA; SP"
+    },
+    {
+      "drug_name": "DUREX EXTRA SENSITIVE THIN",
+      "drug_tier": "Preventive",
+      "drug_requirements": "PV1; QL"
+    },
+    {
+      "drug_name": "DUREX TROPICAL",
+      "drug_tier": "Preventive",
+      "drug_requirements": "PV1; QL"
+    },
+    {
+      "drug_name": "EASIVENT",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "ergoloid mesylates oral tablet 1 mg",
+      "drug_tier": "Nonpreferred generic",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "FC2 FEMALE CONDOM",
+      "drug_tier": "Preventive",
+      "drug_requirements": "PV1; QL"
+    },
+    {
+      "drug_name": "FEMCAP",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "PV2; QL"
+    },
+    {
+      "drug_name": "FIRDAPSE",
+      "drug_tier": "Preferred specialty",
+      "drug_requirements": "PA; SP; QL"
+    },
+    {
+      "drug_name": "FLEXICHAMBER",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "GRASTEK",
+      "drug_tier": "Not covered",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "IWILFIN",
+      "drug_tier": "Preferred specialty",
+      "drug_requirements": "PA; 15DS; SP; OVM"
+    },
+    {
+      "drug_name": "KERENDIA",
+      "drug_tier": "Preferred brand",
+      "drug_requirements": "PA; QL"
+    },
+    {
+      "drug_name": "I-glutamine oral packet",
+      "drug_tier": "Nonpreferred generic",
+      "drug_requirements": "PA; QL"
+    },
+    {
+      "drug_name": "methylergonovine maleate oral",
+      "drug_tier": "Nonpreferred generic",
+      "drug_requirements": "PA; QL"
+    },
+    {
+      "drug_name": "MICROCHAMBER DEVICE",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "MIPLYFFA",
+      "drug_tier": "Not covered",
+      "drug_requirements": "SP; QL"
+    },
+    {
+      "drug_name": "NOVOFINE PEN NEEDLE",
+      "drug_tier": "Preferred brand",
+      "drug_requirements": null
+    }
+  ],
+  "acronyms": [],
+  "tiers": []
+}
+==================================================
+
+=== JSON Parse Error ===
+Original String: {
+  "drug_table": [
+    {
+      "drug_name": "BD ULTRA-FINE INSULIN SYRINGES 30G X 1/2\\" 0.3 ML, 30G X 1/2\\" 0.5 ML, 30G X 1/2\\" 1 ML, 31G X 15/64\\" 0.3 ML, 31G X 5/16\\" 0.3 ML, 31G X 5/16\\" 0.5 ML, 31G X 5/16\\" 1 ML, 31G X 6MM 0.5 ML",
+      "drug_tier": "Preferred brand",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "BD ULTRA-FINE PEN NEEDLES",
+      "drug_tier": "Preferred brand",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "BD VEO INSULIN SYR ULTRAFINE",
+      "drug_tier": "Preferred brand",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "BREATHE COMFORT CHAMBER/ADULT",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "BREATHE COMFORT CHAMBER/CHILD",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "BREATHE EASE LARGE",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "BREATHE EASE MEDIUM",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "BREATHE EASE SMALL",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "BREATHERITE VALVED MDI CHAMBER",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "CAYA",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "PV2"
+    },
+    {
+      "drug_name": "CLEVER CHOICE HOLDING CHAMBER",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "COMPACT SPACE CHAMBER",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "COMPACT SPACE CHAMBER/LG MASK",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "COMPACT SPACE CHAMBER/MED MASK",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "COMPACT SPACE CHAMBER/SM MASK",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "CONDOMS",
+      "drug_tier": "Preventive",
+      "drug_requirements": "PV1; QL"
+    },
+    {
+      "drug_name": "deferoxamine mesylate",
+      "drug_tier": "Nonpreferred generic",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "DOJOLVI",
+      "drug_tier": "Preferred specialty",
+      "drug_requirements": "PA; SP"
+    },
+    {
+      "drug_name": "DUREX EXTRA SENSITIVE THIN",
+      "drug_tier": "Preventive",
+      "drug_requirements": "PV1; QL"
+    },
+    {
+      "drug_name": "DUREX TROPICAL",
+      "drug_tier": "Preventive",
+      "drug_requirements": "PV1; QL"
+    },
+    {
+      "drug_name": "EASIVENT",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "ergoloid mesylates oral tablet 1 mg",
+      "drug_tier": "Nonpreferred generic",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "FC2 FEMALE CONDOM",
+      "drug_tier": "Preventive",
+      "drug_requirements": "PV1; QL"
+    },
+    {
+      "drug_name": "FEMCAP",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "PV2; QL"
+    },
+    {
+      "drug_name": "FIRDAPSE",
+      "drug_tier": "Preferred specialty",
+      "drug_requirements": "PA; SP; QL"
+    },
+    {
+      "drug_name": "FLEXICHAMBER",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "GRASTEK",
+      "drug_tier": "Not covered",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "IWILFIN",
+      "drug_tier": "Preferred specialty",
+      "drug_requirements": "PA; 15DS; SP; OVM"
+    },
+    {
+      "drug_name": "KERENDIA",
+      "drug_tier": "Preferred brand",
+      "drug_requirements": "PA; QL"
+    },
+    {
+      "drug_name": "I-glutamine oral packet",
+      "drug_tier": "Nonpreferred generic",
+      "drug_requirements": "PA; QL"
+    },
+    {
+      "drug_name": "methylergonovine maleate oral",
+      "drug_tier": "Nonpreferred generic",
+      "drug_requirements": "PA; QL"
+    },
+    {
+      "drug_name": "MICROCHAMBER DEVICE",
+      "drug_tier": "Nonpreferred brand",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "MIPLYFFA",
+      "drug_tier": "Not covered",
+      "drug_requirements": "SP; QL"
+    },
+    {
+      "drug_name": "NOVOFINE PEN NEEDLE",
+      "drug_tier": "Preferred brand",
+      "drug_requirements": null
+    }
+  ],
+  "acronyms": [],
+  "tiers": []
+}
+==================================================
+

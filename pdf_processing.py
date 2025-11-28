@@ -31,7 +31,7 @@ from utils import (
     detect_step_therapy, calculate_file_hash, rate_limited_api_call,
     track_bedrock_cost_precalculated, track_mistral_cost, determine_coverage_status,
     normalize_drug_tier, infer_drug_tier_from_text, calculate_bytes_hash,
-    parse_complex_drug_name, similarity, normalize_requirement_code
+    parse_complex_drug_name, similarity, normalize_requirement_code, transform_viewer_url
 )
 
 logger = logging.getLogger(__name__)
@@ -61,6 +61,13 @@ except ImportError:
     PYPDF2_AVAILABLE = False
     logger.warning("PyPDF2 not available. Page count check will be skipped.")
 
+def initialize_worker():
+    """
+    An initializer function for each worker in the ProcessPoolExecutor.
+    This ensures that the prompt configuration is loaded only once per process.
+    """
+    #logger.info(f"Initializing worker process {os.getpid()}...")
+    _load_prompts_config()
 
 def _sanitize_escape_sequences(json_string: str) -> str:
     r"""
@@ -1472,6 +1479,9 @@ def process_single_pdf_url_worker(plan_info):
     try:
         # --- NEW: Proactive URL Validation ---
         # Check for empty URLs or strings that look like phone numbers before making a network request.
+        formulary_url = transform_viewer_url(formulary_url)
+
+        # Proactive URL Validation
         if not formulary_url or re.match(r'^[\d\s\(\)-]{7,}$', str(formulary_url).strip()):
             error_message = f"Invalid Formulary URL detected (is blank or resembles a phone number): '{formulary_url}'"
             logger.error(f"{log_prefix} {error_message}")
@@ -1577,34 +1587,43 @@ def process_single_pdf_url_worker(plan_info):
         structured_df = pd.DataFrame(drug_table_data)
 ########################
         if not structured_df.empty:
-            expanded_rows = []
-            for _, row in structured_df.iterrows():
-                # Get all original data from the row first
+            # Heuristic check: Decide if the complex parser is needed.
+            # We check a sample of rows. If any contain a comma followed by a digit (like "10mg, 20mg"),
+            # we assume the complex format is present.
+            should_run_parser = False
+            sample_rows = structured_df.head(10) # Check the first 10 rows
+            for _, row in sample_rows.iterrows():
                 drug_name_full = str(row.get('drug_name', ''))
-                drug_tier = row.get('drug_tier')
-                drug_requirements = row.get('drug_requirements')
-                page_number = row.get('page_number')  
+                if re.search(r',\s*\d', drug_name_full):
+                    should_run_parser = True
+                    logger.info(f"{log_prefix} Complex multi-strength drug name format detected. Applying parser.")
+                    break
+            
+            if should_run_parser:
+                expanded_rows = []
+                for _, row in structured_df.iterrows():
+                    drug_name_full = str(row.get('drug_name', ''))
+                    # All other fields are passed through
+                    other_data = {k: v for k, v in row.items() if k != 'drug_name'}
 
-                parsed_drugs = parse_complex_drug_name(drug_name_full)
-                
-                if not parsed_drugs: # If parsing fails, keep the original row
-                    expanded_rows.append(row.to_dict())
-                    continue
+                    parsed_drugs = parse_complex_drug_name(drug_name_full)
+                    
+                    if not parsed_drugs:
+                        expanded_rows.append(row.to_dict())
+                        continue
 
-                for parsed_drug in parsed_drugs:
-                    for strength in parsed_drug['strengths']:
-                        new_drug_name = f"{parsed_drug['base_name']} {strength}".strip()
-                        if parsed_drug['brand_name']:
-                            new_drug_name += f" ({parsed_drug['brand_name']})"
-                        
-                        # Create the new row, making sure to include the page number
-                        expanded_rows.append({
-                            "drug_name": new_drug_name,
-                            "drug_tier": drug_tier,
-                            "drug_requirements": drug_requirements,
-                            "page_number": page_number   
-                        })
-            structured_df = pd.DataFrame(expanded_rows)
+                    for parsed_drug in parsed_drugs:
+                        for strength in parsed_drug['strengths']:
+                            new_drug_name = f"{parsed_drug['base_name']} {strength}".strip()
+                            if parsed_drug['brand_name']:
+                                new_drug_name += f" ({parsed_drug['brand_name']})"
+                            
+                            new_row = other_data.copy()
+                            new_row["drug_name"] = new_drug_name
+                            expanded_rows.append(new_row)
+                structured_df = pd.DataFrame(expanded_rows)
+            else:
+                logger.info(f"{log_prefix} Simple drug name format detected. Skipping complex multi-strength parser.")
 #########################
         if structured_df.empty and not all_acronyms and not all_tiers:
             return 'SKIPPED', plan_name, "No structured data extracted from URL PDF.", costs
@@ -1687,6 +1706,8 @@ def process_single_pdf_url_worker(plan_info):
         return 'ERROR', plan_name, str(e), zero_costs
  
 
+# Replace the existing process_pdfs_from_urls_in_parallel function with this one
+
 def process_pdfs_from_urls_in_parallel():
     """Process PDFs by downloading from URLs in plan_details, in parallel."""
     logger.info("STEP 2: Processing PDF Files from URLs in plan_details")
@@ -1701,7 +1722,7 @@ def process_pdfs_from_urls_in_parallel():
 
     logger.info(f"Found {len(plans)} plans with URLs to process.")
     success_count, error_count, skipped_count = 0, 0, 0
-    with ProcessPoolExecutor(max_workers=PROCESS_COUNT) as executor:
+    with ProcessPoolExecutor(max_workers=PROCESS_COUNT, initializer=initialize_worker) as executor:
         future_to_plan = {executor.submit(process_single_pdf_url_worker, plan): plan for plan in plans}
 
         for future in as_completed(future_to_plan):

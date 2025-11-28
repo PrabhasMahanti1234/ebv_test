@@ -12,6 +12,7 @@ import time
 import random
 import json
 from functools import wraps
+from pathlib import Path
 from config import MAX_RETRIES, BACKOFF_MULTIPLIER, RATE_LIMIT_DELAY, COST_TRACKER, BEDROCK_COST_PER_1K_TOKENS, MISTRAL_OCR_COST_PER_1K_PAGES, bedrock
 
 logger = logging.getLogger(__name__)
@@ -23,7 +24,7 @@ GLOBAL_LOCK = threading.Lock()
 RATE_LIMIT_DELAY = 1.2       # Minimum seconds between ANY Bedrock calls
 MAX_RETRIES = 5
 BACKOFF_MULTIPLIER = 2
-
+_URL_MAPPINGS_CACHE = None
 
 def rate_limited_api_call(func):
     """Global rate limiter across ALL Bedrock calls + backoff + jitter"""
@@ -758,3 +759,59 @@ def parse_complex_drug_name(drug_name_full: str):
             })
             
     return parsed_drugs
+
+def transform_viewer_url(url: str) -> str:
+    """
+    Transforms known PDF viewer URLs into direct download links based on rules
+    defined in url_mappings.json.
+    """
+    global _URL_MAPPINGS_CACHE
+
+    if not url:
+        return ""
+
+    # Load and cache mappings from the JSON file on first run
+    if _URL_MAPPINGS_CACHE is None:
+        _URL_MAPPINGS_CACHE = []
+        mappings_file = Path(__file__).parent / "url_mappings.json"
+        if mappings_file.exists():
+            try:
+                with open(mappings_file, 'r', encoding='utf-8') as f:
+                    _URL_MAPPINGS_CACHE = json.load(f)
+                logger.info(f"Loaded {len(_URL_MAPPINGS_CACHE)} URL transformation rules.")
+            except Exception as e:
+                logger.error(f"Failed to load or parse url_mappings.json: {e}")
+        else:
+            # This is not an error, just means no rules are defined.
+            logger.info("url_mappings.json not found. No URL transformations will be applied.")
+
+    # Iterate through the loaded rules and apply the first one that matches
+    for rule in _URL_MAPPINGS_CACHE:
+        pattern = rule.get("pattern")
+        replacement_template = rule.get("replacement")
+        
+        # Skip invalid rules
+        if not pattern or not replacement_template:
+            continue
+
+        try:
+            match = re.search(pattern, url)
+            if match:
+                rule_name = rule.get('name', 'Unnamed Rule')
+                logger.info(f"URL matched transformation rule: '{rule_name}'. Transforming URL.")
+                
+                # Build the replacement string using captured groups from the regex
+                new_url = replacement_template
+                for i, group_val in enumerate(match.groups()):
+                    placeholder = f"{{group{i+1}}}"
+                    new_url = new_url.replace(placeholder, group_val)
+                
+                return new_url
+        except re.error as e:
+            logger.error(f"Invalid regex pattern in url_mappings.json for rule '{rule.get('name')}': {e}")
+            # Invalidate cache so it can be re-read if fixed
+            _URL_MAPPINGS_CACHE = None 
+            return url # Return original url on regex error
+
+    # If no rules match, return the original URL
+    return url
