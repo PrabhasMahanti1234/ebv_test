@@ -10,6 +10,7 @@ import uuid
 import time
 import concurrent.futures
 import PyPDF2
+import random
 from typing import Tuple, List
 from pathlib import Path
 from mistralai.models.sdkerror import SDKError
@@ -207,11 +208,8 @@ def _extract_partial_json_arrays(json_string: str) -> dict:
 
 def robust_json_repair(json_string: str):
     """
-    Attempts to repair common JSON errors from LLMs with multiple strategies:
-    1. Fix trailing commas
-    2. Sanitize invalid escape sequences
-    3. Use lenient parsers (json5)
-    4. Extract partial JSON when full parse fails
+    Attempts to repair common JSON errors from LLMs, primarily focusing on trailing commas,
+    escaping backslashes, and stripping non-JSON content before parsing.
     """
     default_output = {"drug_table": [], "acronyms": [], "tiers": []}
 
@@ -221,22 +219,19 @@ def robust_json_repair(json_string: str):
     # 1. Find the start and end of the main JSON object.
     start_index = json_string.find('{')
     end_index = json_string.rfind('}')
-    
+
     if start_index == -1 or end_index == -1:
         logger.warning("Could not find a JSON object in the LLM response.")
         return default_output
-    
+
     # Extract the JSON part of the string.
     json_string = json_string[start_index : end_index + 1]
 
-    # 2. Fix the most common LLM error: trailing commas before '}' or ']'.
-    json_string = re.sub(r',\s*([}\]])', r'\1', json_string)
+    # 2. Escape every backslash by doubling it.
+    json_string = json_string.replace("\\", "\\\\")
 
-    # 3. NEW: Sanitize invalid escape sequences
-    try:
-        json_string = _sanitize_escape_sequences(json_string)
-    except Exception as e:
-        logger.debug(f"Escape sequence sanitization encountered an issue: {e}")
+    # 3. Fix the most common LLM error: trailing commas before '}' or ']'.
+    json_string = re.sub(r',\s*([}\]])', r'\1', json_string)
 
     # 4. Attempt to parse the cleaned JSON.
     try:
@@ -247,35 +242,380 @@ def robust_json_repair(json_string: str):
                 return _sanitize_output(parsed, default_output)
             except Exception as e:
                 logger.debug(f"json5 parsing failed, falling back to standard json: {e}")
-        
+
         # Fallback to the standard json library.
         parsed = json.loads(json_string)
         return _sanitize_output(parsed, default_output)
 
     except json.JSONDecodeError as e:
-        logger.debug(f"Standard JSON parsing failed: {e}. Attempting partial extraction...")
-        
-        # 5. NEW: Try partial extraction as last resort
-        try:
-            partial_result = _extract_partial_json_arrays(json_string)
-            if any(partial_result.values()):  # If we extracted anything
-                logger.info(f"Successfully extracted partial JSON: {sum(len(v) for v in partial_result.values())} total items")
-                return _sanitize_output(partial_result, default_output)
-        except Exception as partial_error:
-            logger.debug(f"Partial extraction also failed: {partial_error}")
-        
+        logger.error(f"JSON parsing failed definitively after repair attempts: {e}")
+        logger.debug(f"Problematic JSON string for debugging: {json_string}")
+
         # Log the failed JSON to a file for analysis.
-        logger.error(f"JSON parsing failed definitively after all repair attempts: {e}")
         try:
             with open("failed_llm_json.log", "a", encoding="utf-8") as f:
                 f.write(f"=== JSON Parse Error ===\n")
-                f.write(f"Error: {e}\n")
-                f.write(f"Original String (first 1000 chars): {json_string[:1000]}\n")
+                f.write(f"Original String: {json_string}\n")
                 f.write(f"{'='*50}\n\n")
         except Exception as log_error:
-            logger.warning(f"Failed to write to debug log: {log_error}")
-            
+            logging.warning(f"Failed to write to debug log: {log_error}")
+
         return default_output
+    
+    
+def _is_extracted_data_from_index_page(drug_table: List[dict]) -> bool:
+    """
+    Detect if extracted drug data appears to come from an index/table of contents page.
+    Returns True if the data looks like an index, False otherwise.
+   
+    Index page indicators:
+    - High proportion of entries with page numbers in drug name
+    - Drug names that look like section headers or categories
+    - Numeric patterns suggesting page references
+   
+    NOTE: Missing tier/requirements alone is NOT enough to mark as index page,
+    since some formulary formats (like VDP) legitimately have empty tier fields.
+    """
+    if not drug_table or len(drug_table) == 0:
+        return False
+   
+    total_records = len(drug_table)
+   
+    # Count records with suspicious patterns
+    page_number_pattern_count = 0
+    missing_both_count = 0
+    short_name_count = 0
+    numeric_in_name_count = 0
+    category_header_count = 0
+   
+    # Common category/section headers found in index pages
+    category_keywords = [
+        'index', 'contents', 'table of contents', 'formulary index',
+        'drug index', 'medication index',
+        'drug class', 'medication list', 'section', 'chapter',
+        'overview', 'introduction', 'summary', 'appendix'
+    ]
+   
+    for entry in drug_table:
+        drug_name = str(entry.get('drug_name', '')).strip()
+        drug_tier = str(entry.get('drug_tier', '')).strip()
+        drug_requirements = str(entry.get('drug_requirements', '')).strip()
+       
+        # CRITICAL: Check for page number patterns in drug name (strongest indicator)
+        # e.g., "Drug Name.....45" or "Drug Name    45"
+        if re.search(r'\.{2,}\s*\d{1,3}\s*$', drug_name):
+            page_number_pattern_count += 1
+        elif re.search(r'\s{3,}\d{1,3}\s*$', drug_name):  # Multiple spaces before number
+            page_number_pattern_count += 1
+       
+        # Check for standalone numbers or number-heavy content in drug name
+        if re.match(r'^\d+$', drug_name) or (len(drug_name) > 0 and len(re.findall(r'\d', drug_name)) > len(drug_name) / 2):
+            numeric_in_name_count += 1
+       
+        # Only count as missing BOTH if both tier AND requirements are truly empty
+        has_tier = drug_tier and drug_tier not in ['', 'none', 'null', 'n/a']
+        has_requirements = drug_requirements and drug_requirements not in ['', 'none', 'null', 'n/a']
+       
+        if not has_tier and not has_requirements:
+            missing_both_count += 1
+       
+        # Check for very short names (often section headers)
+        if len(drug_name) < 4 and drug_name.strip():
+            short_name_count += 1
+       
+        # Check for category/section header keywords (but NOT "therapeutic category" alone)
+        drug_name_lower = drug_name.lower()
+        if any(keyword in drug_name_lower for keyword in category_keywords):
+            # Don't count if it's just a drug name that happens to contain these words
+            # Only count if it's PRIMARILY a header (short and keyword-heavy)
+            if len(drug_name) < 50:
+                category_header_count += 1
+   
+    # Calculate ratios
+    page_number_ratio = page_number_pattern_count / total_records
+    missing_both_ratio = missing_both_count / total_records
+    short_name_ratio = short_name_count / total_records
+    numeric_ratio = numeric_in_name_count / total_records
+    category_ratio = category_header_count / total_records
+   
+    # Decision logic - use STRICTER thresholds to avoid false positives
+   
+    # STRONGEST indicator: High proportion of page number patterns
+    if page_number_ratio >= 0.4:  # Increased threshold from 0.3 to 0.4
+        logger.info(f"Index page detected: {page_number_ratio:.1%} of entries have page number patterns")
+        return True
+   
+    # STRONG indicator: Nearly ALL entries missing both tier AND requirements
+    # Increased threshold from 0.8 to 0.9 to avoid catching legitimate VDP pages
+    if missing_both_ratio >= 0.9:
+        logger.info(f"Index page detected: {missing_both_ratio:.1%} of entries missing both tier and requirements")
+        return True
+   
+    # MODERATE indicator: High proportion of category headers
+    if category_ratio >= 0.6:  # Increased threshold from 0.5 to 0.6
+        logger.info(f"Index page detected: {category_ratio:.1%} of entries are category headers")
+        return True
+   
+    # Numeric-heavy content (standalone numbers or mostly numbers)
+    if numeric_ratio >= 0.5:  # Increased threshold from 0.4 to 0.5
+        logger.info(f"Index page detected: {numeric_ratio:.1%} of entries are numeric or number-heavy")
+        return True
+   
+    # Combined indicators - need MULTIPLE strong signals
+    # Page numbers + missing data is a strong combo
+    if page_number_ratio >= 0.2 and missing_both_ratio >= 0.7:
+        logger.info(f"Index page detected: Page numbers ({page_number_ratio:.1%}) + missing data ({missing_both_ratio:.1%})")
+        return True
+   
+    # Category headers + missing data
+    if category_ratio >= 0.3 and missing_both_ratio >= 0.8:
+        logger.info(f"Index page detected: Category headers ({category_ratio:.1%}) + missing data ({missing_both_ratio:.1%})")
+        return True
+   
+    # Weak indicators combined - need VERY high suspicion score
+    suspicion_score = (
+        page_number_ratio * 4 +      # Increased weight
+        category_ratio * 3 +          # Increased weight
+        numeric_ratio * 2 +
+        missing_both_ratio * 1 +      # Decreased weight
+        short_name_ratio * 0.5
+    )
+   
+    # Increased threshold from 2.0 to 3.0 to be more conservative
+    if suspicion_score >= 3.0:
+        logger.info(f"Index page detected: Combined suspicion score {suspicion_score:.2f} (threshold: 3.0)")
+        return True
+   
+    return False
+
+
+def _consolidate_and_clean_drug_table(drug_table: List[dict]) -> List[dict]:
+    """
+    A definitive, multi-stage function to fix fragmented and incorrect drug extractions.
+    It performs three critical operations in the correct order:
+    1. CONSOLIDATE: Merges fragmented lines into a single drug name.
+    2. PROPAGATE: Fills down the correct tier and requirements within drug groups.
+    3. FILTER: Removes any remaining invalid or junk records.
+    """
+    if not drug_table:
+        return []
+
+    # --- Stage 1: CONSOLIDATE FRAGMENTS ---
+    # This logic is more robust and does NOT depend on the drug_tier.
+    consolidated_list = []
+    fragment_buffer = []
+    for drug in drug_table:
+        # ROBUST FIX: Ensure we're stripping a string, even if value is None
+        drug_name = str(drug.get("drug_name") or "").strip()
+        
+        # CONSERVATIVE fragment detection: 
+        # A line is a fragment ONLY if it's clearly a dosage/form continuation, NOT a drug name
+        # We must be very careful to avoid false positives (merging separate drugs)
+        is_fragment = False
+        if not drug_name:
+            is_fragment = True # Empty name
+        elif not re.match(r'^[a-zA-Z]', drug_name):
+            is_fragment = True # Starts with number, /, ( etc.
+        elif re.match(r'^(tablet|capsule|injection|solution|suspension|syrup|cream|ointment|lotion|mg|mcg|ml|unit|gram|gm|%|hr)\b', drug_name, re.IGNORECASE):
+            # MUST be complete word "tablet", "capsule" etc., not just "tab" or "cap" prefix
+            # This prevents matching drug names like "Captopril" (starts with "cap") or "LOTREL" (starts with "lot")
+            is_fragment = True
+        elif re.match(r'^(intravenous|intramuscular|subcutaneous|topical|oral|buccal|sublingual|transdermal)\b', drug_name, re.IGNORECASE):
+            # Route of administration - must be complete word
+            is_fragment = True
+        elif re.match(r'^\d+\s*(mg|ml|mcg|hr|%|g|gram|unit|tablet|capsule|cap|tab)', drug_name, re.IGNORECASE):
+            # Pure dosage pattern like "500mg" or "20 ml" (starts with number + unit)
+            is_fragment = True
+        elif re.match(r'^\(.*?(mg|ml|mcg|unit|tablet|capsule)\)', drug_name, re.IGNORECASE):
+            # Parenthetical dosage like "(500mg)"
+            is_fragment = True
+
+        if is_fragment:
+            # SAFETY CHECK: If this "fragment" has its own requirements/tier AND looks like a real drug name,
+            # it's probably a separate drug, not a fragment. Don't merge it.
+            has_own_requirements = drug.get('drug_requirements') and str(drug.get('drug_requirements')).strip()
+            has_own_tier = drug.get('drug_tier') and str(drug.get('drug_tier')).strip()
+            looks_like_drug_name = len(drug_name) >= 5 and re.search(r'[a-zA-Z]{3,}', drug_name)
+            
+            if looks_like_drug_name and has_own_requirements:
+                # This is likely a separate drug entry, not a fragment
+                logger.debug(f"⚠️ '{drug_name}' detected as fragment but has own requirements '{has_own_requirements}' - treating as separate drug")
+                is_fragment = False  # Override the fragment detection
+                # Process it as a normal drug below
+            else:
+                # True fragment - merge it
+                fragment_buffer.append(drug_name)
+                if consolidated_list:
+                    target = consolidated_list[-1]
+                    logger.debug(f"🔗 MERGING fragment '{drug_name}' into '{target['drug_name']}'")
+                    target["drug_name"] += f" {' '.join(fragment_buffer)}"
+                    fragment_buffer.clear()
+                    # Only merge tier if fragment has one and target doesn't (rare case)
+                    if drug.get('drug_tier') and not target.get('drug_tier'):
+                        target['drug_tier'] = drug.get('drug_tier')
+                    # DON'T merge requirements from fragments - they shouldn't have separate requirements
+                continue
+        
+        # Not a fragment - process as normal drug
+
+        if fragment_buffer:
+            # ROBUST FIX: Use or '' to avoid None type issues
+            drug['drug_name'] = f"{' '.join(fragment_buffer)} {drug.get('drug_name') or ''}".strip()
+            fragment_buffer.clear()
+
+        # This is a valid parent row. Add it as a new entry.
+        consolidated_list.append(drug)
+
+    if fragment_buffer and consolidated_list:
+        # Append any trailing fragments to the last entry to avoid data loss.
+        target = consolidated_list[-1]
+        target["drug_name"] += f" {' '.join(fragment_buffer)}"
+
+    # --- Stage 2: PROPAGATE CONTEXT on the now-clean list ---
+    # IMPORTANT: Only propagate tier/requirements within the SAME drug group
+    # Do NOT propagate across different drugs (VDP format has many drugs with legitimately empty tiers)
+    if not consolidated_list:
+        return []
+
+    corrected_with_context = []
+    
+    # Process each drug independently - NO cross-drug propagation
+    for drug in consolidated_list:
+        # Keep the drug as-is - do not fill empty tiers from other drugs
+        # Empty tiers are legitimate in formats like VDP where tier (Comment column) is optional
+        corrected_with_context.append(drug)
+
+    # --- Stage 3: FINAL FILTER to remove any remaining junk ---
+    final_list = []
+    
+    # Common section header patterns to filter out
+    section_header_patterns = [
+        r'^PDL\s+Categories?$',
+        r'^ACE\s+and\s+Thiazide',
+        r'^ACE\s+Inhibitors?$',
+        r'^Agents?\s+For\s+',
+        r'^AGENTS?\s+FOR\s+',
+        r'^Alcohol\s+Deterrents?$',
+        r'^Allergic\s+Extracts?$',
+        r'^Therapeutic\s+Category',
+        r'^Drug\s+Class',
+        r'^Category:',
+        r'^\[.*Category.*\]$',
+        r'^Section\s+\d+',
+        r'^Chapter\s+\d+',
+    ]
+    
+    for drug in corrected_with_context:
+        # ROBUST FIX: Handle cases where value is None before stripping
+        name = str(drug.get('drug_name') or '').strip()
+        tier = drug.get('drug_tier')
+        requirements = str(drug.get('drug_requirements') or '').strip()
+        
+        # Check if this is a section header
+        is_section_header = False
+        for pattern in section_header_patterns:
+            if re.match(pattern, name, re.IGNORECASE):
+                is_section_header = True
+                logger.info(f"Filtering out section header: '{name}'")
+                break
+        
+        if is_section_header:
+            continue  # Skip section headers
+        
+        # Check for VDP-specific section headers (missing both B/G/O column data)
+        # Real VDP drugs have requirements like "B; N", "G; P", etc.
+        # Section headers might have just "N" or "P" without the "B; N" or "G; P" pattern
+        if requirements:
+            # VDP format should have "X; Y" pattern (e.g., "B; N", "G; P")
+            has_vdp_pattern = re.match(r'^[BGO];\s*[PNRL]', requirements, re.IGNORECASE)
+            # Allow single letters for some edge cases, but be suspicious of generic category names
+            is_generic_category = any(keyword in name.upper() for keyword in [
+                'CATEGORY', 'CATEGORIES', 'AGENTS FOR', 'INHIBITOR', 'DETERRENT',
+                'EXTRACT', 'THERAPY', 'TREATMENT', 'MEDICATION', 'COMBO'
+            ])
+            
+            if is_generic_category and not has_vdp_pattern:
+                logger.info(f"Filtering out category header (generic name + no VDP pattern): '{name}'")
+                continue
+        
+        # A record is valid if it has a name with at least one real word.
+        is_valid_name = (name and re.search(r'[a-zA-Z]{3,}', name))
+        has_valid_tier = (tier is not None and str(tier).strip() != "")
+
+        if is_valid_name:
+            # If the tier is missing, flag it for review instead of dropping it.
+            if not has_valid_tier:
+                drug['review_needed'] = True
+                logger.debug(f"Record has valid name but missing tier: {name}")
+            else:
+                drug['review_needed'] = False # Explicitly set to false if tier is present
+
+            final_list.append(drug)
+        else:
+            logger.warning(f"Filtering out invalid junk record (missing valid name): {drug}")
+
+    return final_list
+
+def _clean_and_propagate_drug_groups(drug_table: List[dict]) -> List[dict]:
+    """
+    A definitive, two-pass function that correctly groups drugs by name AND formulation,
+    then propagates context only within those precise groups. This prevents context
+    from "leaking" between different forms of the same drug (e.g., tabs vs. capsules).
+    """
+    if not drug_table:
+        return []
+
+    def get_precise_base_name(drug_name):
+        """
+        Creates a more specific group key by including the drug's formulation.
+        e.g., "ENTRESTO - sacubitril-valsartan tab..." -> "ENTRESTO TAB"
+        e.g., "ENTRESTO - sacubitril-valsartan sprinkle cap..." -> "ENTRESTO SPRINKLE CAP"
+        """
+        if not drug_name:
+            return ""
+        
+        name = drug_name.upper()
+        parts = re.split(r'(\d+)', name, 1) # Split at the first number
+        base_with_formulation = parts[0]
+        
+        # Clean up common words and symbols to create a consistent key
+        base_with_formulation = base_with_formulation.replace('-', '').replace('(', '').replace(')', '')
+        base_with_formulation = re.sub(r'\b(FOR|SOLN|INJ|HCL)\b', '', base_with_formulation)
+        
+        return " ".join(base_with_formulation.split())
+
+    # --- Pass 1: Identify the master context for each PRECISE group ---
+    master_context = {}
+    for drug in drug_table:
+        base_name = get_precise_base_name(drug.get('drug_name'))
+        if not base_name:
+            continue
+
+        if base_name not in master_context:
+            # If we see a row with actual requirements, it's the master.
+            # Otherwise, we assume no requirements for this group until proven otherwise.
+            if drug.get('drug_requirements'):
+                master_context[base_name] = {
+                    'tier': drug.get('drug_tier'),
+                    'reqs': drug.get('drug_requirements')
+                }
+            else:
+                 master_context[base_name] = {'tier': drug.get('drug_tier'), 'reqs': None}
+
+    # --- Pass 2: Apply the correct master context to all members of each group ---
+    corrected_table = []
+    for drug in drug_table:
+        base_name = get_precise_base_name(drug.get('drug_name'))
+        if base_name in master_context:
+            correct_context = master_context[base_name]
+            
+            # Forcefully overwrite the drug's data with the correct master context.
+            drug['drug_tier'] = correct_context['tier']
+            drug['drug_requirements'] = correct_context['reqs']
+            
+            corrected_table.append(drug)
+            
+    return corrected_table
 
 
 def _sanitize_output(parsed_data, default_output):
@@ -307,40 +647,83 @@ def extract_metadata_from_filename(filename):
 
 def is_index_page(markdown: str) -> bool:
     """
-    Detect if a page is an index/table of contents.
+    Detect if a page is an index/table of contents with enhanced detection logic.
     Returns True if index, False otherwise.
     """
-    lines = markdown.splitlines()
+
+    negative_keywords = ['drug tier', 'coverage details', 'requirements', 'limitations', 'dosage form']
+    lower_markdown = markdown.lower()
+    if any(keyword in lower_markdown for keyword in negative_keywords):
+        # A high number of table headers for requirements is a very strong signal of a drug page.
+        if lower_markdown.count('|') > 20 and 'drug name' in lower_markdown:
+             logger.info("Detected drug page characteristics (negative keywords, table structure). Not an index.")
+             return False
+        
+
+    lines = markdown.splitlines() 
+    index_keywords = ['index', 'table of contents', 'contents', 'formulary index']
+    upper_markdown = markdown.upper()
     
-    # Count table cells that look like index entries
+    for keyword in index_keywords:
+        if keyword.upper() in upper_markdown:
+            for line in lines[:10]:  # Check first 10 lines
+                if keyword.upper() in line.upper() and (line.strip().startswith('#') or len(line.strip()) < 50):
+                    logger.info(f"Detected index page based on keyword '{keyword}' in header.")
+                    return True
+     
+    page_number_pattern = re.compile(r'\.{3,}\s*\d+\s*$')   
+    
+    page_number_lines = 0
+    total_meaningful_lines = 0
+    
+    for line in lines:
+        stripped = line.strip()
+        if not stripped or stripped.startswith('|') or stripped.startswith(':'):
+            continue
+        
+        total_meaningful_lines += 1
+        
+        # Check if line ends with dots and page number (classic index format)
+        if page_number_pattern.search(stripped):
+            page_number_lines += 1
+    
+    if total_meaningful_lines > 0:
+        page_number_ratio = page_number_lines / total_meaningful_lines
+        # If 30% or more lines have the "...page_number" pattern, it's an index
+        if page_number_ratio >= 0.30:
+            logger.info(f"Detected index page: {page_number_ratio:.0%} of lines have '...page_number' pattern.")
+            return True 
+        
+    suspected_page_numbers = re.findall(r'\b(\d{2,3})\b', markdown)  # Find 2-3 digit numbers
+    
+    if len(suspected_page_numbers) > 20:  # More than 20 standalone numbers
+        # Check if they're sequential or clustered (typical of page numbers)
+        unique_numbers = set(int(n) for n in suspected_page_numbers)
+        if len(unique_numbers) < len(suspected_page_numbers) * 0.5:  # Many duplicates
+            logger.info(f"Detected index page: Found {len(suspected_page_numbers)} page-like numbers with limited variety.")
+            return True
+    
+    # === ORIGINAL: Table-based index detection ===
     table_index_count = 0
     table_cell_count = 0
-    
-    # Pattern for index entries: text followed by dots and/or spaces, then a number
     index_entry_pattern = re.compile(r'[A-Za-z0-9\s\(\)\-]+\.{2,}\s*\d+')
     
     for line in lines:
-        # Check if this is a table row with content
         if '|' in line and not line.strip().startswith(':'):
-            # Split by pipe and process each cell
             cells = [cell.strip() for cell in line.split('|') if cell.strip()]
             
             for cell in cells:
-                if cell:  # Non-empty cell
+                if cell:
                     table_cell_count += 1
-                    # Check if cell contains an index-like entry
                     if index_entry_pattern.search(cell):
                         table_index_count += 1
     
-    # If we found table-based index entries, check if threshold is met
     if table_cell_count > 0:
         index_ratio = table_index_count / table_cell_count
-        # If at least 40% of table cells are index entries, it's an index page
         if index_ratio >= 0.4:
             logger.info("Detected index page based on table content.")
             return True
-    
-    # Also check for non-table format
+     
     content_lines = [
         line.strip() for line in lines 
         if line.strip() and not line.strip().startswith('|') and not line.strip().startswith(':')
@@ -349,19 +732,51 @@ def is_index_page(markdown: str) -> bool:
     if not content_lines:
         return False
     
-    # Match lines like "DRUGNAME.....5" or "DRUGNAME 5" or "DRUGNAME (DOSE).....5"
+    # Improved patterns for index lines
     index_pattern = re.compile(r'^[A-Za-z0-9\s\(\)\-\.,]+\.{2,}\s*\d+\s*$')
-    alt_pattern = re.compile(r'^[A-Za-z0-9\s\(\)\-\.,]+\s+\d+\s*$')
+    alt_pattern = re.compile(r'^[A-Za-z0-9\s\(\)\-\.,]+\s+\d{2,3}\s*$')  # Name followed by 2-3 digit number
     
     index_lines = sum(
         1 for line in content_lines
         if index_pattern.search(line) or alt_pattern.search(line)
     )
     
-    # If at least 10% of content lines match the index pattern, it's likely an index page
-    if len(content_lines) > 0 and (index_lines / len(content_lines)) >= 0.1:
-        logger.info("Detected index page based on line patterns.")
-        return True
+    if len(content_lines) > 0:
+        index_line_ratio = index_lines / len(content_lines)
+        # If at least 10% of content lines match the index pattern, it's likely an index page
+        if index_line_ratio >= 0.1:
+            logger.info(f"Detected index page based on line patterns: {index_line_ratio:.0%} match.")
+            return True
+    
+    # === NEW: Detect if the page is mostly very short text entries (typical of index) ===
+    if len(content_lines) > 10:  # Only check if we have enough lines
+        avg_line_length = sum(len(line) for line in content_lines) / len(content_lines)
+        short_lines = sum(1 for line in content_lines if len(line) < 50)
+        short_line_ratio = short_lines / len(content_lines)
+         
+        if short_line_ratio >= 0.7 and avg_line_length < 40 and len(suspected_page_numbers) > 15:
+            logger.info("Detected index page: High ratio of short lines with many numbers.")
+            return True
+        
+    # === NEW: Detect table-based index with mostly empty cells (except drug name and page number) ===
+    # This catches index pages that are formatted as tables but lack tier/requirement data
+    table_rows = [line for line in lines if '|' in line and not line.strip().startswith(':')]
+    if len(table_rows) > 5:  # Need at least a few rows to analyze
+        empty_cell_pattern = re.compile(r'\|\s*\|')  # Adjacent pipes with only whitespace
+        rows_with_empty_cells = sum(1 for row in table_rows if empty_cell_pattern.search(row))
+        
+        # Also check for tables with very few columns filled (e.g., only 2 out of 5)
+        rows_with_mostly_empty = 0
+        for row in table_rows:
+            cells = [cell.strip() for cell in row.split('|')]
+            non_empty_cells = sum(1 for cell in cells if cell)
+            if len(cells) > 3 and non_empty_cells <= 2:  # Most cells empty
+                rows_with_mostly_empty += 1
+        
+        empty_ratio = (rows_with_empty_cells + rows_with_mostly_empty) / len(table_rows)
+        if empty_ratio >= 0.6:  # 60% or more rows have mostly empty cells
+            logger.info(f"Detected index page: Table with {empty_ratio:.0%} of rows having mostly empty cells.")
+            return True
         
     return False
 
@@ -423,83 +838,115 @@ def is_aca_drug_list_page(markdown: str) -> bool:
 
     return False
 
- 
 @rate_limited_api_call
 def extract_structured_data_with_llm(page_markdown: str, payer_name: str = None):
     """
     Uses Claude 3 Haiku to parse markdown and extract structured drug data.
+    Implements a proper retry loop and robust exception handling.
     """
     costs = {'tokens': 0, 'cost': 0.0, 'calls': 1}
+    default_output = {"drug_table": [], "acronyms": [], "tiers": []}
+
     if not bedrock:
         logger.error("Bedrock client is not initialized. Cannot extract structured data.")
-        return {"drug_table": [], "acronyms": [], "tiers": []}, costs
+        return default_output, costs
 
     if is_index_page(page_markdown):
         logger.info("Skipping LLM call for index/table of contents page.")
-        return {"drug_table": [], "acronyms": [], "tiers": []}, {'tokens': 0, 'cost': 0.0, 'calls': 0}
+        return default_output, {'tokens': 0, 'cost': 0.0, 'calls': 0}
     
     if is_aca_drug_list_page(page_markdown):
         logger.info("Skipping LLM call for ACA Drug List/Preventative Medications page.")
-        return {"drug_table": [], "acronyms": [], "tiers": []}, {'tokens': 0, 'cost': 0.0, 'calls': 0}
+        return default_output, {'tokens': 0, 'cost': 0.0, 'calls': 0}
 
     system_prompt = get_payer_prompt(payer_name)
     user_message = f"<INPUT_MARKDOWN>\n{page_markdown}\n</INPUT_MARKDOWN>"
 
-    try:
-        body = json.dumps({
-            "anthropic_version": "bedrock-2023-05-31", "max_tokens": 4096,
-            "system": system_prompt, "messages": [{"role": "user", "content": user_message}]
-        })
-        response = bedrock.invoke_model(body=body, modelId=BEDROCK_MODEL_ID)
-        response_body = json.loads(response.get('body').read())
-        response_text = response_body['content'][0]['text']
-        
-        usage = response_body.get('usage', {})
-        total_tokens = usage.get('input_tokens', 0) + usage.get('output_tokens', 0)
-        costs['tokens'] = total_tokens
-        costs['cost'] = (total_tokens / 1000.0) * BEDROCK_COST_PER_1K_TOKENS
+    last_exception = None
 
-        logger.debug(f"Raw LLM response (first 500 chars): {response_text[:500]}...")
-        
-        # Use the robust repair and parsing function.
-        structured_data = robust_json_repair(response_text)
-
-        logger.info(f"Successfully processed page. Extracted: {len(structured_data.get('drug_table', []))} drugs, {len(structured_data.get('acronyms', []))} acronyms, {len(structured_data.get('tiers', []))} tiers.")
-        
-        # Defensive filtering to remove non-English terms the LLM might have missed.
-        blocklist = {'nivel'}
-        for key in ['acronyms', 'tiers']:
-            if key in structured_data and isinstance(structured_data[key], list):
-                filtered_list = []
-                for item in structured_data[key]:
-                    if isinstance(item, dict):
-                        acronym = str(item.get('acronym') or '').lower()
-                        expansion = str(item.get('expansion') or '').lower()
-                        # Only keep the item if neither field contains a blocked word
-                        if acronym not in blocklist and expansion not in blocklist:
-                            filtered_list.append(item)
-                    elif isinstance(item, str):
-                        # Also filter out simple strings that are in the blocklist
-                        if item.lower() not in blocklist:
-                            logger.warning(f"LLM returned a string '{item}' in list '{key}'. Converting to dict.")
-                            filtered_list.append({'acronym': item, 'expansion': None, 'explanation': None})
-                structured_data[key] = filtered_list
-
-        return structured_data, costs
-
-    except Exception as e:
-        logger.error(f"Error in Claude 3 Haiku LLM data extraction: {e}")
-        response_text_for_log = locals().get('response_text', 'No response text captured')
+    for attempt in range(MAX_RETRIES):
         try:
-            with open("llm_errors.log", "a", encoding="utf-8") as f:
-                f.write(f"=== LLM Error ===\n")
-                f.write(f"Error: {e}\n")
-                f.write(f"Response text: {response_text_for_log}\n")
-                f.write(f"Traceback: {traceback.format_exc()}\n")
-                f.write(f"{'='*50}\n\n")
-        except Exception as log_error:
-            logger.warning(f"Failed to write to error log: {log_error}")
-        return {"drug_table": [], "acronyms": [], "tiers": []}, costs
+            body = json.dumps({
+                "anthropic_version": "bedrock-2023-05-31",
+                "max_tokens": 4096,
+                "system": system_prompt,
+                "messages": [{"role": "user", "content": user_message}]
+            })
+            response = bedrock.invoke_model(body=body, modelId=BEDROCK_MODEL_ID)
+
+            raw_body = response.get('body').read()
+            # handle bytes or str
+            if isinstance(raw_body, (bytes, bytearray)):
+                try:
+                    response_body = json.loads(raw_body.decode('utf-8'))
+                except Exception:
+                    response_body = json.loads(raw_body.decode('latin-1'))
+            else:
+                response_body = json.loads(raw_body)
+
+            response_text = response_body.get('content', [{}])[0].get('text', '')
+            usage = response_body.get('usage', {}) or {}
+            total_tokens = usage.get('input_tokens', 0) + usage.get('output_tokens', 0)
+            costs['tokens'] = total_tokens
+            costs['cost'] = (total_tokens / 1000.0) * BEDROCK_COST_PER_1K_TOKENS
+
+            logger.debug(f"Raw LLM response (first 500 chars): {response_text[:500]}...")
+
+            # Use the robust repair and parsing function.
+            structured_data = robust_json_repair(response_text)
+
+            logger.info(
+                f"Successfully processed page. Extracted: "
+                f"{len(structured_data.get('drug_table', []))} drugs, "
+                f"{len(structured_data.get('acronyms', []))} acronyms, "
+                f"{len(structured_data.get('tiers', []))} tiers."
+            )
+
+            # Defensive filtering to remove non-English terms the LLM might have missed.
+            blocklist = {'nivel'}
+            for key in ['acronyms', 'tiers']:
+                if key in structured_data and isinstance(structured_data[key], list):
+                    filtered_list = []
+                    for item in structured_data[key]:
+                        if isinstance(item, dict):
+                            acronym = str(item.get('acronym') or '').lower()
+                            expansion = str(item.get('expansion') or '').lower()
+                            # Only keep the item if neither field contains a blocked word
+                            if acronym not in blocklist and expansion not in blocklist:
+                                filtered_list.append(item)
+                        elif isinstance(item, str):
+                            # Also filter out simple strings that are in the blocklist
+                            if item.lower() not in blocklist:
+                                logger.warning(f"LLM returned a string '{item}' in list '{key}'. Converting to dict.")
+                                filtered_list.append({'acronym': item, 'expansion': '', 'explanation': ''})
+                    structured_data[key] = filtered_list
+
+            return structured_data, costs
+
+        except Exception as e:
+            last_exception = e
+            logger.error(f"Error in Claude 3 Haiku LLM data extraction (attempt {attempt+1}/{MAX_RETRIES}): {e}")
+            if attempt < MAX_RETRIES - 1:
+                delay = min(30, (BACKOFF_MULTIPLIER ** attempt) + random.random())
+                logger.info(f"Retrying after {delay} seconds due to error: {e}")
+                time.sleep(delay)
+                continue
+            else:
+                response_text_for_log = locals().get('response_text', 'No response text captured')
+                try:
+                    with open("llm_errors.log", "a", encoding="utf-8") as f:
+                        f.write(f"=== LLM Error ===\n")
+                        f.write(f"Error: {e}\n")
+                        f.write(f"Response text: {response_text_for_log}\n")
+                        f.write(f"Traceback: {traceback.format_exc()}\n")
+                        f.write(f"{'='*50}\n\n")
+                except Exception as log_error:
+                    logger.warning(f"Failed to write to error log: {log_error}")
+                return {"drug_table": [], "acronyms": [], "tiers": []}, costs
+
+    # If somehow we exit loop without returning (defensive)
+    logger.error(f"All attempts failed for LLM call. Last exception: {last_exception}")
+    return default_output, costs
 
 def _load_prompts_config():
     """Scans the prompts directory and loads all prompts and mappings into memory."""
@@ -1013,7 +1460,6 @@ def get_all_plans_with_formulary_url():
  
 #     except Exception as e:
 #         return 'ERROR', filename, f"An unexpected error occurred in worker: {e}\n{traceback.format_exc()}", zero_costs
-import datetime
  
  
 def process_single_pdf_url_worker(plan_info):
@@ -1035,6 +1481,21 @@ def process_single_pdf_url_worker(plan_info):
             formulary_url = 'https://' + formulary_url
             logger.info(f"{log_prefix} URL scheme was missing. Corrected to: {formulary_url}")
 
+        # proxy_user = os.getenv("PROXY_USER")
+        # proxy_pass = os.getenv("PROXY_PASS")
+        # proxy_host = os.getenv("PROXY_HOST")
+        # proxy_port = os.getenv("PROXY_PORT")
+
+        # proxies = None
+        # if all([proxy_user, proxy_pass, proxy_host, proxy_port]):
+        #     proxy_url = f"http://{proxy_user}:{proxy_pass}@{proxy_host}:{proxy_port}"
+        #     proxies = {
+        #         "http": proxy_url,
+        #         "https": proxy_url,
+        #     }
+        #     logger.info(f"{log_prefix} Using authenticated proxy.")
+        # else:
+        #     logger.info(f"{log_prefix} Proxy environment variables not set. Attempting direct connection.")
 
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
@@ -1044,6 +1505,7 @@ def process_single_pdf_url_worker(plan_info):
         
         # First, try the secure way. If it fails, log a warning and retry insecurely.
         try:
+            #logger.info(f"{log_prefix} Using proxy to download from {formulary_url}")
             with requests.get(formulary_url, timeout=90, headers=headers, stream=True, verify=True) as resp:
                 resp.raise_for_status()
                 content_type = resp.headers.get('Content-Type', '')
@@ -1092,11 +1554,28 @@ def process_single_pdf_url_worker(plan_info):
             full_structured_data = {"drug_table": [], "acronyms": [], "tiers": []}
 
         drug_table_data = full_structured_data.get('drug_table', [])
+
+
+        # Filter out index page data based on extracted content patterns
+        if drug_table_data and _is_extracted_data_from_index_page(drug_table_data):
+            logger.warning(f"{log_prefix} Detected index/TOC page based on extracted data patterns. Skipping this page.")
+            drug_table_data = []
+        
+        if drug_table_data:
+            logger.info(f"{log_prefix} Step 1: Running group propagation on {len(drug_table_data)} raw records.")
+            drug_table_data = _clean_and_propagate_drug_groups(drug_table_data)
+            logger.info(f"{log_prefix} After group propagation: {len(drug_table_data)} records.")
+
+        if drug_table_data:
+            logger.info(f"{log_prefix} Step 2: Consolidating fragments for {len(drug_table_data)} records.")
+            drug_table_data = _consolidate_and_clean_drug_table(drug_table_data)
+            logger.info(f"{log_prefix} After consolidation: {len(drug_table_data)} records.")
+
         all_acronyms = full_structured_data.get('acronyms', [])
         all_tiers = full_structured_data.get('tiers', [])
 
         structured_df = pd.DataFrame(drug_table_data)
-
+########################
         if not structured_df.empty:
             expanded_rows = []
             for _, row in structured_df.iterrows():
@@ -1126,7 +1605,7 @@ def process_single_pdf_url_worker(plan_info):
                             "page_number": page_number   
                         })
             structured_df = pd.DataFrame(expanded_rows)
-
+#########################
         if structured_df.empty and not all_acronyms and not all_tiers:
             return 'SKIPPED', plan_name, "No structured data extracted from URL PDF.", costs
 
@@ -1255,11 +1734,42 @@ def process_pdfs_from_urls_in_parallel():
                         if records_removed > 0:
                             logger.warning(f"Removed {records_removed} duplicate records from the batch for '{plan_name_log}'.")
 
+                        # FINAL FRAGMENT FILTER: Block any remaining orphan dosage rows before DB insertion
                         if deduplicated_data:
-                            logger.info(f"Inserting {len(deduplicated_data)} unique records for plan '{plan_name_log}' into the database.")
-                            insert_drug_formulary_data(deduplicated_data)
+                            fragment_pattern = re.compile(r'^[/\d\(\)\.]+.*?(mg|ml|mcg|hr|%|tab|cap|gm|gram|unit)', re.IGNORECASE)
+                            validated_data = []
+                            blocked_fragments = 0
                             
-                            plan_id = deduplicated_data[0].get('plan_id')
+                            for record in deduplicated_data:
+                                drug_name = str(record.get('drug_name', '')).strip()
+                                
+                                # Block pure dosage fragments
+                                if fragment_pattern.match(drug_name):
+                                    #logger.warning(f"🚫 BLOCKED FRAGMENT before DB insertion: '{drug_name}' (Tier: {record.get('drug_tier')}, Req: {record.get('drug_requirements')})")
+                                    blocked_fragments += 1
+                                    continue
+                                
+                                # Block if drug name is too short and doesn't contain at least 3-letter word
+                                if not re.search(r'[a-zA-Z]{3,}', drug_name):
+                                    #logger.warning(f"🚫 BLOCKED INVALID NAME before DB insertion: '{drug_name}'")
+                                    blocked_fragments += 1
+                                    continue
+                                
+                                validated_data.append(record)
+                            
+                            if blocked_fragments > 0:
+                                logger.warning(f"Blocked {blocked_fragments} fragment/invalid records before DB insertion for '{plan_name_log}'.")
+                            
+                            if validated_data:
+                                logger.info(f"Inserting {len(validated_data)} validated records for plan '{plan_name_log}' into the database.")
+                                insert_drug_formulary_data(validated_data)
+                            else:
+                                logger.warning(f"No valid records remaining after fragment filtering for '{plan_name_log}'.")
+                                validated_data = None  # Set to None to skip plan_id tracking below
+                        
+                        if validated_data:
+                            
+                            plan_id = validated_data[0].get('plan_id')
                             if plan_id and plan_id not in successfully_processed_plan_ids:
                                 successfully_processed_plan_ids.append(plan_id)
 
@@ -1376,9 +1886,3 @@ def is_valid_formulary_definition(item: dict) -> bool:
         return False
 
     return True
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            

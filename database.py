@@ -126,6 +126,7 @@ def ensure_database_schema():
             logger.debug(f"file_hash column may already exist in plan_details: {e}")
             conn.rollback()
 
+
         # Create processed_file_cache table
         try:
             cursor.execute("""

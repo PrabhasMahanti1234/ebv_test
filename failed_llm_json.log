@@ -389723,3 +389723,7925 @@ Original String (first 1000 chars): {
     }
 ==================================================
 
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 357 column 6 (char 9689)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ACTEMRA - tocilizumab subcutaneous soln prefilled syringe 162 mg/0.9ml",
+      "drug_tier": "5",
+      "drug_requirements": "PA; QL; LD"
+    },
+    {
+      "drug_name": "ACTEMRA ACTPEN - tocilizumab subcutaneous soln auto-injector 162 mg/0.9ml",
+      "drug_tier": "5",
+      "drug_requirements": "PA; QL; LD"
+    },
+    {
+      "drug_name": "ADAKVEO - crizanlizumab-tmca iv soln 5 mg/ml",
+      "drug_tier": "5",
+      "drug_requirements": "PA; LD"
+    },
+    {
+      "drug_name": "ADCETRIS - brentuximab vedotin for iv soln 50 mg",
+      "drug_tier": "5",
+      "drug_requirements": "PA; LD"
+    },
+    {
+      "drug_name": "AYVAKIT - avapritinib tab 25 mg",
+      "drug_tier": "5",
+      "drug_requirements": "PA; LD"
+    },
+    {
+      "drug_name": "AYVAKIT - avapritinib tab 50 mg",
+      "drug_tier": "5",
+      "drug_requirements": "PA; LD"
+    },
+    {
+      "drug_name": "AYVAKIT - avapritinib tab 100 mg",
+      "drug_tier": "5",
+      "drug_re
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 347 column 6 (char 10315)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ABILIFY MAINTENA - aripiprazole im for extended release susp 300 mg",
+      "drug_tier": "5",
+      "drug_requirements": "PA; LD"
+    },
+    {
+      "drug_name": "ABILIFY MAINTENA - aripiprazole im for extended release susp 400 mg",
+      "drug_tier": "5",
+      "drug_requirements": "PA; LD"
+    },
+    {
+      "drug_name": "ACTEMRA - tocilizumab subcutaneous soln prefilled syringe 162 mg/0.9ml",
+      "drug_tier": "5",
+      "drug_requirements": "PA; LD"
+    },
+    {
+      "drug_name": "ACTEMRA ACTPEN - tocilizumab subcutaneous soln auto-injector 162 mg/0.9ml",
+      "drug_tier": "5",
+      "drug_requirements": "PA; LD"
+    },
+    {
+      "drug_name": "ADAKVEO - crizanlizumab-tmca iv soln 5 mg/ml",
+      "drug_tier": "5",
+      "drug_requirements": "PA; LD"
+    },
+    {
+      "drug_name": "ADVATE - antihemophilic factor recomb (rahf-pfm) for inj 250 unit",
+      "drug_tier": "2",
+      "drug_requirements": null
+    },
+    {
+      "drug_name
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 357 column 6 (char 9816)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "AFINITOR DISPERZ - everolimus tab for oral susp 2 mg",
+      "drug_tier": "5",
+      "drug_requirements": "PA; LD"
+    },
+    {
+      "drug_name": "AFINITOR DISPERZ - everolimus tab for oral susp 3 mg",
+      "drug_tier": "5",
+      "drug_requirements": "PA; LD"
+    },
+    {
+      "drug_name": "AFINITOR DISPERZ - everolimus tab for oral susp 5 mg",
+      "drug_tier": "5",
+      "drug_requirements": "PA; LD"
+    },
+    {
+      "drug_name": "ALECENSA - alectinib hcl cap 150 mg",
+      "drug_tier": "5",
+      "drug_requirements": "PA; LD"
+    },
+    {
+      "drug_name": "BALVERSA - erdafitinib tab 3 mg",
+      "drug_tier": "5",
+      "drug_requirements": "PA; LD"
+    },
+    {
+      "drug_name": "BALVERSA - erdafitinib tab 4 mg",
+      "drug_tier": "5",
+      "drug_requirements": "PA; LD"
+    },
+    {
+      "drug_name": "BALVERSA - erdafitinib tab 5 mg",
+      "drug_tier": "5",
+      "drug_requirements": "PA; LD"
+    },
+    {
+      "drug_name":
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 337 column 6 (char 9729)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ABILIFY - aripiprazole tab",
+      "drug_tier": "3",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "ABILIFY - aripiprazole oral solution 1 mg/ml",
+      "drug_tier": "3",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "ABILIFY - aripiprazole orally disintegrating tab 10 mg, 15 mg",
+      "drug_tier": "3",
+      "drug_requirements": null
+    },
+    {
+      "drug_name": "ABILIFY MAINTENA - aripiprazole im for extended-release susp",
+      "drug_tier": "5",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "ABILIFY MYCITE - aripiprazole tab with sensor",
+      "drug_tier": "5",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "ABILIFY MYCITE STARTER KIT - aripiprazole tab 2 mg with sensor, 5 mg, 10 mg, 15 mg",
+      "drug_tier": "5",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "abiraterone acetate tab 250 mg",
+      "drug_tier": "5",
+      "drug_requirements": 
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 432 column 6 (char 9863)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "Easy Max Glc Tes",
+      "drug_tier": "5",
+      "drug_requirements": "(PA)(QL)(M)"
+    },
+    {
+      "drug_name": "Easy Plus li Tes",
+      "drug_tier": "5",
+      "drug_requirements": "(PA)(QL)(M)"
+    },
+    {
+      "drug_name": "Easy Step Tes",
+      "drug_tier": "5",
+      "drug_requirements": "(PA)(QL)(M)"
+    },
+    {
+      "drug_name": "Easy Talk Tes",
+      "drug_tier": "5",
+      "drug_requirements": "(PA)(QL)(M)"
+    },
+    {
+      "drug_name": "Easy Touch",
+      "drug_tier": "5",
+      "drug_requirements": "(PA)(QL)(M)"
+    },
+    {
+      "drug_name": "Easy Trak Tes",
+      "drug_tier": "5",
+      "drug_requirements": "(PA)(QL)(M)"
+    },
+    {
+      "drug_name": "Easy Trak li Tes",
+      "drug_tier": "5",
+      "drug_requirements": "(PA)(QL)(M)"
+    },
+    {
+      "drug_name": "Easygluco Tes",
+      "drug_tier": "5",
+      "drug_requirements": "(PA)(QL)(M)"
+    },
+    {
+      "drug_name": "Easymax Tes",
+      "drug_tier": "5"
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 487 column 6 (char 11600)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "Diovan tablet",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Edarbi tablet",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Entresto sprinkle",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Micardis tablet",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sacubitril-valsartan tablet",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "telmisartan tablet",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "valsartan solution",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ranolazine ER tablet",
+      "drug_tier": "Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "A
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 237 column 6 (char 11045)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "adapatene/benzoyl peroxide gel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ACAVYA (benzoyl peroxide/dindamycin) gel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dindamycin/benzoyl peroxide 1%-5% gel w/pump",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CABTRICO (dindamycin/adapatene/benzoyl peroxide) gel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CLEANNING WASH (sulfacetamide sodium/sulfur/urea) cleanser",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dindamycin phosphate/benzoyl peroxide 1.2%-2.5% gel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dindamycin phosphate/tretinoin 1.2%-0.025% gel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dindamycin
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 492 column 6 (char 11680)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "Sporanox capsule",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Sporanox solution",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Tolsura capsule",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Vfend suspension",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Vfend tablet",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Vivjoa capsule",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "voriconazole suspension",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "voriconazole tablet",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "cefacl
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 57 column 6 (char 14081)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "butalbital/APAP/caffeine/codeine",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": "CLINICAL CRITERIA (CC) * - Limited to a total of 4 opioid prescriptions every 30 days. - Initial prescription for opioid-naïve patients limited to a 7-day supply. - PA required for initiation of opioid therapy for patients on established opioid dependence therapy. - PA required for use if ≥ 90 MME of opioid per day for management of non-acute pain (>7 days) - Exception for diagnosis of cancer or sickle cell disease, or hospice or palliative care programs - PA is required for opioid-naïve patients for prescription requests ≥ 50 MME per day. - PA required for continuation of opioid therapy beyond an initial 7-day supply in patients established on gabapentin or pregabalin - PA required for initiation of opioid therapy in patients currently on benzodiazepine therapy - PA required for any codeine- or tramadol-containing products in pts <12 years PA
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 457 column 6 (char 11272)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "metronidazole tablet",
+      "drug_tier": "Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "neomycin",
+      "drug_tier": "Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "imidazole",
+      "drug_tier": "Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "vancomycin oral solution",
+      "drug_tier": "Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ADMCOLO (rifamycin)",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "DIFICID (fidaxomicin)",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "FIRVANQ (vancomycin)",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "FLAOYL (metronidazole)",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LIMMEZ (met
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 307 column 6 (char 11825)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "valganciclovir tablet",
+      "drug_tier": "PREFERRED AGENTS",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LITTENLITT (maltibant)",
+      "drug_tier": "NON-PREFERRED AGENTS",
+      "drug_requirements": "PREVYMIS • Requires clinical review"
+    },
+    {
+      "drug_name": "PREVYMES (setermovir)",
+      "drug_tier": "NON-PREFERRED AGENTS",
+      "drug_requirements": "PREVYMIS • Requires clinical review"
+    },
+    {
+      "drug_name": "VALCYTE (valganciclovir)",
+      "drug_tier": "NON-PREFERRED AGENTS",
+      "drug_requirements": "PREVYMIS • Requires clinical review"
+    },
+    {
+      "drug_name": "valganciclovir solution",
+      "drug_tier": "NON-PREFERRED AGENTS",
+      "drug_requirements": "PREVYMIS • Requires clinical review"
+    },
+    {
+      "drug_name": "acyclovir",
+      "drug_tier": "PREFERRED AGENTS",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SITAVEL (acyclovir)",
+      "drug_tier": "NON-PR
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 407 column 6 (char 11345)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "sertraline capsule",
+      "drug_tier": "",
+      "drug_requirements": "+ 90 days of therapy with the requested agent in the past 105 days"
+    },
+    {
+      "drug_name": "ZOLOFT (sertraline)",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "indansetron solution, tablet",
+      "drug_tier": "PREFERRED AGENTS",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "indansetron ODT 4 mg, 8 mg",
+      "drug_tier": "PREFERRED AGENTS",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ANZIMET (dolasetron)",
+      "drug_tier": "NON-PREFERRED AGENTS",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "granisetron",
+      "drug_tier": "NON-PREFERRED AGENTS",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "indansetron ODT 16 mg tablet",
+      "drug_tier": "NON-PREFERRED AGENTS",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SANELOID (granisetron)"
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 482 column 6 (char 11696)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "zolmitriptan tablet",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Zomig spray",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Zomig tablet",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "amantadine capsule",
+      "drug_tier": "Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "amantadine solution",
+      "drug_tier": "Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "amantadine tablet",
+      "drug_tier": "Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "benztropine",
+      "drug_tier": "Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "carbidopa/levodopa ER tablet",
+      "drug_tier": "Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "carbidopa/levodopa ODT"
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 492 column 6 (char 11799)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "carbamazepine ER capsule",
+      "drug_tier": "Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "carbamazepine ER tablet",
+      "drug_tier": "Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "carbamazepine chewable tablet",
+      "drug_tier": "Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "carbamazepine tablet",
+      "drug_tier": "Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Celontin capsule",
+      "drug_tier": "Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clobazam suspension",
+      "drug_tier": "Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clobazam tablet",
+      "drug_tier": "Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clonazepam tablet",
+      "drug_tier": "Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diazepa
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 392 column 6 (char 11278)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "duloxetine (generic CYMBALTA)",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "gabapentin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "pregabalin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SAVELLA (mitoxicpran)",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CYMBALTA (duloxetine)",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "DIRZALMA SPRINKLE (duloxetine)",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "duloxetine 40 mg DR capsules (generic IRENKA)",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "gabapentin ER",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "GABAPONE (gabapentin)",
+      "drug_tier": "",
+      "drug_requ
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 292 column 6 (char 11208)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "FIRAZYR (icabbaril)",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "XALBITOR (ecatlantide)",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ORLADEYO (laeolinetsal)",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "RUCONEST (C1 esterase inhibitor)",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SALAZIR (icatliben)",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "TAKHZYRO (lanadelumab-fiyo)",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "allopurinol",
+      "drug_tier": "PREFERRED AGENTS",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ALOPRIM (allopurinol)",
+      "drug_tier": "NON-PREFERRED AGENTS",
+      "drug_requirements": "Non-Preferred Criteria"
+    },
+    {
+      "drug_name": "colchicine
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 237 column 6 (char 12863)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "daifamproline ER",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": "Criteria • Documented diagnosis of multiple sclerosis AND • Have tried 2 different preferred agents in the past 6 months OR • 3 claims with the requested agent in the last 105 days"
+    },
+    {
+      "drug_name": "dimethyl fumarate",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": "Criteria • Documented diagnosis of multiple sclerosis AND • Have tried 2 different preferred agents in the past 6 months OR • 3 claims with the requested agent in the last 105 days"
+    },
+    {
+      "drug_name": "fingolimod",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": "Criteria • Documented diagnosis of multiple sclerosis AND • Have tried 2 different preferred agents in the past 6 months OR • 3 claims with the requested agent in the last 105 days"
+    },
+    {
+      "drug_name": "NOD2 (interferon beta-1b)",
+      "drug_tier": "Non-Preferred",
+ 
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 287 column 6 (char 12403)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "nicotine gum",
+      "drug_tier": "Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "nicotine lozenge",
+      "drug_tier": "Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "nicotine patch",
+      "drug_tier": "Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NICOTROL INHALER CARTRIDGE",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NICOTROL NASAL SPRAY",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "TANLOR (methocarbamol)",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Scandine capsule",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ZANAPLEX (Scandine)",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "bupro
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 112 column 6 (char 11416)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "Pylera ® BLTG",
+      "drug_tier": "Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "bismuth/metronidazole/tetracycline (gen Pylera ®)",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lansoprazole/amoxicillin/clarithromycin",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Omeclamox-Pak ®",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Talicia ®",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Voquezna ® Dual Pak",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Voquezna ® Triple Pak",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "esomeprazole magnesium Rx capsule",
+      "drug_tier": "Preferred",
+      "drug
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 97 column 6 (char 13570)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "Cosentyx",
+      "drug_tier": "Preferred",
+      "drug_requirements": "CC, ST"
+    },
+    {
+      "drug_name": "Dupixent",
+      "drug_tier": "Preferred",
+      "drug_requirements": "CC, ST"
+    },
+    {
+      "drug_name": "Enbrel",
+      "drug_tier": "Preferred",
+      "drug_requirements": "CC, ST"
+    },
+    {
+      "drug_name": "Fasenra",
+      "drug_tier": "Preferred",
+      "drug_requirements": "CC, ST"
+    },
+    {
+      "drug_name": "Humira",
+      "drug_tier": "Preferred",
+      "drug_requirements": "CC, ST"
+    },
+    {
+      "drug_name": "Nucala",
+      "drug_tier": "Preferred",
+      "drug_requirements": "CC, ST"
+    },
+    {
+      "drug_name": "Xolair",
+      "drug_tier": "Preferred",
+      "drug_requirements": "CC, ST"
+    },
+    {
+      "drug_name": "Abrilada (adalimumab-AFZB)",
+      "drug_tier": "Non-Preferred",
+      "drug_requirements": "CLINICAL CRITERIA (CC) - Confirm diagnosis of FDA-approved or compendia-supported indi
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 52 column 6 (char 8709)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "Advair Diskus \u00ae BLTG",
+      "drug_tier": "Preferred",
+      "drug_requirements": "CLINICAL CRITERIA (CC)\n- PA is required for all new long-acting beta agonist prescriptions for patients under FDA- or compendia-supported age as indicated:\nFDA / Compendia-Supported Age\nAdvair Diskus \u00ae\nAdvair HFA \u00ae\nAirDuo \u2122 RespiClick \u00ae\nDulera \u00ae 100 mcg and 200 mcg\nDulera \u00ae 50 mcg\nfluticasone-salmeterol\nbudesonide-formoterol (Symbicort \u00ae ) 80/4.5 mcg\nbudesonide-formoterol (Symbicort \u00ae ) 160/4.5 mcg\nfluticasone/vilanterol (Breo Ellipta \u00ae )\nFREQUENCY/QUANTITY/DURATION (F/Q/D)\nAdvair Diskus \u00ae\nAdvair HFA \u00ae\nAirDuo \u2122 RespiClick \u00ae\nfluticasone-salmeterol\nfluticasone/vilanterol (Breo Ellipta \u00ae )\nBudesonide/formoterol (Symbicort \u00ae )\nDulera \u00ae"
+    },
+    {
+      "drug_name": "Advair HFA \u00ae BLTG",
+      "drug_tier": "Preferred",
+      "drug_requirements": "CLINICAL
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 407 column 6 (char 9751)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ABIRATERONE ACETATE",
+      "drug_tier": "5*",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "ABILIFY MAINTENA",
+      "drug_tier": "5*",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "ABILIFY TAB 2MG",
+      "drug_tier": "4",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ABILIFY TAB 5MG",
+      "drug_tier": "4",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ABILIFY TAB 10MG",
+      "drug_tier": "4",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ABILIFY TAB 15MG",
+      "drug_tier": "4",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ABILIFY TAB 20MG",
+      "drug_tier": "4",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ABILIFY TAB 30MG",
+      "drug_tier": "4",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ABILIFY MYCITE TAB 2MG",
+      "drug_tier": "5*",
+      "drug_requirements": "PA"
+    },
+    {
+    
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 407 column 6 (char 9851)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ACYCLOVIR TAB 400MG",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ACYCLOVIR TAB 800MG",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ALAVERT TAB 10MG",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ALLI CAP 60MG",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ALPRAZOLAM TAB 0.25MG",
+      "drug_tier": "1",
+      "drug_requirements": "QL (120 tabs/30 days)"
+    },
+    {
+      "drug_name": "ALPRAZOLAM TAB 0.5MG",
+      "drug_tier": "1",
+      "drug_requirements": "QL (120 tabs/30 days)"
+    },
+    {
+      "drug_name": "ALPRAZOLAM TAB 1MG",
+      "drug_tier": "1",
+      "drug_requirements": "QL (120 tabs/30 days)"
+    },
+    {
+      "drug_name": "ALPRAZOLAM TAB 2MG",
+      "drug_tier": "1",
+      "drug_requirements": "QL (120 tabs/30 days)"
+    },
+    {
+      "drug_name": "AMITRI
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 512 column 6 (char 10891)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "AZSTARYS",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "QELBREE",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "doxepin",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "eszopiclone",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ramelteon",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "zolpidem",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "zolpidem ext-rel",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BELSOMRA",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "QUVIVIQ",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NURTEC ODT",
+      "drug_tier": "3",
+      "drug_requirements":
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 552 column 6 (char 11503)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "OMNIPOD 5 INSULIN INFUSION PUMP",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "OMNIPOD DASH INSULIN INFUSION PUMP",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "OMNIPOD INSULIN INFUSION PUMP",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "TRUE METRIX STRIPS",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "TWIIST INSULIN INFUSION PUMP AND SUPPLIES",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ORILISSA",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dexamethasone",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fludrocortisone",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "hydrocortisone",
+      "drug_tier": "",
+      "drug_r
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 467 column 6 (char 10525)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "sulfasalazine",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sulfasalazine delayed-rel",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sumatriptan",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SUNOSI",
+      "drug_tier": "3",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "SYMLINPEN",
+      "drug_tier": "5",
+      "drug_requirements": "PA; QL (4 pens / 28 days)"
+    },
+    {
+      "drug_name": "SYMPROIC",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL (30 caps / 30 days)"
+    },
+    {
+      "drug_name": "SYNJARDY",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL (60 tabs / 30 days)"
+    },
+    {
+      "drug_name": "SYNJARDY XR",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL (30 tabs / 30 days)"
+    },
+    {
+      "drug_name": "SYNTHROID",
+      "drug_tier": "3",
+  
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 547 column 6 (char 11488)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "megestrol acetate",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "meloxicam tablet",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "memantine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mesalamine delayed-rel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mesalamine enema",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mesalamine ext-rel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mesalamine suppository",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metformin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metformin ext-rel (except generics for FORTAMET and GLUMETZA)",
+      "drug_tier": "",
+      "drug_requirements":
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 552 column 6 (char 11446)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "amlodipine-atorvastatin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "amlodipine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diltiazem ext-rel (except generics for CARDIZEM LA)",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "nifedipine ext-rel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "verapamil ext-rel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "digoxin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "aliskiren",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "amiloride",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "chlorthalidone",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_nam
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 497 column 6 (char 11168)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "CIMZIA PREFILLED SYRINGE",
+      "drug_tier": "not_found",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "COSENTYX SUBCUTANEOUS",
+      "drug_tier": "not_found",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "RINVOQ",
+      "drug_tier": "not_found",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ADALIMUMAB-ADAZ",
+      "drug_tier": "not_found",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ADALIMUMAB-FKJP",
+      "drug_tier": "not_found",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BIMZELX",
+      "drug_tier": "not_found",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "HYRIMOZ (except NDCs 61314-XXXXXX)",
+      "drug_tier": "not_found",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "OTEZLA",
+      "drug_tier": "not_found",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PYZCHIVA SUBCUTANEOUS",
+      "drug_tier":
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 537 column 6 (char 11217)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "NURTEC ODT",
+      "drug_tier": null,
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "QULIPTA",
+      "drug_tier": null,
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "UBRELVY",
+      "drug_tier": null,
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "AJOVY",
+      "drug_tier": null,
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "EMGALITY",
+      "drug_tier": null,
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "eletriptan",
+      "drug_tier": null,
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "naratriptan",
+      "drug_tier": null,
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "rizatriptan",
+      "drug_tier": null,
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sumatriptan",
+      "drug_tier": null,
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "zolmitriptan",
+      "drug_tier": null,
+      "drug_req
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 507 column 6 (char 11651)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "balsalazide",
+      "drug_tier": "Not Specified",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "budesonide delayed-rel capsule",
+      "drug_tier": "Not Specified",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "budesonide foam",
+      "drug_tier": "Not Specified",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "hydrocortisone enema",
+      "drug_tier": "Not Specified",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mesalamine delayed-rel",
+      "drug_tier": "Not Specified",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mesalamine enema",
+      "drug_tier": "Not Specified",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mesalamine ext-rel",
+      "drug_tier": "Not Specified",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mesalamine suppository",
+      "drug_tier": "Not Specified",
+      "drug_requirements": ""
+    },
+    {
+    
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 497 column 6 (char 10763)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "alendronate",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ibandronate",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "risedronate",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "calcitonin-salmon",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PROLIA",
+      "drug_tier": "4",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "teriparatide",
+      "drug_tier": "5",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "TYMLOS",
+      "drug_tier": "5",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "levocarnitine",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "FENSOLVI",
+      "drug_tier": "5",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "LUPRON DEPOT-PED",
+      "drug_tier": "5",
+
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 467 column 6 (char 10565)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "celecoxib",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "allopurinol",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "colchicine tablet",
+      "drug_tier": "3",
+      "drug_requirements": "QL (60 caps / 30 days)"
+    },
+    {
+      "drug_name": "probenecid",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "MITIGARE",
+      "drug_tier": "3",
+      "drug_requirements": "QL (60 caps / 30 days)"
+    },
+    {
+      "drug_name": "diclofenac sodium",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diclofenac sodium gel 1%",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diclofenac sodium solution 1.5%",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ibuprofen",
+      "drug_tier": "1",
+      "drug_requirements": 
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 562 column 6 (char 11341)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "CALQUENCE",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "cyclophosphamide",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "melphalan",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "temozolomide",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "COPIKTRA",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "GAVRETO",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "GOMEKLI",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "IBRANCE",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "capecitabine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mercaptopurine",
+      "drug_tier": "",
+      "drug_requirements":
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 537 column 6 (char 11527)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "formoterol inhalation solution",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "levalbuterol tartrate cfc-free aerosol",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "STRIVERDI RESPIMAT",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "DUPIXENT",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NUCALA (except lyophilized powder)",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "benzonatate (except NDCs 69336012615, 69499032915)",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "codeine-promethazine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dextromethorphan-brompheniramine-pseudoephedrine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 527 column 6 (char 11093)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "dihydroergotamine spray",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ergotamine-caffeine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Migergot",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CAFERGOT",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "MAXALT",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "MAXALT-MLT",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "eletriptan",
+      "drug_tier": "",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "naratriptan",
+      "drug_tier": "",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "rizatriptan",
+      "drug_tier": "",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "sumatriptan",
+      "drug_tier": "",
+    
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 507 column 6 (char 10718)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ADDERALL XR",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "calcipotriene cream",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "EVERSENSE CONTINUOUS GLUCOSE MONITORING SYSTEM",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ADRENALIN",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "calcipotriene foam",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "EPANED",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ADVAIR DISKUS",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CALCIPOTRIENE FOAM",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "EXFORGE",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name"
+==================================================
+
+=== JSON Parse Error ===
+Error: Unterminated string starting at: line 549 column 20 (char 11176)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "JENTADUETO",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JENTADUETO XR",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JORNAY PM",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JUXTAPID",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JANUMET",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JANUMET XR",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JANUVIA",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JYNARQUE",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "KAMDOY",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Kapzin DC",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+   
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 547 column 6 (char 11464)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "TRILEPTAL",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fenofibrate tablet 40 mg, 120 mg",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fenofibric acid delayedrel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "UROXATRAL",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "alfuzosin ext-rel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "doxazosin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "silodosin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tamsulosin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "terazosin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "V-GO INSULIN INFUSION P
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 547 column 6 (char 11219)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "metaxalone 400 mg",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metformin ext-rel (generics for FORTAMET and GLUMETZA only)",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "methocarbamol 500 mg (NDC 69036091010 only)",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "methocarbamol 750 mg (NDCs 69036093090, 70868090190 only)",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "MIACALCIN INJECTION",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "MICARDIS",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "MICARDIS HCT",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Migergot",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "MILLIPRED",
+      "
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 517 column 6 (char 10472)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "abacavir",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "abacavir-lamivudine",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "abiraterone",
+      "drug_tier": "4",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "ALECENSA",
+      "drug_tier": "5",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "ALUNBRIG",
+      "drug_tier": "5",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "APRETUDE",
+      "drug_tier": "1",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "AUGTYRO",
+      "drug_tier": "5",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "atazanavir",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "bexarotene",
+      "drug_tier": "5",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "BESREMI",
+      "drug_tier": "5",
+      "dr
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 512 column 6 (char 10481)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ALECENSA",
+      "drug_tier": "5",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ALPROLIX",
+      "drug_tier": "5",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ALTUVIIIO",
+      "drug_tier": "5",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ALUNBRIG",
+      "drug_tier": "5",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ALVAIZ",
+      "drug_tier": "5",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ambrisentan",
+      "drug_tier": "4",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "APRETUDE",
+      "drug_tier": "5",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ARALAST NP",
+      "drug_tier": "5",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "ARANESP",
+      "drug_tier": "5",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "atazanavir",
+      "drug_tier": "3",
+      "drug_requirements":
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 547 column 6 (char 11380)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "amlodipine-valsartan",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "amlodipine-valsartan-hydrochlorothiazide",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ammonium lactate $12 \\%$",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "amoxicillin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "amoxicillin-clavulanate",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "amphetamine-dextroamphetamine mixed salts",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "amphetamine-dextroamphetamine mixed salts ext-rel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "anagrelide",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "anastrozole",
+      "dr
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 547 column 6 (char 11391)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "formoterol inhalation solution",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fosinopril",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fosinopril-hydrochlorothiazide",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "hydrochlorothiazide",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fulvestrant",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "furosemide",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "FYCOMPA",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "FYLNETRA",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "gabapentin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "GALAFOLD",
+      "
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 562 column 6 (char 11473)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "RUCONEST",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "rufinamide",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "RUXIENCE",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "RYBELSUS",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "RYDAPT",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "RYTARY",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sulfasalazine delayed-rel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sumatriptan",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sunitinib",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SUNOSI",
+      "drug_tier": "",
+      "drug_requirements": ""
+
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 492 column 6 (char 10537)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "modafinil",
+      "drug_tier": "3",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "mometasone",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "montelukast",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "morphine",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "morphine ext-rel",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL (90 tablets / 30 days)"
+    },
+    {
+      "drug_name": "MOUNJARO",
+      "drug_tier": "5",
+      "drug_requirements": "PA; QL (4 pens / 28 days)"
+    },
+    {
+      "drug_name": "moxifloxacin",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "MUGARD",
+      "drug_tier": "4",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "MULTAQ",
+      "drug_tier": "5",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 462 column 6 (char 10653)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "clonazepam",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clonidine",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clonidine transdermal",
+      "drug_tier": "2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clopidogrel",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clotrimazole",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clozapine",
+      "drug_tier": "4",
+      "drug_requirements": "PA; QL (270 tabs/30 days)"
+    },
+    {
+      "drug_name": "codeine-acetaminophen",
+      "drug_tier": "3",
+      "drug_requirements": "QL (360 tabs/30 days)"
+    },
+    {
+      "drug_name": "codeine-promethazine",
+      "drug_tier": "3",
+      "drug_requirements": "QL (240 mL/30 days); PA"
+    },
+    {
+      "drug_name": "colchicine tablet",
+      "drug_tier": "3",
+      "d
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 547 column 6 (char 11369)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "celecoxib",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "allopurinol",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "colchicine tablet",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "probenecid",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "MITIGARE",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diclofenac sodium",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diclofenac sodium gel $1 \\%$",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diclofenac sodium solution $1.5 \\%$",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ibuprofen",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "meloxic
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 552 column 6 (char 11444)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "sulfasalazine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sulfasalazine delayed-rel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sumatriptan",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SUNOSI",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SYMLINPEN",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SYMPROIC",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SYNJARDY",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SYNJARDY XR",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SYNTHROID",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tacrolimus",
+      "drug_tier": "",
+      "drug_requi
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 542 column 6 (char 11453)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "neomycin-polymyxin b-bacitracin-hydrocortisone",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "neomycin-polymyxin b-dexamethasone",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tobramycin-dexamethasone",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "TOBRADEX OINTMENT",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ciprofloxacin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "erythromycin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "gentamicin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "levofloxacin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "moxifloxacin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 547 column 6 (char 11486)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "OMNIPOD 5 INSULIN INFUSION PUMP",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "OMNIPOD DASH INSULIN INFUSION PUMP",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "OMNIPOD INSULIN INFUSION PUMP",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "TRUE METRIX STRIPS",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "TWIIST INSULIN INFUSION PUMP AND SUPPLIES",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ORILISSA",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dexamethasone",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fludrocortisone",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "hydrocortisone",
+      "drug_tier": "",
+      "drug_r
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 547 column 6 (char 11488)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "megestrol acetate",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "meloxicam tablet",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "memantine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mesalamine delayed-rel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mesalamine enema",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mesalamine ext-rel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mesalamine suppository",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metformin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metformin ext-rel (except generics for FORTAMET and GLUMETZA)",
+      "drug_tier": "",
+      "drug_requirements":
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 537 column 6 (char 11380)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "alendronate",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ibandronate",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "risedronate",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "calcitonin-salmon",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PROLIA",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "teriparatide",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "TYMLOS",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "levocarnitine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "FENSOLVI",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LUPRON DEPOT-PED",
+      "drug_tier": "",
+      "drug_requ
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 552 column 6 (char 11441)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "amlodipine-atorvastatin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "amlodipine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diltiazem ext-rel (except generics for CARDIZEM LA)",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "nifedipine ext-rel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "verapamil ext-rel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "digoxin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "aliskiren",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "amiloride",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "chlorthalidone",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_nam
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 562 column 6 (char 11408)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "balsalazide",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "budesonide delayed-rel capsule",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "budesonide foam",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "hydrocortisone enema",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mesalamine delayed-rel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mesalamine enema",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mesalamine ext-rel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mesalamine suppository",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sulfasalazine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 547 column 6 (char 11371)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "NURTEC ODT",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "QULIPTA",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "UBRELVY",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "AJOVY",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "EMGALITY",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "eletriptan",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "naratriptan",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "rizatriptan",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sumatriptan",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "zolmitriptan",
+      "drug_tier": "",
+      "drug_requirements": ""
+    }
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 532 column 6 (char 11403)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "formoterol inhalation solution",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "levalbuterol tartrate cfc-free aerosol",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "STRIVERDI RESPIMAT",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "DUPIXENT",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NUCALA",
+      "drug_tier": "",
+      "drug_requirements": "except lyophilized powder"
+    },
+    {
+      "drug_name": "DUPIXENT",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NUCALA",
+      "drug_tier": "",
+      "drug_requirements": "except lyophilized powder"
+    },
+    {
+      "drug_name": "XOLAIR",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "benzonatate",
+      "drug_tier": "",
+      "drug_requirements": "except 
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 547 column 6 (char 11381)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "amlodipine-valsartan",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "amlodipine-valsartan-hydrochlorothiazide",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ammonium lactate $12 \\%$",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "amoxicillin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "amoxicillin-clavulanate",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "amphetamine-dextroamphetamine mixed salts",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "amphetamine-dextroamphetamine mixed salts ext-rel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "anagrelide",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "anastrozole",
+      "dr
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 487 column 6 (char 11736)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "benzonatate",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "benzonatate",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BEPREVE",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "azelastine",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "bepotastine",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "cromolyn sodium",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "loteprednol",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "olopatadine",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BETAMETHASONE ACETATE- BETAMETHASONE SODIUM
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 492 column 6 (char 11818)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "COLAZAL",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "balsalazide",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mesalamine delayed-rel",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mesalamine ext-rel",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sulfasalazine",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sulfasalazine delayed-rel",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "colchicine capsule",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "colchicine tablet",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 537 column 6 (char 11449)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "clonazepam",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clonidine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clonidine transdermal",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clopidogrel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clotrimazole",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clozapine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "codeine-acetaminophen",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "codeine-promethazine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "colchicine tablet",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "colesevelam",
+      "dr
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 467 column 6 (char 11659)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "BUTRANS",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "buprenorphine transdermal",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BELBUCA",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "chlorzoxazone 375 mg",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "chlorzoxazone 500 mg (NDC 73007001303 only)",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "chlorzoxazone 750 mg",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "cyclobenzaprine tablet 7.5 mg",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BYDUREON BCISE",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "dr
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 487 column 6 (char 11721)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ADZENYS XR-ODT",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "amphetamine-dextroamphetamine mixed salts ext-rel",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dexmethylphenidate ext-rel",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dextroamphetamine ext-rel",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lisdexamfetamine",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "methylphenidate ext-rel",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "AZSTARYS",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ANGELIQ",
+      "drug_tier": "Excluded",
+      "drug_requirements"
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 512 column 6 (char 11935)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "LAMICTAL XR",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ext-rel",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clobazam",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clonazepam",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "divalproex sodium",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "divalproex sodium ext-rel",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "gabapentin",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lacosamide",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lamotrigine",
+      "dru
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 502 column 6 (char 11812)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "JANUVIA",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JATENZO",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "saxagliptin",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ZITUVIO",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "testosterone gel (except authorized generics for TESTIM and VOGELXO)",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "testosterone solution",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NATESTO",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "icosapent ethyl",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_nam
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 497 column 6 (char 11655)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "DYRENIUM",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "amiloride",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "triamterene",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "EDARBI",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "EDARBYCLOR",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "candesartan",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "candesartan-hydrochlorothiazide",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "irbesartan",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "irbesartan-hydrochlorothiazide",
+      "dr
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 552 column 6 (char 11435)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "formoterol inhalation solution",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fosinopril",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fosinopril-",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "hydrochlorothiazide",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fulvestrant",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "furosemide",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "FYCOMPA",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "FYLNETRA",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "gabapentin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "GALAFOLD",
+      "drug_tier": "",
+   
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 557 column 10 (char 14338)
+Original String (first 1000 chars): {
+    "drug_table": [
+        {
+            "drug_name": "RUCONEST",
+            "drug_tier": "",
+            "drug_requirements": ""
+        },
+        {
+            "drug_name": "rufinamide",
+            "drug_tier": "",
+            "drug_requirements": ""
+        },
+        {
+            "drug_name": "RUXIENCE",
+            "drug_tier": "",
+            "drug_requirements": ""
+        },
+        {
+            "drug_name": "RYBELSUS",
+            "drug_tier": "",
+            "drug_requirements": ""
+        },
+        {
+            "drug_name": "RYDAPT",
+            "drug_tier": "",
+            "drug_requirements": ""
+        },
+        {
+            "drug_name": "RYTARY",
+            "drug_tier": "",
+            "drug_requirements": ""
+        },
+        {
+            "drug_name": "sulfasalazine delayed-rel",
+            "drug_tier": "",
+            "drug_requirements": ""
+        },
+        {
+            "drug_name": "sumatriptan",
+            "drug_tier": "",
+            "drug_requi
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 537 column 6 (char 11185)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "modafinil",
+      "drug_tier": "",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "mometasone",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mometasone",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "montelukast",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "morphine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "morphine ext-rel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "MOUNJARO",
+      "drug_tier": "",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "moxifloxacin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "moxifloxacin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "MUGARD",
+      "drug_tier": "",
+      "drug_requireme
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 477 column 6 (char 11679)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "methocarbamol (except NDCs 69036091010, 69036093090, 70868090190)",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "solution, clindamycin-benzoyl peroxide, dapsone, erythromycin solution, erythromycin-benzoyl peroxide, tazarotene, tretinoin, AKLIEF, EPIDUO",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CARNITOR",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CARNITOR SF",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "levocarnitine",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CAYSTON",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tobramycin inhalation solution",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+  
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 552 column 6 (char 11236)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "JENTADUETO",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JENTADUETO XR",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JORNAY PM",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JUXTAPID",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JANUMET",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JANUMET XR",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JANUVIA",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JYNARQUE",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "KAMDOY",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Kapzin DC",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+   
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 532 column 6 (char 11068)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "dihydroergotamine spray",
+      "drug_tier": "",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "ergotamine-caffeine",
+      "drug_tier": "",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "Migergot",
+      "drug_tier": "",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "CAFERGOT",
+      "drug_tier": "",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "MAXALT",
+      "drug_tier": "",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "MAXALT-MLT",
+      "drug_tier": "",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "eletriptan",
+      "drug_tier": "",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "naratriptan",
+      "drug_tier": "",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "rizatriptan",
+      "drug_tier": "",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "sumatriptan",
+      "drug_tie
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 497 column 6 (char 11747)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "losartan-hydrochlorothiazide",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "olmesartan",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "olmesartan-hydrochlorothiazide",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "telmisartan",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "telmisartan-hydrochlorothiazide",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "valsartan",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "valsartan-hydrochlorothiazide",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "estradiol-drospirenone-levomefolate",
+      "drug_tier": "Preferred Opt
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 552 column 6 (char 11301)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "metaxalone 400 mg",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metformin ext-rel (generics for FORTAMET and",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "GLUMETZA only)",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "methocarbamol 500 mg (NDC a 69036091010 only)",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "methocarbamol 750 mg (NDCs a 69036093090,",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "70868090190 only)",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "MIACALCIN INJECTION",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "MICARDIS",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "MICARDIS HCT",
+      "drug_tier": "",
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 482 column 6 (char 11806)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "mefenamic acid (NDC 69336012830 only)",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diclofenac sodium",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ibuprofen",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "meloxicam tablet",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "naproxen (except naproxen $C R$ or naproxen suspension)",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "meloxicam capsule",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diclofenac sodium",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ibuprofen",
+      "drug_tier": "Preferred Option",
+      "drug_requ
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 487 column 6 (char 11717)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "BETHKIS",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tobramycin inhalation solution",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BETIMOL",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "timolol maleate solution",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BETOPTIC S",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "timolol maleate solution",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BEVESPI AEROSPHERE",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ANORO ELLIPTA",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "STIOLTO RESPI
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 542 column 6 (char 11134)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ADDERALL XR",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ADRENALIN",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ADVAIR DISKUS",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ADVAIR HFA",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ADZENYS XR-ODT",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "AFINITOR",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "AFINITOR DISPERZ",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "AIMOVIG",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "albuterol sulfate CFC-free (NDC\u00a0${ }^{\text{A }}$ 66993001968,00093317431 only)",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+ 
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 492 column 6 (char 11739)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "COMBIGAN",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "brimonidine-timolol",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "COSOPT PF",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dorzolamide-timolol",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "COMPLERA",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "efavirenz-emtricitabinetenofovir disoproxil fumarate",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "efavirenz-lamivudinetenofovir disoproxil fumarate",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BIKTARVY",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 487 column 6 (char 11765)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "only)",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Norgesic Forte",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "cyclobenzaprine (except cyclobenzaprine tablet 7.5 mg )",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NORITATE",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "azelaic acid gel",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "brimonidine gel",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ivermectin cream",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metronidazole",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 487 column 6 (char 11696)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "diltiazem ext-rel (generics for CARDIZEM LA only)",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diltiazem ext-rel (except generics for CARDIZEM LA), verapamil ext-rel",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "DIOVAN",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "DIOVAN HCT",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "candesartan",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "candesartan-hydrochlorothiazide",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "irbesartan",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "irbesartan-hydrochlorothiazide",
+      "drug_tier": "Pre
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 487 column 6 (char 11839)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "TRILEPTAL",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fenofibrate tablet 40 mg, 120 mg",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fenofibric acid delayedrel",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "UROXATRAL",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "alfuzosin ext-rel",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "doxazosin",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "silodosin",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tamsulosin",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "terazosin
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 502 column 6 (char 11938)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "YAZ",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ethinyl estradiol-drospirenone",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ethinyl estradiol-drospirenonelevomefolate",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ethinyl estradiollevonorgestrel",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ethinyl estradiollevonorgestrel-iron",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ethinyl estradiol-norethindrone acetate",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "VITAFOL-ONE",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "generic prenatal vitamins",
+      "drug_tier": "Preferred O
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 502 column 6 (char 11771)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ENLITE CONTINUOUS GLUCOSE MONITORING SYSTEM",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "DEXCOM CONTINUOUS GLUCOSE MONITORING SYSTEM",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "GLUCOSE MONITORING SYSTEM",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "hydrochlorothiazide, olmesartan-amlodipinehydrochlorothiazide",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ENTERAGAM",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "alosetron",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "VIBERZI",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "XIFAXAN 550 MG",
+      "drug_tier": "Preferred
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 497 column 6 (char 11691)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "GLEEVEC",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dasatinib",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "imatinib mesylate",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BOSULIF",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SCEMBLIX",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "GLUMETZA",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metformin",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metformin ext-rel",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "GLYCOPYRROLATE TABLET 1.5 MG",
+      "drug_tier"
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 497 column 6 (char 11785)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "INFLECTRA",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CR or naproxen suspension",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "AVSOLA",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ILUMYA",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PYZCHIVA INTRAVENOUS",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "REMICADE",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SIMPONI ARIA",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SKYRIZI INTRAVENOUS",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "STELARA INTRAVENO
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 562 column 6 (char 11204)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ALECENSA",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ALPROLIX",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ALTUVIIIO",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ALUNBRIG",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ALVAIZ",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ambrisentan",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "APRETUDE",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ARALAST NP",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ARANESP",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "atazanavir",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 567 column 6 (char 11264)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "DUROLANE",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "EUFLEXXA",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "GELSYN-3",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SUPARTZ FX",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "abacavir",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "atazanavir",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "darunavir",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "efavirenz",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "emtricitabine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "etravirine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 512 column 6 (char 11808)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ketoprofen ext-rel capsule",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diclofenac sodium",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ibuprofen",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "meloxicam tablet",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "naproxen",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LATUDA",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "aripiprazole",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "asenapine",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clozapine",
+      "drug_tie
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 517 column 6 (char 11628)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "Fyremadel",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "cetrorelix acetate",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "GANIRELIX ACETATE",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ganirelix acetate",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "cetrorelix acetate",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "GANIRELIX ACETATE",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "GEL-ONE",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "DUROLANE",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "EUFLEXXA",
+      "drug_tier
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 492 column 6 (char 11665)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "LOKELMA",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "VELTASSA",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "meloxicam capsule",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dolofenac sodium",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ibuprofen",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "meloxicam tablet",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "naproxen (except naproxen CR or naproxen suspension)",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Lorzone",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "cariso
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 487 column 6 (char 11742)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "MINIVELLE",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "zolmitriptan",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NURTEC ODT",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "UBRELVY",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "minocycline ext-rel",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "estradiol",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "doxycycline hyclate capsule",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "doxycycline hyclate tablet (except doxycycline hyclate tablet $50 mg, 75 mg, 150 mg)",
+      "drug_tier": "Preferred Option",
+      "drug_requ
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 507 column 6 (char 11566)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ACTEMRA",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "AVSOLA",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "REMICADE",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SIMPONI ARIA",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ADCIRCA",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sildenafil",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tadalafil",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "TADLIQ",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "AFINITOR",
+      "drug_tier": "Excluded",
+      "drug_requirement
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 507 column 6 (char 11694)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "OCTAGAM",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "OGIVRI",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "omeprazole-sodium bicarbonate",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "chlorzoxazone 500 mg",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "cyclobenzaprine",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metaxalone 800 mg",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "methocarbamol",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NORITATE",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "azelaic acid gel",
+      "drug_
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 512 column 6 (char 11751)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "RELISTOR",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lubiprostone",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SYMPROIC",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ROZEREM",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "doxepin",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ramelteon",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "temazepam",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "zolpidem",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "zolpidem ext-rel",
+      "drug_tier": "Preferred Option",
+    
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 512 column 6 (char 11609)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "OVIDREL",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PEGASYS",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PRALUENT",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PREZISTA",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PROCYSBI",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PROLASTIN-C",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PROMACTA",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "RASUVO",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "RAVICTI",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "REMODULIN",
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 502 column 6 (char 11731)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "SPRYCEL",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dasatinib",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "imatinib mesylate",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BOSULIF",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SCEMBLIX",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "STENDRA",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "avanafil",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sildenafil",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tadalafil",
+      "drug_tier": "Preferred Option",
+      
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 502 column 6 (char 11921)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "TESTIM",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "testosterone gel 1% (authorized generics for TESTIM and VOGELXO only)",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "OXTELLAR XR",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "XCOPRI",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "testosterone gel (except authorized generics for TESTIM and VOGELXO)",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "testosterone solution",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NATESTO",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "TOVIAZ",
+      "drug_tier": "Excluded",
+      "
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 487 column 6 (char 11723)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ethinyl estradiol-levonorgestrel-iron",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ethinyl estradiol-norethindrone acetate-iron",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ethinyl estradiol-norgestimate",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LO LOESTRIN FE",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NATAZIA",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "naproxen (except naproxen CR or naproxen suspension)",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ZIEXTENZO",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "FYLNETRA",
+      "drug_tier": "Pre
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 552 column 6 (char 11441)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "NURTEC ODT",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "QULIPTA",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "UBRELVY",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "AJOVY",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "EMGALITY",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "eletriptan",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "naratriptan",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "rizatriptan",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sumatriptan",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "zolmitriptan",
+      "drug_tier": "",
+      "drug_requirements": ""
+    }
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 542 column 6 (char 11451)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "neomycin-polymyxin bbacitracin-hydrocortisone",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "neomycin-polymyxin bdexamethasone",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tobramycin-dexamethasone",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "TOBRADEX OINTMENT",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ciprofloxacin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "erythromycin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "gentamicin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "levofloxacin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "moxifloxacin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+ 
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 552 column 6 (char 11504)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "OMNIPOD 5 INSULIN INFUSION PUMP",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "OMNIPOD DASH INSULIN INFUSION PUMP",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "OMNIPOD INSULIN INFUSION PUMP",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "TRUE METRIX STRIPS",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "TWIIST INSULIN INFUSION PUMP AND SUPPLIES",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ORILISSA",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dexamethasone",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fludrocortisone",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "hydrocortisone",
+      "drug_tier": "",
+      "drug_r
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 532 column 6 (char 11343)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "AZSTARYS",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "QELBREE",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "doxepin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "eszopiclone",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ramelteon",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "zolpidem",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "zolpidem ext-rel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BELSOMRA",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "QUVIVIQ",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NURTEC ODT",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 552 column 6 (char 11440)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "amlodipine-atorvastatin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "amlodipine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diltiazem ext-rel (except generics for CARDIZEM LA)",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "nifedipine ext-rel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "verapamil ext-rel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "digoxin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "aliskiren",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "amiloride",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "chlorthalidone",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_nam
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 552 column 6 (char 11365)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "HYRIMOZ",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CIMZIA PREFILLED SYRINGE",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "COSENTYX SUBCUTANEOUS",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "RINVOQ",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ADALIMUMAB-ADAZ",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ADALIMUMAB-FKJP",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BIMZELX",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "HYRIMOZ",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "OTEZLA",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PYZCHIVA SUBCUTANEOUS",
+     
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 537 column 6 (char 11426)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "lidocaine patch",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lidocaine-prilocaine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "azelaic acid gel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "brimonidine gel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ivermectin cream",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metronidazole",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "FINACEA FOAM",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ORACEA",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lidocaine viscous",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "EPISIL",
+      "drug_ti
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 502 column 6 (char 11345)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ethinyl estradiol-etonogestrel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "EluRyng",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NUVARING",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ANNOVERA",
+      "drug_tier": "",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "KORLYM",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BETHKIS",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CAYSTON",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "KITABIS PAK",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "TOBI",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "TOBI PODHALER",
+      "drug_tie
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 547 column 6 (char 11375)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "celecoxib",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "allopurinol",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "colchicine tablet",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "probenecid",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "MITIGARE",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diclofenac sodium",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diclofenac sodium gel $1 \\%$",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diclofenac sodium solution $1.5 \\%$",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ibuprofen",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "meloxic
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 562 column 6 (char 11408)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "balsalazide",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "budesonide delayed-rel capsule",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "budesonide foam",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "hydrocortisone enema",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mesalamine delayed-rel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mesalamine enema",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mesalamine ext-rel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mesalamine suppository",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sulfasalazine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 537 column 6 (char 11383)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "alendronate",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ibandronate",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "risedronate",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "calcitonin-salmon",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PROLIA",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "teriparatide",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "TYMLOS",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "levocarnitine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "FENSOLVI",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LUPRON DEPOT-PED",
+      "drug_tier": "",
+      "drug_requ
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 532 column 6 (char 11425)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "formoterol inhalation solution",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "levalbuterol tartrate cfc-free aerosol",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "STRIVERDI RESPIMAT",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "DUPIXENT",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NUCALA (except lyophilized powder)",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "benzonatate (except NDCs 69336012615, 69499032915)",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "codeine-promethazine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dextromethorphan-brompheniramine-pseudoephedrine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 547 column 6 (char 11488)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "megestrol acetate",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "meloxicam tablet",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "memantine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mesalamine delayed-rel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mesalamine enema",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mesalamine ext-rel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mesalamine suppository",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metformin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metformin ext-rel (except generics for FORTAMET and GLUMETZA)",
+      "drug_tier": "",
+      "drug_requirements":
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 547 column 6 (char 11407)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "sulfasalazine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sulfasalazine delayed-rel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sumatriptan",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SUNOSI",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SYMLINPEN",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SYMPROIC",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SYNJARDY",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SYNJARDY XR",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SYNTHROID",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tacrolimus",
+      "drug_tier": "",
+      "drug_requi
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 502 column 6 (char 11758)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "irbesartan-hydrochlorothiazide",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "losartan",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "losartan-hydrochlorothiazide",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "olmesartan",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "olmesartan-hydrochlorothiazide",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "telmisartan",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "telmisartan-hydrochlorothiazide",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "valsartan",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "valsartan-hydrochlorothiazide",
+      "drug_tier": "",
+      "drug_requirements": ""
+
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 492 column 6 (char 11886)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "COLAZAL",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "balsalazide",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mesalamine delayedrel",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mesalamine ext-rel",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sulfasalazine",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sulfasalazine delayed-rel",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "DAYTRANA",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "amphetamine- dextroamphetamine mixed salts ext-rel",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+  
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 492 column 6 (char 11943)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "diclofenac potassium powder",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "suspension)",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diclofenac sodium",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ibuprofen",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "naproxen (except naproxen CR or naproxen suspension)",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diclofenac sodium solution 2%",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diclofenac sodium",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diclofenac sodium gel 1%",
+      "drug_tier": "Preferred Option",
+      "
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 497 column 6 (char 11679)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "XHANCE",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "DYRENIUM",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "amiloride",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "triamterene",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "EVERSENSE CONTINUOUS",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "DEXCOM CONTINUOUS",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "EDARBI",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "EDARBYCLOR",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "candesartan",
+      "drug_tier": "Preferred Option",
+      
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 482 column 6 (char 11765)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ADZENYS XR-ODT",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "amphetamine-dextroamphetamine mixed salts ext-rel",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dexmethylphenidate ext-rel",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dextroamphetamine ext-rel",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lisdexamfetamine",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "methylphenidate ext-rel",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "AZSTARYS",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ANGELIQ",
+      "drug_tier": "Excluded",
+      "drug_requirements"
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 547 column 6 (char 11489)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "clonazepam",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clonidine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clonidine transdermal",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clopidogrel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clotrimazole",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clozapine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "codeine-acetaminophen",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "codeine-promethazine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "colchicine tablet",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "colesevelam",
+      "dr
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 547 column 6 (char 11372)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "formoterol inhalation solution",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fosinopril",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fosinopril-",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "hydrochlorothiazide",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "fulvestrant",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "furosemide",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "FYCOMPA",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "FYLNETRA",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "gabapentin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "GALAFOLD",
+      "drug_tier": "",
+   
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 512 column 6 (char 11029)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "dihydroergotamine spray",
+      "drug_tier": "",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "ergotamine-caffeine",
+      "drug_tier": "",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "Migergot",
+      "drug_tier": "",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "CAFERGOT",
+      "drug_tier": "",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "MAXALT",
+      "drug_tier": "",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "MAXALT-MLT",
+      "drug_tier": "",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "eletriptan",
+      "drug_tier": "",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "naratriptan",
+      "drug_tier": "",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "rizatriptan",
+      "drug_tier": "",
+      "drug_requirements": "QL"
+    },
+    {
+      "drug_name": "sumatriptan",
+      "drug_tie
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 547 column 6 (char 11332)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "modafinil",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mometasone",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "mometasone",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "montelukast",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "morphine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "morphine ext-rel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "MOUNJARO",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "moxifloxacin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "moxifloxacin",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "MUGARD",
+      "drug_tier": "",
+      "drug_requirements"
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 477 column 6 (char 11611)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "BUTRANS",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "buprenorphine transdermal",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BELBUCA",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "chlorzoxazone 375 mg",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "chlorzoxazone 500 mg (NDC 73007001303 only)",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "chlorzoxazone 750 mg",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "cyclobenzaprine tablet 7.5 mg",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BYDUREON BCISE",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "dr
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 557 column 6 (char 11458)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "RUCONEST",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sulfasalazine delayed-rel",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "rufinamide",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sumatriptan",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "RUXIENCE",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sunitinib",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "RYBELSUS",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SUNOSI",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "RYDAPT",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SUPARTZ FX",
+      "drug_tier": "",
+      "drug_requirements":
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 502 column 6 (char 11819)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "losartan-hydrochlorothiazide",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "olmesartan",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "olmesartan-hydrochlorothiazide",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "telmisartan",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "telmisartan-hydrochlorothiazide",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "valsartan",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "valsartan-hydrochlorothiazide",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ATIVAN",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+ 
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 492 column 6 (char 11763)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "BETHKIS",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tobramycin inhalation solution",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BETIMOL",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "timolol maleate solution",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BETOPTIC S",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "timolol maleate solution",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BEVESPI AEROSPHERE",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ANORO ELLIPTA",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "STIOLTO RESPI
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 487 column 6 (char 10486)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ADDERALL XR",
+      "drug_tier": "Tier 2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ADRENALIN",
+      "drug_tier": "Tier 2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ADVAIR DISKUS",
+      "drug_tier": "Tier 2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ADVAIR HFA",
+      "drug_tier": "Tier 2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ADZENYS XR-ODT",
+      "drug_tier": "Tier 2",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "AFINITOR",
+      "drug_tier": "Tier 5",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "AFINITOR DISPERZ",
+      "drug_tier": "Tier 5",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "AIMOVIG",
+      "drug_tier": "Tier 3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "albuterol sulfate CFC-free (NDC 66993001968,00093317431 only)",
+      "drug_tier": "",
+      "drug_require
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 552 column 6 (char 11237)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "JENTADUETO",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JENTADUETO XR",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JORNAY PM",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JUXTAPID",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JANUMET",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JANUMET XR",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JANUVIA",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JYNARQUE",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "KAMDOY",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Kapzin DC",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+   
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 502 column 6 (char 11847)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "JANUVIA",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "JATENZO",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "saxagliptin",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ZITUVIO",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "testosterone gel (except authorized generics for TESTIM and VOGELXO)",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "testosterone solution",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NATESTO",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "icosapent ethyl",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_nam
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 482 column 6 (char 11692)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "methocarbamol (except NDCs 69036091010, 69036093090, 70868090190)",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "levocarnitine",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CARNITOR",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CARNITOR SF",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tobramycin inhalation solution",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "CAYSTON",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "celecoxib",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diclofenac sodium",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 552 column 10 (char 14157)
+Original String (first 1000 chars): {
+    "drug_table": [
+        {
+            "drug_name": "metaxalone 400 mg",
+            "drug_tier": "",
+            "drug_requirements": ""
+        },
+        {
+            "drug_name": "metformin ext-rel (generics for FORTAMET and",
+            "drug_tier": "",
+            "drug_requirements": ""
+        },
+        {
+            "drug_name": "GLUMETZA only)",
+            "drug_tier": "",
+            "drug_requirements": ""
+        },
+        {
+            "drug_name": "methocarbamol 500 mg (NDC a 69036091010 only)",
+            "drug_tier": "",
+            "drug_requirements": ""
+        },
+        {
+            "drug_name": "methocarbamol 750 mg (NDCs a 69036093090,",
+            "drug_tier": "",
+            "drug_requirements": ""
+        },
+        {
+            "drug_name": "70868090190 only)",
+            "drug_tier": "",
+            "drug_requirements": ""
+        },
+        {
+            "drug_name": "MIACALCIN INJECTION",
+            "drug_tier": "",
+            "drug_requi
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 492 column 6 (char 11756)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "COMBIGAN",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "brimonidine-timolol",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "COSOPT PF",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dorzolamide-timolol",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "COMPLERA",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "efavirenz-emtricitabinetenofovir disoproxil fumarate",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "efavirenz-lamivudinetenofovir disoproxil fumarate",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BIKTARVY",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 507 column 6 (char 11841)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "SPRIX",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "VTAMA, ZORYVE CREAM",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diclofenac sodium",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ibuprofen",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "meloxicam tablet",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "naproxen (except naproxen CR or naproxen suspension)",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "STENDRA",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "avanafil",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sildenafil",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+   
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 482 column 6 (char 11689)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "mefenamic acid (NDC 69336012830 only)",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diclofenac sodium",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ibuprofen",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "meloxicam tablet",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "naproxen (except naproxen $C R$ or naproxen suspension)",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "meloxicam capsule",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "MENEST",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "estradiol",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": 
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 512 column 6 (char 11874)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "LAMICTAL XR",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ext-rel",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clobazam",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clonazepam",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "divalproex sodium",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "divalproex sodium ext-rel",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "gabapentin",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lacosamide",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lamotrigine",
+      "dru
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 502 column 6 (char 12006)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "TAZORAC",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "adapalene (except adapalene pad)",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "benzoyl peroxide",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clindamycin gel (except NDC 68682046275)",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clindamycin solution",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clindamycin-benzoyl peroxide",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dapsone",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "erythromycin solution",
+      "drug_tier": "Preferred Option",
+      "drug_re
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 487 column 6 (char 11901)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "oxcarbazepine",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "phenobarbital",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "phenytoin",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "phenytoin sodium extended",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "pregabalin",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "primidone",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tiagabine",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "topiramate",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "topiramate extre
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 482 column 6 (char 11691)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "diltiazem ext-rel (generics for CARDIZEM LA only)",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diltiazem ext-rel (except generics for CARDIZEM LA)",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "verapamil ext-rel",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "DIOVAN",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "DIOVAN HCT",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "candesartan",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "candesartan-hydrochlorothiazide",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "irbesartan",
+      "drug_tier": "Preferred Option",
+      "drug_requ
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 497 column 6 (char 11666)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "GLEEVEC",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dasatinib",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "imatinib mesylate",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BOSULIF",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SCEMBLIX",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "GLUMETZA",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metformin",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metformin ext-rel",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "FORTAMET",
+      "drug_tier": "Preferred Option"
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 502 column 6 (char 11772)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ENLITE CONTINUOUS GLUCOSE MONITORING SYSTEM",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "DEXCOM CONTINUOUS GLUCOSE MONITORING SYSTEM",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "GLUCOSE MONITORING SYSTEM",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "hydrochlorothiazide, olmesartan-amlodipine-hydrochlorothiazide",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ENTERAGAM",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "alosetron",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "VIBERZI",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "XIFAXAN 550 MG",
+      "drug_tier": "Preferre
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 497 column 6 (char 11710)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "INFLECTRA",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "AVSOLA",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ILUMYA",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PYZCHIVA INTRAVENOUS",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "REMICADE",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SIMPONI ARIA",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SKYRIZI INTRAVENOUS",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "STELARA INTRAVENOUS",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "TREMFYA INTRAVENOUS",
+ 
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 517 column 6 (char 11902)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ketoprofen ext-rel capsule",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "diclofenac sodium",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ibuprofen",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "meloxicam tablet",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "naproxen",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "LATUDA",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "aripiprazole",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "asenapine",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "clozapine",
+      "drug_tie
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 567 column 6 (char 11264)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "DUROLANE",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "EUFLEXXA",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "GELSYN-3",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SUPARTZ FX",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "abacavir",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "atazanavir",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "darunavir",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "efavirenz",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "emtricitabine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "etravirine",
+      "drug_tier": "",
+      "drug_requirements": ""
+    
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 497 column 6 (char 11916)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "VITAFOL-ONE",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Vitasure",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "extended",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "pregabalin",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "primidone",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tiagabine",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "topiramate",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "topiramate ext-rel",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "valproic acid",
+      "drug_tier": "Preferred O
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 562 column 6 (char 11204)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ALECENSA",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ALPROLIX",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ALTUVIIIO",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ALUNBRIG",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ALVAIZ",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ambrisentan",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "APRETUDE",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ARALAST NP",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ARANESP",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "atazanavir",
+      "drug_tier": "",
+      "drug_requirements": ""
+    },
+    {
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 487 column 6 (char 11735)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "LOKELMA",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "VELTASSA",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "meloxicam capsule",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dolofenac sodium",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ibuprofen",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "meloxicam tablet",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "naproxen (except naproxen CR or naproxen suspension)",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "Lorzone",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "cariso
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 497 column 6 (char 11704)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "chlorzoxazone 500 mg",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "cyclobenzaprine",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "cyclobenzaprine tablet 7.5 mg",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "metaxalone 800 mg",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "methocarbamol",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "OCTAGAM",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "OGIVRI",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "omeprazole-sodium bicarbonate",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ch
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 507 column 6 (char 11710)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "MINIVELLE",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "zolmitriptan",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NURTEC ODT",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "UBRELVY",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "cream 2%",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "naftifine",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "oxiconazole",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "minocycline ext-rel",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "estradiol",
+      "drug_tier": "Preferred Option",
+      "drug_requir
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 507 column 6 (char 11633)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "ACTEMRA",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "AVSOLA",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "REMICADE",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SIMPONI ARIA",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ADCIRCA",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sildenafil",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tadalafil",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "TADLIQ",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "AFINITOR",
+      "drug_tier": "Excluded",
+      "drug_requirement
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 522 column 6 (char 11700)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "Fyremadel",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "cetrorelix acetate",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "GANIRELIX ACETATE",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ganirelix acetate",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "cetrorelix acetate",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "GANIRELIX ACETATE",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "GEL-ONE",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "DUROLANE",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "EUFLEXXA",
+      "drug_tier
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 512 column 6 (char 11712)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "RELISTOR",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "lubiprostone",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SYMPROIC",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ROZEREM",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "doxepin",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ramelteon",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "temazepam",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "zolpidem",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "zolpidem ext-rel",
+      "drug_tier": "Preferred Option",
+    
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 502 column 6 (char 11758)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "SPRYCEL",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "dasatinib",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "imatinib mesylate",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "BOSULIF",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SCEMBLIX",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "STENDRA",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "avanafil",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "sildenafil",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "tadalafil",
+      "drug_tier": "Preferred Option",
+      
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 502 column 6 (char 12010)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "TESTIM",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "testosterone gel (except authorized generics for TESTIM and VOGELXO)",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "testosterone solution",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "NATESTO",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "testosterone gel 1% (authorized generics for TESTIM and VOGELXO only)",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "testosterone gel (except authorized generics for TESTIM and VOGELXO)",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "testosterone solution",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+ 
+==================================================
+
+=== JSON Parse Error ===
+Error: Expecting ',' delimiter: line 517 column 6 (char 11618)
+Original String (first 1000 chars): {
+  "drug_table": [
+    {
+      "drug_name": "OVIDREL",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PREGNYL",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "ONE",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SUPARTZ FX",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PEGASYS",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "SYPRINE",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "trientine",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "PRALUENT",
+      "drug_tier": "Excluded",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "REPATHA",
+      "drug_tier": "Preferred Option",
+      "drug_requirements": ""
+    },
+    {
+    
+==================================================
+
+=== JSON Parse Error ===
+Original String: {
+  "drug_table": [
+    {
+      "drug_name": "OMNIPOD 5 INTRO(G6/LIBRE2 PLUS)",
+      "drug_tier": "3",
+      "drug_requirements": "QL (1/365)"
+    },
+    {
+      "drug_name": "OMNIPOD DASH INTRO KIT (GEN 4)",
+      "drug_tier": "3",
+      "drug_requirements": "QL (1/365)"
+    },
+    {
+      "drug_name": "OMNIPOD DASH PODS (GEN 4)",
+      "drug_tier": "3",
+      "drug_requirements": "QL (20/30)"
+    },
+    {
+      "drug_name": "PEN NEEDLE, DIABETIC NEEDLE 29 GAUGE X 1/2\\"",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL (200/30)"
+    },
+    {
+      "drug_name": "PENTIPS PEN NEEDLE",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL (200/30)"
+    },
+    {
+      "drug_name": "TECHLITE INSULIN SYRINGE SYRINGE 1 ML 30 GAUGE X 1/2\\", 1 ML 31 GAUGE X 15/64\\", 1 ML 31 GAUGE X 5/16",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL (200/30)"
+    },
+    {
+      "drug_name": "TECHLITE INSULIN SYR(HALF UNIT) SYRINGE 0.3 ML 31 GAUGE X 15/64\\", 0.3 ML 31 GAUGE X 5/16\\", 0.5 ML 30 GAUGE X 1/2\\", 0.5 ML 31 GAUGE X 15/64\\", 0.5 ML 31 GAUGE X 5/16\\"",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL (200/30)"
+    },
+    {
+      "drug_name": "TECHLITE PEN NEEDLE NEEDLE 29 GAUGE X 1/2\\", 31 GAUGE X 3/16\\", 31 GAUGE X 5/16\\", 32 GAUGE X 1/4\\", 32 GAUGE X 5/32\\"",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL (200/30)"
+    },
+    {
+      "drug_name": "TRUEPLUS INSULIN",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL (200/30)"
+    },
+    {
+      "drug_name": "TRUEPLUS PEN NEEDLE",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL (200/30)"
+    },
+    {
+      "drug_name": "ULTRA-FINE INSULIN SYRINGE SYRINGE 0.5 ML 30 GAUGE X 1/2\\", 1 ML 31 GAUGE X 5/16",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL (200/30)"
+    },
+    {
+      "drug_name": "ULTRA-FINE PEN NEEDLE NEEDLE 31 GAUGE X 5/16\\"",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL (200/30)"
+    },
+    {
+      "drug_name": "UNIFINE PENTIPS MAXFLOW",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL (200/30)"
+    },
+    {
+      "drug_name": "UNIFINE PENTIPS NEEDLE 29 GAUGE X 1/2\\", 31 GAUGE X 1/4\\", 31 GAUGE X 3/16\\", 31 GAUGE X 5/16\\", 32 GAUGE X 1/4\\", 32 GAUGE X 5/32\\", 33 GAUGE X 5/32\\"",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL (200/30)"
+    },
+    {
+      "drug_name": "UNIFINE PENTIPS PLUS",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL (200/30)"
+    },
+    {
+      "drug_name": "UNIFINE PENTIPS PLUS MAXFLOW",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL (200/30)"
+    }
+  ],
+  "acronyms": [
+    {
+      "acronym": "PA",
+      "expansion": "Prior Authorization",
+      "explanation": "Requires approval before coverage."
+    },
+    {
+      "acronym": "QL",
+      "expansion": "Quantity Limit",
+      "explanation": "Limits the amount or duration of coverage for the drug."
+    }
+  ],
+  "tiers": []
+}
+==================================================
+
+=== JSON Parse Error ===
+Original String: {
+  "drug_table": [
+    {
+      "drug_name": "VAQTA (PF) INTRAMUSCULAR SYRINGE 50 UNIT/ML",
+      "drug_tier": "3",
+      "drug_requirements": "V"
+    },
+    {
+      "drug_name": "VARIVAX (PF)",
+      "drug_tier": "3",
+      "drug_requirements": "V"
+    },
+    {
+      "drug_name": "VAXCHORA VACCINE",
+      "drug_tier": "3",
+      "drug_requirements": "V"
+    },
+    {
+      "drug_name": "VIMKUNYA",
+      "drug_tier": "3",
+      "drug_requirements": "V"
+    },
+    {
+      "drug_name": "VIVOTIF",
+      "drug_tier": "3",
+      "drug_requirements": "V; QL (4/720)"
+    },
+    {
+      "drug_name": "XEMBIFY",
+      "drug_tier": "5",
+      "drug_requirements": "B/D PA; NDS"
+    },
+    {
+      "drug_name": "YF-VAX (PF)",
+      "drug_tier": "3",
+      "drug_requirements": "V"
+    },
+    {
+      "drug_name": "ADVOCATE PEN NEEDLE NEEDLE 32 GAUGE X 5/32\\"",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL $(200 / 30)$"
+    },
+    {
+      "drug_name": "ASSURE ID INSULIN SAFETY SYRINGE 1 ML 29 GAUGE X 1/2\\"",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL $(200 / 30)$"
+    },
+    {
+      "drug_name": "BD SAFETYGLIDE INSULIN SYRINGE SYRINGE 1 ML 29 GAUGE X 1/2\\", 1 ML 31 GAUGE X 15/64\\"",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL $(200 / 30)$"
+    },
+    {
+      "drug_name": "CURITY GAUZE TOPICAL SPONGE 2 X 2 \\"",
+      "drug_tier": "3",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "DROPLET MICRON PEN NEEDLE",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL (200/30)"
+    },
+    {
+      "drug_name": "DROPLET PEN NEEDLE NEEDLE 30 GAUGE X 5/16\\"",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL (200/30)"
+    },
+    {
+      "drug_name": "DROPSAFE PEN NEEDLE NEEDLE 31 GAUGE X 3/16\\"",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL (200/30)"
+    },
+    {
+      "drug_name": "EASY COMFORT SAFETY PEN NEEDLE NEEDLE 31 GAUGE X 3/16\\"",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL (200/30)"
+    },
+    {
+      "drug_name": "GAUZE PAD TOPICAL BANDAGE 2 X 2 \\"",
+      "drug_tier": "3",
+      "drug_requirements": "PA"
+    },
+    {
+      "drug_name": "INCONTROL PEN NEEDLE NEEDLE 32 GAUGE X 5/32\\"",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL (200/30)"
+    },
+    {
+      "drug_name": "INSULIN SYRINGE-NEEDLE U-100 SYRINGE 0.3 ML 29 GAUGE, 1 ML 29 GAUGE X 1/2\\", 1/2 ML 28 GAUGE",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL (200/30)"
+    },
+    {
+      "drug_name": "MAXICOMFORT SAFETY PEN NEEDLE NEEDLE 29 GAUGE X 5/16\\"",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL (200/30)"
+    },
+    {
+      "drug_name": "NANO PEN NEEDLE",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL (200/30)"
+    },
+    {
+      "drug_name": "NOVOFINE 32",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL (200/30)"
+    },
+    {
+      "drug_name": "NOVOFINE PLUS",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL (200/30)"
+    },
+    {
+      "drug_name": "OMNIPOD 5 (G6/LIBRE 2 PLUS)",
+      "drug_tier": "3",
+      "drug_requirements": "QL (20/30)"
+    },
+    {
+      "drug_name": "OMNIPOD 5 G6-G7 INTRO KT(GEN5)",
+      "drug_tier": "3",
+      "drug_requirements": "QL (1/365)"
+    },
+    {
+      "drug_name": "OMNIPOD 5 G6-G7 PODS (GEN 5)",
+      "drug_tier": "3",
+      "drug_requirements": "QL (20/30)"
+    }
+  ],
+  "acronyms": [
+    {
+      "acronym": "V",
+      "expansion": "Vaccine",
+      "explanation": "Provided at no cost when administered under CDC/ACIP recommendations."
+    },
+    {
+      "acronym": "B/D",
+      "expansion": "Part B versus D Administrative Requirement",
+      "explanation": "Prescription drug may be covered under Medicare Part B or D depending on circumstances; prior authorization required to determine coverage."
+    },
+    {
+      "acronym": "PA",
+      "expansion": "Prior Authorization",
+      "explanation": "Requires approval before coverage."
+    },
+    {
+      "acronym": "NDS",
+      "expansion": "Non-Extended Day Supply",
+      "explanation": "Only available for a one-month supply."
+    },
+    {
+      "acronym": "QL",
+      "expansion": "Quantity Limit",
+      "explanation": "Limits the amount or duration of coverage for the drug."
+    }
+  ],
+  "tiers": []
+}
+==================================================
+
+=== JSON Parse Error ===
+Original String: {
+  "drug_table": [
+    {
+      "drug_name": "UNIFINE SAFECONTROL PEN NEEDLE NEEDLE 30 GAUGE X 3/16\\", 30 GAUGE X 5/16\\", 32 GAUGE X 5/32\\"",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL $(200 / 30)$"
+    },
+    {
+      "drug_name": "UNIFINE ULTRA PEN NEEDLE",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL (200 / 30)"
+    },
+    {
+      "drug_name": "VERIFINE PLUS PEN NEEDLESHARP",
+      "drug_tier": "3",
+      "drug_requirements": "PA; QL (200 / 30)"
+    },
+    {
+      "drug_name": "V-GO 20",
+      "drug_tier": "3",
+      "drug_requirements": "QL (30/30)"
+    },
+    {
+      "drug_name": "V-GO 30",
+      "drug_tier": "3",
+      "drug_requirements": "QL (30/30)"
+    },
+    {
+      "drug_name": "V-GO 40",
+      "drug_tier": "3",
+      "drug_requirements": "QL (30/30)"
+    },
+    {
+      "drug_name": "allopurinol oral tablet 100 mg, 300 mg",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "colchicine oral tablet",
+      "drug_tier": "3",
+      "drug_requirements": "QL (120/30)"
+    },
+    {
+      "drug_name": "febuxostat",
+      "drug_tier": "3",
+      "drug_requirements": "ST"
+    },
+    {
+      "drug_name": "probenecid",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "probenecidcolchicine",
+      "drug_tier": "3",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "alendronate oral solution",
+      "drug_tier": "1",
+      "drug_requirements": ""
+    },
+    {
+      "drug_name": "alendronate oral tablet 10 mg",
+      "drug_tier": "1",
+      "drug_requirements": "QL (30/30)"
+    },
+    {
+      "drug_name": "alendronate oral tablet 35 mg, 70 mg",
+      "drug_tier": "1",
+      "drug_requirements": "QL (4/28)"
+    },
+    {
+      "drug_name": "FORTEO",
+      "drug_tier": "5",
+      "drug_requirements": "PA; QL (2.4/28); NDS"
+    },
+    {
+      "drug_name": "ibandronate oral",
+      "drug_tier": "3",
+      "drug_requirements": "QL (1/28)"
+    },
+    {
+      "drug_name": "PROLIA",
+      "drug_tier": "4",
+      "drug_requirements": "QL (1/180)"
+    },
+    {
+      "drug_name": "raloxifene",
+      "drug_tier": "3",
+      "drug_requirements": "QL (30/30)"
+    },
+    {
+      "drug_name": "BENLYSTA INTRAVENOUS",
+      "drug_tier": "5",
+      "drug_requirements": "PA; NDS"
+    },
+    {
+      "drug_name": "ENBREL MINI",
+      "drug_tier": "5",
+      "drug_requirements": "PA; QL (8/28); NDS"
+    },
+    {
+      "drug_name": "ENBREL SUBCUTANEOUS SOLUTION",
+      "drug_tier": "5",
+      "drug_requirements": "PA; QL (8/28); NDS"
+    },
+    {
+      "drug_name": "ENBREL SUBCUTANEOUS SYRINGE",
+      "drug_tier": "5",
+      "drug_requirements": "PA; QL (8/28); NDS"
+    },
+    {
+      "drug_name": "ENBREL SURECLICK",
+      "drug_tier": "5",
+      "drug_requirements": "PA; QL (8/28); NDS"
+    },
+    {
+      "drug_name": "HUMIRA PEN (PREFERRED NDCS STARTING WITH 00074)",
+      "drug_tier": "5",
+      "drug_requirements": "PA; QL (4/28); NDS"
+    },
+    {
+      "drug_name": "HUMIRA SUBCUTANEOUS SYRINGE KIT 40 MG/0.8 ML (PREFERRED NDCS STARTING WITH 00074)",
+      "drug_tier": "5",
+      "drug_requirements": "PA; QL (4/28); NDS"
+    },
+    {
+      "drug_name": "HUMIRA(CF) PEN CROHNS-UC-HS (PREFERRED NDCS STARTING WITH 00074)",
+      "drug_tier": "5",
+      "drug_requirements": "PA; QL (6/365); NDS"
+    }
+  ],
+  "acronyms": [
+    {
+      "acronym": "PA",
+      "expansion": "Prior Authorization",
+      "explanation": "Requires approval before coverage."
+    },
+    {
+      "acronym": "QL",
+      "expansion": "Quantity Limit",
+      "explanation": "Limits the amount or duration of coverage for the drug."
+    },
+    {
+      "acronym": "NDS",
+      "expansion": "Non-Extended Day Supply",
+      "explanation": "Only available for a one-month supply."
+    },
+    {
+      "acronym": "ST",
+      "expansion": "Step Therapy",
+      "explanation": "Requires prior use of specified alternative medications before coverage."
+    }
+  ],
+  "tiers": []
+}
+==================================================
+

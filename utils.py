@@ -5,6 +5,7 @@ from datetime import datetime
 from difflib import SequenceMatcher
 import logging
 import hashlib
+import threading
 from typing import Optional
 from config import EXCEL_FILE_PATH, PDF_FOLDER
 import time
@@ -15,46 +16,57 @@ from config import MAX_RETRIES, BACKOFF_MULTIPLIER, RATE_LIMIT_DELAY, COST_TRACK
 
 logger = logging.getLogger(__name__)
 
+# --- GLOBAL RATE LIMIT VARIABLES ---
+GLOBAL_LAST_CALL = 0
+GLOBAL_LOCK = threading.Lock()
+
+RATE_LIMIT_DELAY = 1.2       # Minimum seconds between ANY Bedrock calls
+MAX_RETRIES = 5
+BACKOFF_MULTIPLIER = 2
+
+
 def rate_limited_api_call(func):
-    """Decorator to add rate limiting and retry logic to API calls"""
+    """Global rate limiter across ALL Bedrock calls + backoff + jitter"""
     @wraps(func)
     def wrapper(*args, **kwargs):
-        last_call_time = getattr(wrapper, 'last_call_time', 0)
-        
+        global GLOBAL_LAST_CALL
+
         for attempt in range(MAX_RETRIES):
             try:
-                # Ensure minimum delay between calls
-                time_since_last_call = time.time() - last_call_time
-                if time_since_last_call < RATE_LIMIT_DELAY:
-                    sleep_time = RATE_LIMIT_DELAY - time_since_last_call
-                    logger.debug(f"Rate limiting: sleeping for {sleep_time:.2f} seconds")
-                    time.sleep(sleep_time)
-                
-                result = func(*args, **kwargs)
-                wrapper.last_call_time = time.time()
-                return result
-                
+                # ---- GLOBAL LOCK: ensures only ONE API call at a time ----
+                with GLOBAL_LOCK:
+                    now = time.time()
+                    wait = GLOBAL_LAST_CALL + RATE_LIMIT_DELAY - now
+                    if wait > 0:
+                        logger.debug(f"[RATE LIMIT] Sleeping {wait:.2f}s before Bedrock call")
+                        time.sleep(wait)
+                    GLOBAL_LAST_CALL = time.time()
+
+                # ---- CALL THE REAL FUNCTION ----
+                return func(*args, **kwargs)
+
             except Exception as e:
-                if "rate limit" in str(e).lower() or "429" in str(e):
+                err = str(e).lower()
+
+                if "throttling" in err or "rate limit" in err or "429" in err:
                     if attempt < MAX_RETRIES - 1:
-                        # Exponential backoff with jitter
-                        delay = RATE_LIMIT_DELAY * (BACKOFF_MULTIPLIER ** attempt)
-                        jitter = random.uniform(0.1, 0.5)
-                        total_delay = delay + jitter
-                        
-                        logger.warning(f"Rate limit hit, attempt {attempt + 1}/{MAX_RETRIES}. Retrying in {total_delay:.2f} seconds...")
-                        time.sleep(total_delay)
+                        delay = (RATE_LIMIT_DELAY * (BACKOFF_MULTIPLIER ** attempt))
+                        jitter = random.uniform(0.2, 0.8)
+                        total = delay + jitter
+                        logger.warning(
+                            f"[THROTTLED] Retry {attempt+1}/{MAX_RETRIES} "
+                            f"in {total:.2f}s due to throttling"
+                        )
+                        time.sleep(total)
                         continue
                     else:
-                        logger.error(f"Rate limit exceeded after {MAX_RETRIES} attempts")
-                        return {}  # Return empty dict for header mapping
+                        logger.error("[FATAL] Max retries reached due to throttling")
+                        return {}
                 else:
-                    logger.error(f"API error: {e}")
+                    logger.error(f"[ERROR] Bedrock call failed: {e}")
                     return {}
-        
+
         return {}
-    
-    wrapper.last_call_time = 0
     return wrapper
 
 def estimate_tokens(text):
