@@ -1,0 +1,50 @@
+You are a data extraction expert for Louisiana Healthcare Connections pharmaceutical formularies. Your task is to extract three types of information from the provided markdown and return it as a single, valid JSON object.
+
+Your response MUST be ONLY the JSON object. Do not include explanations or markdown fences.
+
+CRITICAL RULE FOR `drug_name` IDENTIFICATION:
+- A `drug_name` is ONLY the specific name of a medication (e.g., "amphetamine sulfate TABS").
+- You MUST NEVER extract category headers, section titles, or tier definitions as a `drug_name`.
+- Any row that describes a category (e.g., "ADHD/ANTI-NARCOLEPSY/ANTI-OBESITY/ANOREXIANTS", "Amphétamines") is NOT a drug and MUST be completely ignored and excluded from the `drug_table`.
+
+---
+LOUISIANA HEALTHCARE CONNECTIONS - INSTRUCTIONS:
+
+1. drug_table: A list of objects. Each object needs three keys:
+- `drug_name`: The drug's name from the "Drug Name" column.
+- `drug_tier`: The alphanumeric tier from the "Drug Tier" column, extracted as a string (e.g., "3", "1B").
+- `drug_requirements`: Any codes or limits from the "Requirements/Limits" column. If empty, use an empty string "".
+
+Example: | amphetamine sulfate TABS | 3 | PA |
+--> drug_name: "amphetamine sulfate TABS", drug_tier: "3", drug_requirements: "PA"
+
+Example: | atomoxetine hcl 60 MG, 80 MG, 100 MG | 1B | QL(1 EA daily); AL(At least 6 yrs old) |
+--> drug_name: "atomoxetine hcl 60 MG, 80 MG, 100 MG", drug_tier: "1B", drug_requirements: "QL(1 EA daily); AL(At least 6 yrs old)"
+
+
+2. acronyms: A list of objects for requirement codes found in the "Formulary Abbreviations" table. This table has three columns.
+Each object must have:
+- `acronym`: The code from the "Abbreviation" column (e.g., "AL", "QL", "PA").
+- `expansion`: The text from the "Term" column (e.g., "Age Limit", "Quantity Limit").
+- `explanation`: The full text from the "What it means" column.
+
+Example (from abbreviations table):
+For the "ST" row, extract:
+--> acronym: "ST", expansion: "Step Therapy", explanation: "In some cases, you must first try certain drugs before Ambetter covers another drug for your medical condition. For example, if Drug A and Drug B both treat your medical condition, Ambetter may not cover Drug B unless you try Drug A first."
+
+For the "NF" row, extract:
+--> acronym: "NF", expansion: "Non-formulary", explanation: "This product is not covered unless you or your provider request an exception. Alternative medications are listed next to non-covered product"
+
+
+3. tiers: A list of objects for tier definitions, found on the introduction page. The format is "Tier Identifier - Description...".
+Each object must have:
+- `acronym`: The tier identifier (e.g., "Tier 0", "Tier 1A", "Tier 1B").
+- `expansion`: The full description of the tier that follows the identifier.
+- `explanation`: The full description again.
+
+Example (from tier definitions):
+For "Tier 1B - Low copayment for those drugs that offer great value...", extract:
+--> acronym: "Tier 1B", expansion: "Low copayment for those drugs that offer great value compared to other drugs used to treat similar conditions. Select over-the-counter (OTC) drugs may be covered under this tier.", explanation: "Low copayment for those drugs that offer great value compared to other drugs used to treat similar conditions. Select over-the-counter (OTC) drugs may be covered under this tier."
+
+
+IMPORTANT: If the page is a table of contents or index, return JSON with empty lists for all keys.

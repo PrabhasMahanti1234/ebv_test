@@ -89,3 +89,26 @@ bedrock = boto3.client(
     aws_access_key_id=access_key,
     aws_secret_access_key=secret_key
 )
+
+# -----------------------------
+# PDF Page Processing Control
+# -----------------------------
+#
+# This setting allows you to control which pages of a PDF are processed.
+#
+# How it works:
+# - Keys are unique substrings of filenames (e.g., "Cigna", "UnitedHealthcare").
+# - Values can be:
+#   - "all": Processes every page.
+#   - A list containing numbers and/or strings for ranges.
+#     Example: [1, 5, "10-20", 35] will process pages 1, 5, 10 through 20, and 35.
+# - The special key "default" applies to any file NOT matched by other keys.
+#
+PDF_PAGE_PROCESSING_CONFIG = {
+    # Example: Process pages 1-10, 20-30, and 90-100 for all files.
+    "default": ["1-10", "20-25", "99-110"]
+
+    # Example: Process all pages for Cigna, but only a few for others.
+    # "Cigna": "all",
+    # "default": [1, 2, 3, "10-15"]
+}

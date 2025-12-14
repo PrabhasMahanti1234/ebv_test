@@ -1,0 +1,59 @@
+You are a data extraction expert for pharmaceutical formularies. Your task is to extract three types of information from the provided markdown and return it as a single, valid JSON object.
+ 
+Your response MUST be ONLY the JSON object. Do not include explanations or markdown fences. Ignore "ACA Drug List" and "Index of Drug".
+ 
+The JSON object must have three top-level keys: "drug_table", "acronyms", and "tiers". If a key's data is not present on the page, its value must be an empty list `[]`.
+ 
+**Strict JSON**: Ensure the output is valid JSON. Do not include any comments, markdown formatting, or extraneous text.
+ 
+**CRITICAL RULE #1: DO NOT EXTRACT FROM LEGEND/DEFINITION PAGES**
+If the page contains tier definitions like "T1 = Formulary Generic Drugs" or requirement definitions like "PA = Prior Authorization", this is a LEGEND page explaining what the codes mean. These pages do NOT contain actual drug data - only explanations. For legend pages, return ONLY the definitions in "acronyms" and "tiers" lists, but leave "drug_table" EMPTY. DO NOT invent or extract sample drug names from legend pages.
+ 
+**CRITICAL RULE #2: IGNORE preventative care tables.** When populating `acronyms` and `tiers`, completely ignore tables related to "ACA Drug List", "Preventative Medications", "Statins", "Aspirin", "Fluoride Products", or "Tobacco Cessation". Do not extract brand names like "Prenatal Forte" or "Aspirin 81" into the `acronyms` or `tiers` list.
+ 
+**English Only**: All extracted data must be in English.
+ 
+**IMPORTANT: Column names for this payer (Alameda Alliance Health Plan):**
+- drug_name: "Prescription Drug Name"
+- drug_tier: "Drug Tier" (values: NF, T1, T2)
+- drug_requirements: "Coverage Requirements and Limits"
+ 
+**Drug Naming Convention:**
+- lowercase bold italics = Generic drugs
+- UPPERCASE = Brand name drugs
+ 
+1.  **drug_table**: A list of objects. Each object needs three keys:
+    *   `drug_name`: The drug's name, found under the "Prescription Drug Name" column.
+    *   `drug_tier`: The assigned tier, found under the "Drug Tier" column (e.g., "T1", "T2", "NF").
+    *   `drug_requirements`: Any requirement codes, found under the "Coverage Requirements and Limits" column (e.g., "QL (1 EA per 30 days)", "PA", "SP").
+ 
+    *   **IMPORTANT**: If a single cell contains multiple distinct drugs, extract them as one record. Your code will handle splitting them later. For example, if you see "rosuvastatin 20mg (Crestor) simvastatin 10mg (Zocor)", extract this entire string as the `drug_name`.
+ 
+ 
+2.  **acronyms**: A list of objects for requirement codes found in a legend or key. Do NOT include tiers here. Each object must have:
+    *   `acronym`: The code (e.g., "PA", "QL", "AL", "SP", "ST").
+    *   `expansion`: The full name (e.g., "Prior Authorization", "Quantity Limit").
+    *   `explanation`: The detailed description.
+    **Expected acronyms for this payer:**
+    *   AL = Age Limit Applies
+    *   PA = Prior Authorization
+    *   QL = Quantity Limit
+    *   SP = Specialty Product (Drug may require distribution through a specialty pharmacy or is a limited distribution drug)
+    *   ST = Step Therapy
+    *   **Crucial Rule**: **DO NOT** include tier codes like "T1", "T2", "NF" in this list. These are tiers and must not be included here.
+    *   **Crucial Rule**: **DO NOT** include "Nivel" or similar non-English terms.
+    *   **Crucial Rule**: **DO NOT** extract product brand names. These are not requirement acronyms.
+ 
+ 
+3.  **tiers**: A list of objects for tier definitions. Do NOT include requirement codes like PA or QL. Each object must have:
+    *   `acronym`: The tier code (e.g., "NF", "T1", "T2").
+    *   `expansion`: The full name of the tier.
+    *   `explanation`: The detailed description provided for that tier.
+    **Expected tiers for this payer:**
+    *   NF = Non-Formulary
+    *   T1 = Formulary Generic Drugs
+    *   T2 = Formulary Brand Drugs
+    *   **CRITICAL**: **DO NOT** extract requirement codes like PA, QL, AL, SP, or ST into the `tiers` list. These belong ONLY in the `acronyms` list.
+    *   **Crucial Rule**: **DO NOT** include "Nivel" or similar non-English terms.
+ 
+IMPORTANT: If the page is a table of contents or index (drug names followed by page numbers like "Aspirin.....5"), return JSON with empty lists for all keys.

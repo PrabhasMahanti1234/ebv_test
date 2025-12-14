@@ -1,3 +1,4 @@
+import re
 import pandas as pd
 import uuid
 import logging
@@ -240,6 +241,29 @@ def populate_payer_and_plan_tables():
         cursor = conn.cursor()
         
         try:
+
+            def clean_excel_string(value):
+                """
+                A robust function to clean strings read from Excel. It removes
+                all common non-printable characters, control characters, and the
+                Byte Order Mark (BOM) that cause URL truncation issues.
+                """
+                if pd.isna(value):
+                    return None
+                
+                # Convert to string first
+                cleaned_str = str(value)
+                
+                # Regex to remove control characters and other non-printing chars,
+                # including the BOM (\ufeff). This is more comprehensive.
+                # This pattern matches characters in the C0 and C1 control blocks, plus BOM.
+                cleaned_str = re.sub(r'[\x00-\x1F\x7F-\x9F\ufeff]', '', cleaned_str)
+                
+                # Finally, strip leading/trailing whitespace
+                cleaned_str = cleaned_str.strip()
+                
+                return cleaned_str if cleaned_str else None
+            
             payers_added = 0
             plans_added = 0
             

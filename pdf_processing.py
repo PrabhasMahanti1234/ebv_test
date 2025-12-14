@@ -14,6 +14,7 @@ import random
 from typing import Tuple, List
 from pathlib import Path
 from mistralai.models.sdkerror import SDKError
+from typing import List, Dict, Optional, Union
 from mistralai import Mistral
 from mistralai.models import DocumentURLChunk
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
@@ -23,7 +24,7 @@ from pathlib import Path
 from config import (
     PDF_FOLDER, PROCESS_COUNT, MISTRAL_API_KEY, BEDROCK_MODEL_ID, BEDROCK_COST_PER_1K_TOKENS,bedrock,
     MISTRAL_OCR_COST_PER_1K_PAGES, BEDROCK_COST_PER_1K_TOKENS, LLM_PAGE_WORKERS,
-    MAX_RETRIES, BACKOFF_MULTIPLIER, CLIENT_TIMEOUT, CONNECT_TIMEOUT
+    MAX_RETRIES, BACKOFF_MULTIPLIER, CLIENT_TIMEOUT, CONNECT_TIMEOUT, PDF_PAGE_PROCESSING_CONFIG
 )
 from database import get_db_connection, batch_determine_coverage_status, get_cached_result, cache_result, update_plan_file_hash, insert_acronyms_to_ref_table, insert_drug_formulary_data, delete_drug_formulary_records_for_plan
 from utils import (
@@ -35,11 +36,13 @@ from utils import (
 )
 
 logger = logging.getLogger(__name__)
- 
+
 MAX_PDF_PAGES = 2000
 PROMPTS_DIR = Path(__file__).parent / "prompts"
 DEFAULT_PROMPT_FILE = PROMPTS_DIR / "default.txt"
 PROMPT_MAPPINGS_FILE = PROMPTS_DIR / "prompt_mappings.json"
+ENHANCED_PDF_DPI = 300  # High resolution for better table recognition
+USE_ENHANCED_PDF = True  # Toggle to enable/disable PDF enhancement before OCR
 
 # Cache prompts in memory to avoid repeated file reads
 _PROMPT_CACHE = {}
@@ -61,6 +64,20 @@ except ImportError:
     PYPDF2_AVAILABLE = False
     logger.warning("PyPDF2 not available. Page count check will be skipped.")
 
+try:
+    import fitz
+    PYMUPDF_AVAILABLE = True
+except ImportError:
+    PYMUPDF_AVAILABLE = False
+
+# PIL for image handling
+try:
+    from PIL import Image
+    PIL_AVAILABLE = True
+except ImportError:
+    PIL_AVAILABLE = False
+
+
 def initialize_worker():
     """
     An initializer function for each worker in the ProcessPoolExecutor.
@@ -69,6 +86,85 @@ def initialize_worker():
     #logger.info(f"Initializing worker process {os.getpid()}...")
     _load_prompts_config()
 
+def enhance_pdf(pdf_input, dpi=ENHANCED_PDF_DPI):
+    """
+    Enhance a PDF by converting it to high-resolution images and 
+    reconstructing it as a new high-quality PDF.
+    
+    This improves OCR accuracy, especially for tables, by:
+    1. Rendering each page at high DPI (300)
+    2. Creating a new PDF with these high-quality renders
+    
+    Args:
+        pdf_input: File path (str/Path) or BytesIO object
+        dpi: Resolution for enhancement (default 300)
+        
+    Returns:
+        BytesIO object containing the enhanced PDF, or None if enhancement fails
+    """
+    if not PYMUPDF_AVAILABLE:
+        logger.warning("PyMuPDF (fitz) not available. Cannot enhance PDF.")
+        return None
+    
+    logger.info(f"Enhancing PDF at {dpi} DPI for better OCR quality...")
+    
+    try:
+        # Open the source PDF
+        if isinstance(pdf_input, (str, Path)):
+            src_doc = fitz.open(str(pdf_input))
+        elif isinstance(pdf_input, BytesIO):
+            pdf_input.seek(0)
+            src_doc = fitz.open(stream=pdf_input.getvalue(), filetype="pdf")
+        else:
+            logger.error("pdf_input must be a file path or BytesIO object")
+            return None
+        
+        page_count = len(src_doc)
+        logger.info(f"Source PDF has {page_count} pages. Starting enhancement...")
+        
+        # Create a new PDF document for the enhanced version
+        enhanced_doc = fitz.open()
+        
+        zoom = dpi / 72  # 72 is default PDF DPI
+        matrix = fitz.Matrix(zoom, zoom)
+        
+        for page_num in range(page_count):
+            # Get the source page
+            src_page = src_doc[page_num]
+            
+            # Render page to high-resolution pixmap
+            pix = src_page.get_pixmap(matrix=matrix, alpha=False)
+            
+            # Create a new page in enhanced doc with same dimensions as original
+            # but insert the high-res image
+            page_rect = src_page.rect
+            new_page = enhanced_doc.new_page(width=page_rect.width, height=page_rect.height)
+            
+            # Insert the high-res pixmap as an image on the new page
+            # Scale it back down to fit the original page dimensions
+            new_page.insert_image(page_rect, pixmap=pix)
+            
+            if (page_num + 1) % 10 == 0 or page_num == page_count - 1:
+                logger.info(f"Enhanced page {page_num + 1}/{page_count}")
+        
+        src_doc.close()
+        
+        # Save enhanced PDF to BytesIO
+        enhanced_bytes = BytesIO()
+        enhanced_doc.save(enhanced_bytes, garbage=4, deflate=True)
+        enhanced_doc.close()
+        
+        enhanced_bytes.seek(0)
+        enhanced_size_mb = len(enhanced_bytes.getvalue()) / (1024 * 1024)
+        logger.info(f"Successfully created enhanced PDF: {page_count} pages, {enhanced_size_mb:.2f} MB")
+        
+        return enhanced_bytes
+        
+    except Exception as e:
+        logger.error(f"Failed to enhance PDF: {e}")
+        traceback.print_exc()
+        return None
+    
 def _sanitize_escape_sequences(json_string: str) -> str:
     r"""
     Sanitizes invalid escape sequences in JSON string values.
@@ -81,35 +177,35 @@ def _sanitize_escape_sequences(json_string: str) -> str:
         # Replace invalid escape sequences
         # Valid escapes are: \", \\, \/, \b, \f, \n, \r, \t, \uXXXX
         # Invalid ones like \e, \x (not followed by hex), etc. need to be escaped
-        
+
         # Fix invalid single-character escapes (not in list of valid ones)
         # Pattern matches \ followed by a character that's not a valid escape
         fixed = re.sub(r'\\(?![nrtbfu"\\/0-9x])', r'\\\\', string_content)
-        
+
         # Fix invalid \u sequences (must be followed by 4 hex digits)
         # Replace \u not followed by 4 hex digits with \\u
         fixed = re.sub(r'\\u(?![0-9a-fA-F]{4})', r'\\\\u', fixed)
-        
+
         # Fix incomplete \x sequences (must be followed by 2 hex digits)
         # Replace \x not followed by 2 hex digits with \\x
         fixed = re.sub(r'\\x(?![0-9a-fA-F]{2})', r'\\\\x', fixed)
-        
+
         return f'"{fixed}"'
-    
+
     # Match strings: "content" but handle escaped quotes
     # This is tricky - we'll use a state machine approach
     result = []
     i = 0
     in_string = False
     escape_next = False
-    
+
     while i < len(json_string):
         char = json_string[i]
-        
+
         if escape_next:
             # Current char is escaped - check if it's valid
             valid_escapes = {'"', '\\', '/', 'b', 'f', 'n', 'r', 't', 'u', 'x', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}
-            
+
             if char == 'u':
                 # Check if next 4 chars are hex digits
                 if i + 4 < len(json_string) and all(c in '0123456789abcdefABCDEF' for c in json_string[i+1:i+5]):
@@ -142,21 +238,21 @@ def _sanitize_escape_sequences(json_string: str) -> str:
                 # Invalid escape - escape the backslash, keep the char
                 result.append(f'\\\\{char}')
                 escape_next = False
-            
+
             i += 1
             continue
-        
+
         if char == '\\' and in_string:
             escape_next = True
             i += 1
             continue
-        
+
         if char == '"' and not escape_next:
             in_string = not in_string
-        
+
         result.append(char)
         i += 1
-    
+
     return ''.join(result)
 
 
@@ -166,19 +262,19 @@ def _extract_partial_json_arrays(json_string: str) -> dict:
     Uses regex to find and parse individual array sections.
     """
     default_output = {"drug_table": [], "acronyms": [], "tiers": []}
-    
+
     # Pattern to match array sections: "key": [...]
     array_pattern = r'"(\w+)":\s*(\[[\s\S]*?\])'
-    
+
     extracted = {}
-    
+
     for match in re.finditer(array_pattern, json_string):
         key = match.group(1)
         array_str = match.group(2)
-        
+
         if key not in ['drug_table', 'acronyms', 'tiers']:
             continue
-        
+
         try:
             # Try to parse just this array
             # First fix trailing commas in the array
@@ -204,12 +300,12 @@ def _extract_partial_json_arrays(json_string: str) -> dict:
             else:
                 # For acronyms and tiers, try simpler extraction
                 extracted[key] = []
-    
+
     # Fill missing keys with empty lists
     for key in ['drug_table', 'acronyms', 'tiers']:
         if key not in extracted:
             extracted[key] = []
-    
+
     return extracted
 
 
@@ -268,133 +364,84 @@ def robust_json_repair(json_string: str):
             logging.warning(f"Failed to write to debug log: {log_error}")
 
         return default_output
-    
-    
+
+
 def _is_extracted_data_from_index_page(drug_table: List[dict]) -> bool:
     """
     Detect if extracted drug data appears to come from an index/table of contents page.
     Returns True if the data looks like an index, False otherwise.
-   
+
     Index page indicators:
     - High proportion of entries with page numbers in drug name
     - Drug names that look like section headers or categories
     - Numeric patterns suggesting page references
-   
+
     NOTE: Missing tier/requirements alone is NOT enough to mark as index page,
     since some formulary formats (like VDP) legitimately have empty tier fields.
     """
     if not drug_table or len(drug_table) == 0:
         return False
-   
+
     total_records = len(drug_table)
-   
-    # Count records with suspicious patterns
+
+    # NEW: Added more specific counters for different index patterns.
     page_number_pattern_count = 0
     missing_both_count = 0
-    short_name_count = 0
-    numeric_in_name_count = 0
     category_header_count = 0
-   
-    # Common category/section headers found in index pages
+
+    # NEW: List of common section headers found in index pages to filter out.
     category_keywords = [
         'index', 'contents', 'table of contents', 'formulary index',
-        'drug index', 'medication index',
-        'drug class', 'medication list', 'section', 'chapter',
-        'overview', 'introduction', 'summary', 'appendix'
+        'drug index', 'medication index', 'drug class', 'medication list',
+        'section', 'chapter', 'overview', 'introduction', 'summary', 'appendix'
     ]
-   
+
     for entry in drug_table:
         drug_name = str(entry.get('drug_name', '')).strip()
         drug_tier = str(entry.get('drug_tier', '')).strip()
         drug_requirements = str(entry.get('drug_requirements', '')).strip()
-       
-        # CRITICAL: Check for page number patterns in drug name (strongest indicator)
-        # e.g., "Drug Name.....45" or "Drug Name    45"
-        if re.search(r'\.{2,}\s*\d{1,3}\s*$', drug_name):
+
+        # NEW: Strongest indicator - check for page number patterns in the extracted drug name.
+        if re.search(r'\.{2,}\s*\d{1,3}\s*$', drug_name) or re.search(r'\s{3,}\d{1,3}\s*$', drug_name):
             page_number_pattern_count += 1
-        elif re.search(r'\s{3,}\d{1,3}\s*$', drug_name):  # Multiple spaces before number
-            page_number_pattern_count += 1
-       
-        # Check for standalone numbers or number-heavy content in drug name
-        if re.match(r'^\d+$', drug_name) or (len(drug_name) > 0 and len(re.findall(r'\d', drug_name)) > len(drug_name) / 2):
-            numeric_in_name_count += 1
-       
-        # Only count as missing BOTH if both tier AND requirements are truly empty
+
+        # MODIFIED: Stricter check for missing data.
         has_tier = drug_tier and drug_tier not in ['', 'none', 'null', 'n/a']
         has_requirements = drug_requirements and drug_requirements not in ['', 'none', 'null', 'n/a']
-       
         if not has_tier and not has_requirements:
             missing_both_count += 1
-       
-        # Check for very short names (often section headers)
-        if len(drug_name) < 4 and drug_name.strip():
-            short_name_count += 1
-       
-        # Check for category/section header keywords (but NOT "therapeutic category" alone)
+
+        # NEW: Check for category/section header keywords.
         drug_name_lower = drug_name.lower()
-        if any(keyword in drug_name_lower for keyword in category_keywords):
-            # Don't count if it's just a drug name that happens to contain these words
-            # Only count if it's PRIMARILY a header (short and keyword-heavy)
-            if len(drug_name) < 50:
-                category_header_count += 1
-   
-    # Calculate ratios
+        if any(keyword in drug_name_lower for keyword in category_keywords) and len(drug_name) < 50:
+            category_header_count += 1
+
+    # NEW: More robust decision logic with stricter thresholds.
     page_number_ratio = page_number_pattern_count / total_records
     missing_both_ratio = missing_both_count / total_records
-    short_name_ratio = short_name_count / total_records
-    numeric_ratio = numeric_in_name_count / total_records
     category_ratio = category_header_count / total_records
-   
-    # Decision logic - use STRICTER thresholds to avoid false positives
-   
-    # STRONGEST indicator: High proportion of page number patterns
-    if page_number_ratio >= 0.4:  # Increased threshold from 0.3 to 0.4
-        logger.info(f"Index page detected: {page_number_ratio:.1%} of entries have page number patterns")
-        return True
-   
-    # STRONG indicator: Nearly ALL entries missing both tier AND requirements
-    # Increased threshold from 0.8 to 0.9 to avoid catching legitimate VDP pages
-    if missing_both_ratio >= 0.9:
-        logger.info(f"Index page detected: {missing_both_ratio:.1%} of entries missing both tier and requirements")
-        return True
-   
-    # MODERATE indicator: High proportion of category headers
-    if category_ratio >= 0.6:  # Increased threshold from 0.5 to 0.6
-        logger.info(f"Index page detected: {category_ratio:.1%} of entries are category headers")
-        return True
-   
-    # Numeric-heavy content (standalone numbers or mostly numbers)
-    if numeric_ratio >= 0.5:  # Increased threshold from 0.4 to 0.5
-        logger.info(f"Index page detected: {numeric_ratio:.1%} of entries are numeric or number-heavy")
-        return True
-   
-    # Combined indicators - need MULTIPLE strong signals
-    # Page numbers + missing data is a strong combo
-    if page_number_ratio >= 0.2 and missing_both_ratio >= 0.7:
-        logger.info(f"Index page detected: Page numbers ({page_number_ratio:.1%}) + missing data ({missing_both_ratio:.1%})")
-        return True
-   
-    # Category headers + missing data
-    if category_ratio >= 0.3 and missing_both_ratio >= 0.8:
-        logger.info(f"Index page detected: Category headers ({category_ratio:.1%}) + missing data ({missing_both_ratio:.1%})")
-        return True
-   
-    # Weak indicators combined - need VERY high suspicion score
-    suspicion_score = (
-        page_number_ratio * 4 +      # Increased weight
-        category_ratio * 3 +          # Increased weight
-        numeric_ratio * 2 +
-        missing_both_ratio * 1 +      # Decreased weight
-        short_name_ratio * 0.5
-    )
-   
-    # Increased threshold from 2.0 to 3.0 to be more conservative
-    if suspicion_score >= 3.0:
-        logger.info(f"Index page detected: Combined suspicion score {suspicion_score:.2f} (threshold: 3.0)")
-        return True
-   
-    return False
 
+    # If 40% or more entries have a clear page number pattern, it's an index.
+    if page_number_ratio >= 0.4:
+        logger.info(f"Index page detected: {page_number_ratio:.1%} of entries have page number patterns.")
+        return True
+
+    # If 95% or more entries are missing BOTH tier and requirements, it's an index.
+    if missing_both_ratio >= 0.95:
+        logger.info(f"Index page detected: {missing_both_ratio:.1%} of entries missing both tier and requirements.")
+        return True
+
+    # If a high percentage of entries are category headers.
+    if category_ratio >= 0.6:
+        logger.info(f"Index page detected: {category_ratio:.1%} of entries are category headers.")
+        return True
+
+    # A combination of page numbers and missing data is also a strong signal.
+    if page_number_ratio >= 0.2 and missing_both_ratio >= 0.7:
+        logger.info(f"Index page detected: Page numbers ({page_number_ratio:.1%}) + missing data ({missing_both_ratio:.1%}).")
+        return True
+
+    return False
 
 def _consolidate_and_clean_drug_table(drug_table: List[dict]) -> List[dict]:
     """
@@ -408,155 +455,70 @@ def _consolidate_and_clean_drug_table(drug_table: List[dict]) -> List[dict]:
         return []
 
     # --- Stage 1: CONSOLIDATE FRAGMENTS ---
-    # This logic is more robust and does NOT depend on the drug_tier.
     consolidated_list = []
-    fragment_buffer = []
-    for drug in drug_table:
-        # ROBUST FIX: Ensure we're stripping a string, even if value is None
-        drug_name = str(drug.get("drug_name") or "").strip()
-        
-        # CONSERVATIVE fragment detection: 
-        # A line is a fragment ONLY if it's clearly a dosage/form continuation, NOT a drug name
-        # We must be very careful to avoid false positives (merging separate drugs)
-        is_fragment = False
-        if not drug_name:
-            is_fragment = True # Empty name
-        elif not re.match(r'^[a-zA-Z]', drug_name):
-            is_fragment = True # Starts with number, /, ( etc.
-        elif re.match(r'^(tablet|capsule|injection|solution|suspension|syrup|cream|ointment|lotion|mg|mcg|ml|unit|gram|gm|%|hr)\b', drug_name, re.IGNORECASE):
-            # MUST be complete word "tablet", "capsule" etc., not just "tab" or "cap" prefix
-            # This prevents matching drug names like "Captopril" (starts with "cap") or "LOTREL" (starts with "lot")
-            is_fragment = True
-        elif re.match(r'^(intravenous|intramuscular|subcutaneous|topical|oral|buccal|sublingual|transdermal)\b', drug_name, re.IGNORECASE):
-            # Route of administration - must be complete word
-            is_fragment = True
-        elif re.match(r'^\d+\s*(mg|ml|mcg|hr|%|g|gram|unit|tablet|capsule|cap|tab)', drug_name, re.IGNORECASE):
-            # Pure dosage pattern like "500mg" or "20 ml" (starts with number + unit)
-            is_fragment = True
-        elif re.match(r'^\(.*?(mg|ml|mcg|unit|tablet|capsule)\)', drug_name, re.IGNORECASE):
-            # Parenthetical dosage like "(500mg)"
-            is_fragment = True
-
-        if is_fragment:
-            # SAFETY CHECK: If this "fragment" has its own requirements/tier AND looks like a real drug name,
-            # it's probably a separate drug, not a fragment. Don't merge it.
-            has_own_requirements = drug.get('drug_requirements') and str(drug.get('drug_requirements')).strip()
-            has_own_tier = drug.get('drug_tier') and str(drug.get('drug_tier')).strip()
-            looks_like_drug_name = len(drug_name) >= 5 and re.search(r'[a-zA-Z]{3,}', drug_name)
-            
-            if looks_like_drug_name and has_own_requirements:
-                # This is likely a separate drug entry, not a fragment
-                logger.debug(f"⚠️ '{drug_name}' detected as fragment but has own requirements '{has_own_requirements}' - treating as separate drug")
-                is_fragment = False  # Override the fragment detection
-                # Process it as a normal drug below
-            else:
-                # True fragment - merge it
-                fragment_buffer.append(drug_name)
-                if consolidated_list:
-                    target = consolidated_list[-1]
-                    logger.debug(f"🔗 MERGING fragment '{drug_name}' into '{target['drug_name']}'")
-                    target["drug_name"] += f" {' '.join(fragment_buffer)}"
-                    fragment_buffer.clear()
-                    # Only merge tier if fragment has one and target doesn't (rare case)
-                    if drug.get('drug_tier') and not target.get('drug_tier'):
-                        target['drug_tier'] = drug.get('drug_tier')
-                    # DON'T merge requirements from fragments - they shouldn't have separate requirements
-                continue
-        
-        # Not a fragment - process as normal drug
-
-        if fragment_buffer:
-            # ROBUST FIX: Use or '' to avoid None type issues
-            drug['drug_name'] = f"{' '.join(fragment_buffer)} {drug.get('drug_name') or ''}".strip()
-            fragment_buffer.clear()
-
-        # This is a valid parent row. Add it as a new entry.
-        consolidated_list.append(drug)
-
-    if fragment_buffer and consolidated_list:
-        # Append any trailing fragments to the last entry to avoid data loss.
-        target = consolidated_list[-1]
-        target["drug_name"] += f" {' '.join(fragment_buffer)}"
-
-    # --- Stage 2: PROPAGATE CONTEXT on the now-clean list ---
-    # IMPORTANT: Only propagate tier/requirements within the SAME drug group
-    # Do NOT propagate across different drugs (VDP format has many drugs with legitimately empty tiers)
-    if not consolidated_list:
+    if not drug_table:
         return []
 
-    corrected_with_context = []
-    
-    # Process each drug independently - NO cross-drug propagation
-    for drug in consolidated_list:
-        # Keep the drug as-is - do not fill empty tiers from other drugs
-        # Empty tiers are legitimate in formats like VDP where tier (Comment column) is optional
-        corrected_with_context.append(drug)
+    # This buffer holds parts of a drug name that span multiple lines
+    current_drug_parts = []
+    last_drug = None
 
-    # --- Stage 3: FINAL FILTER to remove any remaining junk ---
+    for i, drug in enumerate(drug_table):
+        drug_name = str(drug.get("drug_name") or "").strip()
+        drug_tier = str(drug.get("drug_tier") or "").strip()
+
+        # A line is a fragment if it lacks a tier AND starts with a non-letter
+        # or a common dosage form word. This is much safer.
+        is_fragment = (not drug_tier and
+                       (not re.match(r'^[a-zA-Z]', drug_name) or
+                        re.match(r'^(oral|tablet|capsule|injection|solution|suspension|cream|ointment|lotion|mg|mcg|ml)\b', drug_name, re.IGNORECASE)))
+
+        # Override: If it's a known medical supply, it's NEVER a fragment.
+        supply_keywords = ['needle', 'syringe', 'pad', 'strip', 'lancet', 'sensor', 'cap', 'duo']
+        if any(keyword in drug_name.lower() for keyword in supply_keywords):
+            is_fragment = False
+
+        if not is_fragment:
+            # This is a new drug entry. First, save the previously buffered drug.
+            if last_drug:
+                last_drug['drug_name'] = ' '.join(current_drug_parts)
+                consolidated_list.append(last_drug)
+
+            # Start a new buffer for the current drug
+            current_drug_parts = [drug_name]
+            last_drug = drug
+        else:
+            # This is a fragment, add it to the current buffer.
+            if drug_name:
+                current_drug_parts.append(drug_name)
+
+    # Add the very last drug that was being processed
+    if last_drug:
+        last_drug['drug_name'] = ' '.join(current_drug_parts)
+        consolidated_list.append(last_drug)
+
+    # --- Stage 2 & 3: PROPAGATE & FINAL FILTER ---
     final_list = []
-    
+    # (The propagation from _clean_and_propagate_drug_groups already handles context)
+
     # Common section header patterns to filter out
     section_header_patterns = [
-        r'^PDL\s+Categories?$',
-        r'^ACE\s+and\s+Thiazide',
-        r'^ACE\s+Inhibitors?$',
-        r'^Agents?\s+For\s+',
-        r'^AGENTS?\s+FOR\s+',
-        r'^Alcohol\s+Deterrents?$',
-        r'^Allergic\s+Extracts?$',
-        r'^Therapeutic\s+Category',
-        r'^Drug\s+Class',
-        r'^Category:',
-        r'^\[.*Category.*\]$',
-        r'^Section\s+\d+',
-        r'^Chapter\s+\d+',
+        r'^\s*drug\s+name\s*$', r'^\s*drug\s+tier\s*$', r'^\s*requirements\s*$',
+        r'^Therapeutic\s+Category', r'^Drug\s+Class', r'^Category:',
+        r'^\[.*Category.*\]$', r'^Section\s+\d+', r'^Chapter\s+\d+',
+        r'^\s*notes\s*&\s*restrictions\s*$', r'\.{3,}\s*\d+\s*$', r'\s{3,}\d+\s*$'
     ]
-    
-    for drug in corrected_with_context:
-        # ROBUST FIX: Handle cases where value is None before stripping
+
+    for drug in consolidated_list:
         name = str(drug.get('drug_name') or '').strip()
-        tier = drug.get('drug_tier')
-        requirements = str(drug.get('drug_requirements') or '').strip()
-        
-        # Check if this is a section header
-        is_section_header = False
-        for pattern in section_header_patterns:
-            if re.match(pattern, name, re.IGNORECASE):
-                is_section_header = True
-                logger.info(f"Filtering out section header: '{name}'")
-                break
-        
+
+        is_section_header = any(re.search(pattern, name, re.IGNORECASE) for pattern in section_header_patterns)
         if is_section_header:
-            continue  # Skip section headers
-        
-        # Check for VDP-specific section headers (missing both B/G/O column data)
-        # Real VDP drugs have requirements like "B; N", "G; P", etc.
-        # Section headers might have just "N" or "P" without the "B; N" or "G; P" pattern
-        if requirements:
-            # VDP format should have "X; Y" pattern (e.g., "B; N", "G; P")
-            has_vdp_pattern = re.match(r'^[BGO];\s*[PNRL]', requirements, re.IGNORECASE)
-            # Allow single letters for some edge cases, but be suspicious of generic category names
-            is_generic_category = any(keyword in name.upper() for keyword in [
-                'CATEGORY', 'CATEGORIES', 'AGENTS FOR', 'INHIBITOR', 'DETERRENT',
-                'EXTRACT', 'THERAPY', 'TREATMENT', 'MEDICATION', 'COMBO'
-            ])
-            
-            if is_generic_category and not has_vdp_pattern:
-                logger.info(f"Filtering out category header (generic name + no VDP pattern): '{name}'")
-                continue
-        
+            logger.info(f"Filtering out potential junk/header record: '{name}'")
+            continue
+
         # A record is valid if it has a name with at least one real word.
-        is_valid_name = (name and re.search(r'[a-zA-Z]{3,}', name))
-        has_valid_tier = (tier is not None and str(tier).strip() != "")
-
-        if is_valid_name:
-            # If the tier is missing, flag it for review instead of dropping it.
-            if not has_valid_tier:
-                drug['review_needed'] = True
-                logger.debug(f"Record has valid name but missing tier: {name}")
-            else:
-                drug['review_needed'] = False # Explicitly set to false if tier is present
-
+        if name and re.search(r'[a-zA-Z]{3,}', name):
             final_list.append(drug)
         else:
             logger.warning(f"Filtering out invalid junk record (missing valid name): {drug}")
@@ -565,63 +527,58 @@ def _consolidate_and_clean_drug_table(drug_table: List[dict]) -> List[dict]:
 
 def _clean_and_propagate_drug_groups(drug_table: List[dict]) -> List[dict]:
     """
-    A definitive, two-pass function that correctly groups drugs by name AND formulation,
-    then propagates context only within those precise groups. This prevents context
-    from "leaking" between different forms of the same drug (e.g., tabs vs. capsules).
+    Corrected function that fills in missing context (tier/requirements) for
+    fragmented drug entries without incorrectly overwriting valid, extracted data.
     """
     if not drug_table:
         return []
 
-    def get_precise_base_name(drug_name):
-        """
-        Creates a more specific group key by including the drug's formulation.
-        e.g., "ENTRESTO - sacubitril-valsartan tab..." -> "ENTRESTO TAB"
-        e.g., "ENTRESTO - sacubitril-valsartan sprinkle cap..." -> "ENTRESTO SPRINKLE CAP"
-        """
+    # --- Stage 1: Build a context map from rows that have data ---
+    context_map = {}
+    for i, drug in enumerate(drug_table):
+        # Use a simple base name for grouping (e.g., first word)
+        drug_name = str(drug.get('drug_name', '')).strip()
         if not drug_name:
-            return ""
-        
-        name = drug_name.upper()
-        parts = re.split(r'(\d+)', name, 1) # Split at the first number
-        base_with_formulation = parts[0]
-        
-        # Clean up common words and symbols to create a consistent key
-        base_with_formulation = base_with_formulation.replace('-', '').replace('(', '').replace(')', '')
-        base_with_formulation = re.sub(r'\b(FOR|SOLN|INJ|HCL)\b', '', base_with_formulation)
-        
-        return " ".join(base_with_formulation.split())
-
-    # --- Pass 1: Identify the master context for each PRECISE group ---
-    master_context = {}
-    for drug in drug_table:
-        base_name = get_precise_base_name(drug.get('drug_name'))
-        if not base_name:
             continue
 
-        if base_name not in master_context:
-            # If we see a row with actual requirements, it's the master.
-            # Otherwise, we assume no requirements for this group until proven otherwise.
-            if drug.get('drug_requirements'):
-                master_context[base_name] = {
-                    'tier': drug.get('drug_tier'),
-                    'reqs': drug.get('drug_requirements')
-                }
-            else:
-                 master_context[base_name] = {'tier': drug.get('drug_tier'), 'reqs': None}
+        base_name = drug_name.split()[0].lower()
+        has_tier = drug.get('drug_tier') and str(drug.get('drug_tier')).strip()
+        has_reqs = drug.get('drug_requirements') and str(drug.get('drug_requirements')).strip()
 
-    # --- Pass 2: Apply the correct master context to all members of each group ---
+        # If this row has good data, store it as the context for this group
+        if has_tier or has_reqs:
+            context_map[base_name] = {
+                'tier': drug.get('drug_tier'),
+                'reqs': drug.get('drug_requirements')
+            }
+
+    # --- Stage 2: Apply context ONLY to rows that are missing it ---
     corrected_table = []
     for drug in drug_table:
-        base_name = get_precise_base_name(drug.get('drug_name'))
-        if base_name in master_context:
-            correct_context = master_context[base_name]
-            
-            # Forcefully overwrite the drug's data with the correct master context.
-            drug['drug_tier'] = correct_context['tier']
-            drug['drug_requirements'] = correct_context['reqs']
-            
-            corrected_table.append(drug)
-            
+        drug_name = str(drug.get('drug_name', '')).strip()
+        if not drug_name:
+            continue
+
+        base_name = drug_name.split()[0].lower()
+
+        # Check if the current drug is missing data and if a context exists for it
+        is_missing_tier = not (drug.get('drug_tier') and str(drug.get('drug_tier')).strip())
+        is_missing_reqs = not (drug.get('drug_requirements') and str(drug.get('drug_requirements')).strip())
+
+        if (is_missing_tier or is_missing_reqs) and base_name in context_map:
+            correct_context = context_map[base_name]
+
+            # **THE FIX**: Only fill if the field is empty. Do NOT overwrite.
+            if is_missing_tier and correct_context.get('tier'):
+                drug['drug_tier'] = correct_context['tier']
+                logger.debug(f"Propagated tier '{correct_context['tier']}' to '{drug_name}'")
+
+            if is_missing_reqs and correct_context.get('reqs'):
+                drug['drug_requirements'] = correct_context['reqs']
+                logger.debug(f"Propagated reqs '{correct_context['reqs']}' to '{drug_name}'")
+
+        corrected_table.append(drug)
+
     return corrected_table
 
 
@@ -640,6 +597,139 @@ def _sanitize_output(parsed_data, default_output):
         "tiers": parsed_data.get("tiers", []),
     }
     return sanitized
+
+def extract_printed_page_number_from_markdown(markdown: Optional[str]) -> Optional[int]:
+    """
+    Try to extract a printed page number from OCR markdown/text for a page.
+
+    Heuristics tried (in order):
+      1. A lone number on one of the last 6 non-empty lines: "1" or "12"
+      2. "Page 1", "Page 1 of 10", "Pg. 1", "p. 1", possibly with punctuation
+      3. A number appearing near the end of the page text (last 200 chars)
+      4. If nothing found -> return None
+
+    Returns int when found, else None.
+    """
+    if not markdown:
+        return None
+
+    # normalize line endings & split
+    lines = [ln.strip() for ln in markdown.splitlines() if ln.strip()]
+    # 1) Check last few lines for a single number
+    for ln in reversed(lines[-6:]):  # footers are usually within the last few lines
+        if re.fullmatch(r'\d{1,4}', ln):
+            try:
+                return int(ln)
+            except ValueError:
+                pass
+
+    # Prepare a short tail of the text (footers typically near the end)
+    tail = "\n".join(lines[-12:]) if lines else markdown
+    tail_search = tail[-400:] if len(tail) > 400 else tail  # limit search area
+
+    # 2) Common "Page X" patterns
+    page_patterns = [
+        r'page[\s:\.-]*?(\d{1,4})\b',     # "Page 1", "page-1"
+        r'pg[\s\.]*?(\d{1,4})\b',         # "Pg. 1"
+        r'\bp[\s\.]*?(\d{1,4})\b',        # "p. 1"
+        r'(\d{1,4})\s+of\s+\d{1,4}\b',    # "1 of 10"
+    ]
+    for pat in page_patterns:
+        m = re.search(pat, tail_search, flags=re.IGNORECASE)
+        if m:
+            try:
+                return int(m.group(1))
+            except (IndexError, ValueError):
+                continue
+
+    # 3) As a last resort, look for any lone number near the very end
+    m = re.search(r'(\d{1,3})\s*$', tail_search)
+    if m:
+        try:
+            return int(m.group(1))
+        except ValueError:
+            pass
+
+    return None
+
+
+def apply_effective_page_numbers(
+    ocr_pages: List[Union[str, Dict]],
+    structured_records_per_page: List[List[Dict]],
+) -> List[Dict]:
+    """
+    Given OCR pages and the structured records produced per OCR page,
+    return a single flattened list of structured records where each record will have:
+      - 'page_number'        : printed page number when found, otherwise the OCR page index (1-based)
+      - 'ocr_page_index'     : the OCR page sequence index (1-based) (for auditing)
+
+    Parameters
+    - ocr_pages: list where each item is either:
+        * a markdown string for the page, or
+        * a dict having a 'markdown' or 'text' key
+      The list order represents the OCR page sequence.
+    - structured_records_per_page: list with same length as ocr_pages; each element is a list
+      of structured records (dicts) extracted from that OCR page.
+
+    Returns:
+      - flattened list of dict records with page_number & ocr_page_index injected.
+    """
+    if len(ocr_pages) != len(structured_records_per_page):
+        logger.warning(
+            "apply_effective_page_numbers: ocr_pages length != structured_records_per_page length "
+            f"({len(ocr_pages)} vs {len(structured_records_per_page)})"
+        )
+
+    flattened: List[Dict] = []
+    n_pages = min(len(ocr_pages), len(structured_records_per_page))
+
+    for idx in range(n_pages):
+        ocr_page = ocr_pages[idx]
+        # robustly obtain page markdown text
+        if isinstance(ocr_page, str):
+            markdown = ocr_page
+        elif isinstance(ocr_page, dict):
+            markdown = (
+                ocr_page.get("markdown")
+                or ocr_page.get("text")
+                or ocr_page.get("page_text")
+                or ""
+            )
+        else:
+            markdown = ""
+
+        ocr_page_index = idx + 1  # 1-based
+        printed_page = extract_printed_page_number_from_markdown(markdown)
+        effective_page = printed_page if printed_page is not None else ocr_page_index
+
+        logger.debug(
+            "Page mapping: ocr_index=%d printed_footer=%s effective=%d",
+            ocr_page_index,
+            str(printed_page),
+            effective_page,
+        )
+
+        records = structured_records_per_page[idx] or []
+        for rec in records:
+            # preserve existing page_number if present? we overwrite intentionally
+            rec["page_number"] = effective_page
+            # add raw OCR index for auditing
+            rec["ocr_page_index"] = ocr_page_index
+            flattened.append(rec)
+
+    # If lengths differ, handle any remaining pages (defensive)
+    if len(ocr_pages) > n_pages:
+        logger.warning("apply_effective_page_numbers: extra OCR pages without structured records.")
+    if len(structured_records_per_page) > n_pages:
+        logger.warning("apply_effective_page_numbers: extra structured pages without OCR pages; "
+                       "assigning ocr_page_index=None")
+        for idx in range(n_pages, len(structured_records_per_page)):
+            for rec in structured_records_per_page[idx]:
+                rec["page_number"] = None
+                rec["ocr_page_index"] = None
+                flattened.append(rec)
+
+    return flattened
 
 
 def extract_metadata_from_filename(filename):
@@ -665,113 +755,113 @@ def is_index_page(markdown: str) -> bool:
         if lower_markdown.count('|') > 20 and 'drug name' in lower_markdown:
              logger.info("Detected drug page characteristics (negative keywords, table structure). Not an index.")
              return False
-        
 
-    lines = markdown.splitlines() 
+
+    lines = markdown.splitlines()
     index_keywords = ['index', 'table of contents', 'contents', 'formulary index']
     upper_markdown = markdown.upper()
-    
+
     for keyword in index_keywords:
         if keyword.upper() in upper_markdown:
             for line in lines[:10]:  # Check first 10 lines
                 if keyword.upper() in line.upper() and (line.strip().startswith('#') or len(line.strip()) < 50):
                     logger.info(f"Detected index page based on keyword '{keyword}' in header.")
                     return True
-     
-    page_number_pattern = re.compile(r'\.{3,}\s*\d+\s*$')   
-    
+
+    page_number_pattern = re.compile(r'\.{3,}\s*\d+\s*$')
+
     page_number_lines = 0
     total_meaningful_lines = 0
-    
+
     for line in lines:
         stripped = line.strip()
         if not stripped or stripped.startswith('|') or stripped.startswith(':'):
             continue
-        
+
         total_meaningful_lines += 1
-        
+
         # Check if line ends with dots and page number (classic index format)
         if page_number_pattern.search(stripped):
             page_number_lines += 1
-    
+
     if total_meaningful_lines > 0:
         page_number_ratio = page_number_lines / total_meaningful_lines
         # If 30% or more lines have the "...page_number" pattern, it's an index
         if page_number_ratio >= 0.30:
             logger.info(f"Detected index page: {page_number_ratio:.0%} of lines have '...page_number' pattern.")
-            return True 
-        
+            return True
+
     suspected_page_numbers = re.findall(r'\b(\d{2,3})\b', markdown)  # Find 2-3 digit numbers
-    
+
     if len(suspected_page_numbers) > 20:  # More than 20 standalone numbers
         # Check if they're sequential or clustered (typical of page numbers)
         unique_numbers = set(int(n) for n in suspected_page_numbers)
         if len(unique_numbers) < len(suspected_page_numbers) * 0.5:  # Many duplicates
             logger.info(f"Detected index page: Found {len(suspected_page_numbers)} page-like numbers with limited variety.")
             return True
-    
+
     # === ORIGINAL: Table-based index detection ===
     table_index_count = 0
     table_cell_count = 0
     index_entry_pattern = re.compile(r'[A-Za-z0-9\s\(\)\-]+\.{2,}\s*\d+')
-    
+
     for line in lines:
         if '|' in line and not line.strip().startswith(':'):
             cells = [cell.strip() for cell in line.split('|') if cell.strip()]
-            
+
             for cell in cells:
                 if cell:
                     table_cell_count += 1
                     if index_entry_pattern.search(cell):
                         table_index_count += 1
-    
+
     if table_cell_count > 0:
         index_ratio = table_index_count / table_cell_count
         if index_ratio >= 0.4:
             logger.info("Detected index page based on table content.")
             return True
-     
+
     content_lines = [
-        line.strip() for line in lines 
+        line.strip() for line in lines
         if line.strip() and not line.strip().startswith('|') and not line.strip().startswith(':')
     ]
-    
+
     if not content_lines:
         return False
-    
+
     # Improved patterns for index lines
     index_pattern = re.compile(r'^[A-Za-z0-9\s\(\)\-\.,]+\.{2,}\s*\d+\s*$')
     alt_pattern = re.compile(r'^[A-Za-z0-9\s\(\)\-\.,]+\s+\d{2,3}\s*$')  # Name followed by 2-3 digit number
-    
+
     index_lines = sum(
         1 for line in content_lines
         if index_pattern.search(line) or alt_pattern.search(line)
     )
-    
+
     if len(content_lines) > 0:
         index_line_ratio = index_lines / len(content_lines)
-        # If at least 10% of content lines match the index pattern, it's likely an index page
-        if index_line_ratio >= 0.1:
+        # If at least 30% of content lines match the index pattern, it's likely an index page
+        if index_line_ratio >= 0.3:
             logger.info(f"Detected index page based on line patterns: {index_line_ratio:.0%} match.")
             return True
-    
+
     # === NEW: Detect if the page is mostly very short text entries (typical of index) ===
     if len(content_lines) > 10:  # Only check if we have enough lines
         avg_line_length = sum(len(line) for line in content_lines) / len(content_lines)
         short_lines = sum(1 for line in content_lines if len(line) < 50)
         short_line_ratio = short_lines / len(content_lines)
-         
+
         if short_line_ratio >= 0.7 and avg_line_length < 40 and len(suspected_page_numbers) > 15:
             logger.info("Detected index page: High ratio of short lines with many numbers.")
             return True
-        
+
     # === NEW: Detect table-based index with mostly empty cells (except drug name and page number) ===
     # This catches index pages that are formatted as tables but lack tier/requirement data
     table_rows = [line for line in lines if '|' in line and not line.strip().startswith(':')]
     if len(table_rows) > 5:  # Need at least a few rows to analyze
         empty_cell_pattern = re.compile(r'\|\s*\|')  # Adjacent pipes with only whitespace
         rows_with_empty_cells = sum(1 for row in table_rows if empty_cell_pattern.search(row))
-        
+
         # Also check for tables with very few columns filled (e.g., only 2 out of 5)
         rows_with_mostly_empty = 0
         for row in table_rows:
@@ -779,12 +869,12 @@ def is_index_page(markdown: str) -> bool:
             non_empty_cells = sum(1 for cell in cells if cell)
             if len(cells) > 3 and non_empty_cells <= 2:  # Most cells empty
                 rows_with_mostly_empty += 1
-        
+
         empty_ratio = (rows_with_empty_cells + rows_with_mostly_empty) / len(table_rows)
         if empty_ratio >= 0.6:  # 60% or more rows have mostly empty cells
             logger.info(f"Detected index page: Table with {empty_ratio:.0%} of rows having mostly empty cells.")
             return True
-        
+
     return False
 
 def is_aca_drug_list_page(markdown: str) -> bool:
@@ -797,7 +887,7 @@ def is_aca_drug_list_page(markdown: str) -> bool:
     score = 0
     # A score of 10 or more gives high confidence that this page should be skipped.
     CONFIDENCE_THRESHOLD = 10
-    
+
     lower_markdown = markdown.lower()
 
     # --- Feature 1: The Strongest Signal - The BRAND/GENERIC Table Header ---
@@ -837,7 +927,7 @@ def is_aca_drug_list_page(markdown: str) -> bool:
         if keyword in lower_markdown:
             logger.debug(f"ACA page score +2 for keyword: {keyword}")
             score += 2
-            
+
     # --- Final Decision ---
     if score >= CONFIDENCE_THRESHOLD:
         logger.info(f"Detected ACA/Preventative drug list page with a confidence score of {score}. Skipping.")
@@ -861,7 +951,7 @@ def extract_structured_data_with_llm(page_markdown: str, payer_name: str = None)
     if is_index_page(page_markdown):
         logger.info("Skipping LLM call for index/table of contents page.")
         return default_output, {'tokens': 0, 'cost': 0.0, 'calls': 0}
-    
+
     if is_aca_drug_list_page(page_markdown):
         logger.info("Skipping LLM call for ACA Drug List/Preventative Medications page.")
         return default_output, {'tokens': 0, 'cost': 0.0, 'calls': 0}
@@ -1047,7 +1137,7 @@ def _load_default_prompt() -> str:
         logger.error(f"[PROMPT SELECTION] Error loading default prompt from {DEFAULT_PROMPT_FILE.name}: {e}. Using hardcoded fallback prompt.")
         return """You are a data extraction expert for pharmaceutical formularies. Extract drug information and return as JSON with keys: "drug_table", "acronyms", "tiers"."""
 
-        
+
 
 def create_resilient_mistral_client():
     """
@@ -1061,18 +1151,107 @@ def create_resilient_mistral_client():
     return Mistral(api_key=MISTRAL_API_KEY, client=client)
 
 
-def process_pdf_with_mistral_ocr(pdf_input, payer_name=None):
+def _parse_page_ranges(page_config_value: Union[str, list, None]) -> List[int]:
     """
-    Processes a PDF (from a file path or a BytesIO object) using Mistral OCR 
-    and a parallelized LLM pipeline for data extraction, with robust retry logic.
+    Parses a flexible page range configuration into a flat list of page numbers.
+    Handles "all", lists of numbers, and lists of strings with ranges (e.g., "10-20").
     """
-    log_name = getattr(pdf_input, 'name', pdf_input) if not isinstance(pdf_input, str) else pdf_input
-    logger.info(f"Analyzing PDF with parallel LLM pipeline: {log_name}")
+    if not page_config_value:
+        return []
+
+    pages = set()
+    # Ensure the config value is a list to simplify processing
+    if isinstance(page_config_value, str) and page_config_value.lower() != 'all':
+        config_list = [item.strip() for item in page_config_value.split(',')]
+    elif not isinstance(page_config_value, list):
+        config_list = [page_config_value]
+    else:
+        config_list = page_config_value
+
+    for item in config_list:
+        item_str = str(item).strip()
+        if '-' in item_str:
+            try:
+                start, end = map(int, item_str.split('-'))
+                if start <= end:
+                    pages.update(range(start, end + 1))
+            except ValueError:
+                logger.warning(f"Ignoring malformed page range: '{item_str}'")
+        else:
+            try:
+                pages.add(int(item_str))
+            except ValueError:
+                logger.warning(f"Ignoring invalid page number entry: '{item_str}'")
+    return sorted(list(pages))
+
+
+def _get_pages_to_process(filename: Optional[str], total_pages: int) -> List[int]:
+    """
+    Determines which page indices to process based on the configuration in config.py.
+    Returns a list of 0-based page indices.
+    """
+    config = PDF_PAGE_PROCESSING_CONFIG
+
+    # Default behavior is to process all pages
+    selected_rule = "all"
+    rule_source = "system default"
+
+    # Find a specific rule for the filename
+    if filename:
+        for key, pages_rule in config.items():
+            if key != "default" and key.lower() in filename.lower():
+                selected_rule = pages_rule
+                rule_source = f"specific rule for key '{key}'"
+                break
+
+    # If no specific rule was found, use the default
+    if rule_source == "system default" and "default" in config:
+        selected_rule = config["default"]
+        rule_source = "configuration default"
+
+    logger.info(f"Applying page processing rule for '{filename}' from {rule_source}: {selected_rule}")
+
+    # Process the selected rule
+    if isinstance(selected_rule, str) and selected_rule.lower() == "all":
+        logger.info(f"Processing all {total_pages} pages for '{filename}'.")
+        return list(range(total_pages))
+
+    # Parse the rule, which can be a list of numbers and/or string ranges
+    page_numbers_1_based = _parse_page_ranges(selected_rule)
+
+    if not page_numbers_1_based:
+        logger.warning(f"No valid pages specified by rule '{selected_rule}' for '{filename}'. No pages will be processed.")
+        return []
+
+    # Filter this numeric list to remove out-of-range pages and get valid 1-based pages
+    valid_pages_1_based = [p for p in page_numbers_1_based if 1 <= p <= total_pages]
+
+    # Log which pages were specified but invalid
+    invalid_pages = [p for p in page_numbers_1_based if p not in valid_pages_1_based]
+    if invalid_pages:
+        logger.warning(f"Ignoring invalid/out-of-range pages for '{filename}': {invalid_pages}. Total pages in document: {total_pages}.")
+
+    # Convert the final valid list to 0-based indices for processing
+    page_indices_0_based = [p - 1 for p in valid_pages_1_based]
+
+    logger.info(f"Final list of pages to process for '{filename}': {[p + 1 for p in page_indices_0_based]}")
+    return sorted(list(set(page_indices_0_based)))
+
+
+def process_pdf_with_mistral_ocr(pdf_input, payer_name=None, filename: Optional[str] = None):
+    """
+    Processes a PDF using Mistral OCR and a parallelized LLM pipeline.
+    Includes an optional enhancement step to improve OCR quality for complex documents.
+    """
+    if not filename:
+        filename = getattr(pdf_input, 'name', 'in_memory_file.pdf')
+
+    logger.info(f"Analyzing PDF with parallel LLM pipeline: {filename}")
 
     if PYPDF2_AVAILABLE and isinstance(pdf_input, BytesIO):
         try:
             reader = PyPDF2.PdfReader(pdf_input)
-            num_pages = len(reader)
+            num_pages = len(reader.pages)
             if num_pages > MAX_PDF_PAGES:
                 logger.error(f"PDF has {num_pages} pages, exceeding limit of {MAX_PDF_PAGES}.")
                 return {"drug_table": [], "acronyms": [], "tiers": []}, "", {'mistral_pages': 0, 'bedrock_tokens': 0, 'bedrock_cost': 0.0, 'bedrock_calls': 0}
@@ -1082,25 +1261,36 @@ def process_pdf_with_mistral_ocr(pdf_input, payer_name=None):
 
     total_costs = {'mistral_pages': 0, 'mistral_cost': 0.0, 'bedrock_tokens': 0, 'bedrock_cost': 0.0, 'bedrock_calls': 0}
     
-    # Use the resilient client for all API interactions
     mistral_client = create_resilient_mistral_client()
 
     try:
-        if isinstance(pdf_input, BytesIO):
-            file_bytes = pdf_input.getvalue()
-            file_name = "temp_in_memory.pdf"
+        pdf_to_process = pdf_input
+        # --- PDF Enhancement Step ---
+        if USE_ENHANCED_PDF:
+            enhanced_pdf_bytes = enhance_pdf(pdf_input)
+            if enhanced_pdf_bytes:
+                pdf_to_process = enhanced_pdf_bytes
+                logger.info("Proceeding with enhanced PDF for OCR.")
+            else:
+                logger.warning("PDF enhancement failed. Falling back to original PDF.")
+                if isinstance(pdf_input, BytesIO):
+                    pdf_input.seek(0) # Ensure original stream is at the start for fallback
+        
+        # --- Document Upload and OCR ---
+        if isinstance(pdf_to_process, BytesIO):
+            file_bytes = pdf_to_process.getvalue()
+            file_name_for_upload = "enhanced_temp.pdf" if pdf_to_process is not pdf_input else "temp_in_memory.pdf"
         else:
-            pdf_file = Path(pdf_input)
+            pdf_file = Path(pdf_to_process)
             file_bytes = pdf_file.read_bytes()
-            file_name = pdf_file.name
+            file_name_for_upload = pdf_file.name
 
         uploaded_file = None
-        # Manual retry loop for the initial upload for extra safety
         for attempt in range(MAX_RETRIES):
             try:
-                logger.info(f"Attempt {attempt + 1}/{MAX_RETRIES} to upload '{file_name}' to Mistral...")
+                logger.info(f"Attempt {attempt + 1}/{MAX_RETRIES} to upload '{file_name_for_upload}' to Mistral...")
                 uploaded_file = mistral_client.files.upload(
-                    file={"file_name": file_name, "content": file_bytes},
+                    file={"file_name": file_name_for_upload, "content": file_bytes},
                     purpose="ocr",
                 )
                 logger.info("File uploaded successfully to Mistral.")
@@ -1111,11 +1301,10 @@ def process_pdf_with_mistral_ocr(pdf_input, payer_name=None):
                     logger.warning(f"Network or Server error during upload: {e}. Retrying in {delay}s...")
                     time.sleep(delay)
                 else:
-                    logger.error(f"Failed to upload file to Mistral after {MAX_RETRIES} attempts due to a persistent network/server error.")
-                    raise # Re-raise the exception to fail the worker
+                    logger.error(f"Failed to upload file to Mistral after {MAX_RETRIES} attempts.")
+                    raise
 
         if not uploaded_file:
-            # Return the correct structure on failure
             return {"drug_table": [], "acronyms": [], "tiers": []}, "", total_costs
 
         signed_url = mistral_client.files.get_signed_url(file_id=uploaded_file.id, expiry=120)
@@ -1129,36 +1318,39 @@ def process_pdf_with_mistral_ocr(pdf_input, payer_name=None):
         total_costs['mistral_pages'] = page_count
         total_costs['mistral_cost'] = (page_count / 1000.0) * MISTRAL_OCR_COST_PER_1K_PAGES
 
-        all_structured_data, all_acronyms, all_tiers, all_raw_pages = [], [], [], []
+        all_structured_data, all_acronyms, all_tiers = [], [], []
 
-        logger.info(f"Processing {page_count} pages in parallel with up to {LLM_PAGE_WORKERS} workers...")
-        with ThreadPoolExecutor(max_workers=LLM_PAGE_WORKERS) as executor:
-            future_to_page = {executor.submit(extract_structured_data_with_llm, page.markdown, payer_name): page_idx + 1 for page_idx, page in enumerate(ocr_response.pages)}
-            # Collect raw markdown content separately to avoid race conditions
-            for page in ocr_response.pages:
-                 all_raw_pages.append(page.markdown)
+        page_indices_to_process = _get_pages_to_process(filename, page_count)
 
-            for future in as_completed(future_to_page):
-                page_num = future_to_page[future]
-                try:
-                    structured_records, llm_costs = future.result()
-                    logger.info(f"--- Completed processing for Page {page_num}/{page_count} ---")
-                    total_costs['bedrock_tokens'] += llm_costs.get('tokens', 0)
-                    total_costs['bedrock_cost'] += llm_costs.get('cost', 0)
-                    total_costs['bedrock_calls'] += llm_costs.get('calls', 0)
-                    if structured_records:
-                        for drug in structured_records.get('drug_table', []):
-                            drug['page_number'] = page_num
-                            all_structured_data.append(drug)
-                        all_acronyms.extend(structured_records.get('acronyms', []))
-                        all_tiers.extend(structured_records.get('tiers', []))
-                except Exception as exc:
-                    logger.error(f"Page {page_num} generated an exception during result processing: {exc}")
+        if not page_indices_to_process:
+            logger.warning(f"No valid pages selected for processing for file '{filename}'. Skipping LLM stage.")
+        else:
+            logger.info(f"Processing {len(page_indices_to_process)} pages in parallel with up to {LLM_PAGE_WORKERS} workers...")
+            with ThreadPoolExecutor(max_workers=LLM_PAGE_WORKERS) as executor:
+                future_to_page = {
+                    executor.submit(extract_structured_data_with_llm, ocr_response.pages[page_idx].markdown, payer_name): page_idx + 1
+                    for page_idx in page_indices_to_process
+                }
 
-        full_raw_content = "\n\n--- PAGE BREAK ---\n\n".join(all_raw_pages)
+                for future in as_completed(future_to_page):
+                    page_num = future_to_page[future]
+                    try:
+                        structured_records, llm_costs = future.result()
+                        logger.info(f"--- Completed processing for Page {page_num}/{page_count} ---")
+                        total_costs['bedrock_tokens'] += llm_costs.get('tokens', 0)
+                        total_costs['bedrock_cost'] += llm_costs.get('cost', 0)
+                        total_costs['bedrock_calls'] += llm_costs.get('calls', 0)
+                        if structured_records:
+                            for drug in structured_records.get('drug_table', []):
+                                drug['page_number'] = page_num
+                                all_structured_data.append(drug)
+                            all_acronyms.extend(structured_records.get('acronyms', []))
+                            all_tiers.extend(structured_records.get('tiers', []))
+                    except Exception as exc:
+                        logger.error(f"Page {page_num} generated an exception during result processing: {exc}")
+
+        full_raw_content = "\n\n--- PAGE BREAK ---\n\n".join([p.markdown for p in ocr_response.pages])
         
-        # --- CONSOLIDATE RESULTS ---
-        # Instead of returning multiple lists, return a single dictionary.
         full_structured_data = {
             "drug_table": all_structured_data,
             "acronyms": all_acronyms,
@@ -1176,9 +1368,8 @@ def process_pdf_with_mistral_ocr(pdf_input, payer_name=None):
         return full_structured_data, full_raw_content, total_costs
 
     except Exception as e:
-        logger.error(f"A critical error occurred in the main PDF processing pipeline for {log_name}: {e}")
+        logger.error(f"A critical error occurred in the main PDF processing pipeline for {filename}: {e}")
         traceback.print_exc()
-        # Return empty structures to prevent downstream errors
         return {"drug_table": [], "acronyms": [], "tiers": []}, "", total_costs
 
 
@@ -1267,7 +1458,7 @@ def deduplicate_dicts(dicts, primary_key='acronym'):
 #         return [], {}
 
 #     # Define a generous timeout for each PDF file in seconds (e.g., 20 minutes)
-#     PDF_PROCESSING_TIMEOUT = 1200 
+#     PDF_PROCESSING_TIMEOUT = 1200
 
 #     logger.info(f"Found {len(pdf_files)} PDFs. Starting parallel processing with up to {PROCESS_COUNT} workers.")
 #     success_count, error_count, skipped_count = 0, 0, 0
@@ -1278,7 +1469,7 @@ def deduplicate_dicts(dicts, primary_key='acronym'):
 #             try:
 #                 # Wait for the result, but no longer than the timeout
 #                 status, _, result_data, costs = future.result(timeout=PDF_PROCESSING_TIMEOUT)
-                
+
 #                 if status == 'SUCCESS':
 #                     success_count += 1
 #                     payer_name = result_data['db_payer_name']
@@ -1328,25 +1519,25 @@ def get_all_plans_with_formulary_url():
 #     """
 #     log_prefix = f"[Worker for {filename}]"
 #     zero_costs = {'mistral_pages': 0, 'bedrock_tokens': 0, 'bedrock_cost': 0.0, 'bedrock_calls': 0}
- 
+
 #     try:
 #         full_path = os.path.join(pdf_folder_path, filename)
 #         if not os.path.isfile(full_path) or os.path.getsize(full_path) == 0:
 #             return 'ERROR', filename, "File not found or is empty.", zero_costs
- 
+
 #         state_name, payer, plan_name = extract_metadata_from_filename(filename)
 #         plan_id, payer_id, db_payer_name, db_plan_name, formulary_url = get_plan_and_payer_info(state_name, payer, plan_name)
 #         if not plan_id:
 #             return 'SKIPPED', filename, f"Plan not found in DB for: {state_name}, {payer}, {plan_name}", zero_costs
- 
+
 #         file_hash = calculate_file_hash(full_path)
 #         update_plan_file_hash(plan_id, file_hash)
- 
+
 #         # --- CORRECTED CACHING LOGIC ---
 #         cached_data, raw_content = get_cached_result(file_hash)
 #         costs = zero_costs
 #         full_structured_data = None  # Initialize
- 
+
 #         if cached_data is None: # Cache MISS
 #             logger.info(f"{log_prefix} Cache MISS. Starting full processing...")
 #             full_structured_data, raw_content, costs = process_pdf_with_mistral_ocr(full_path, db_payer_name)
@@ -1354,40 +1545,40 @@ def get_all_plans_with_formulary_url():
 #         else: # Cache HIT
 #             logger.info(f"{log_prefix} Cache HIT. Using pre-processed data.")
 #             full_structured_data = cached_data
- 
+
 #         # --- UNPACK DATA FOR POST-PROCESSING ---
 #         if not isinstance(full_structured_data, dict):
 #             logger.error(f"{log_prefix} Corrupted cache or processing error. Expected a dictionary, got {type(full_structured_data)}")
 #             full_structured_data = {"drug_table": [], "acronyms": [], "tiers": []}
- 
+
 #         drug_table_data = full_structured_data.get('drug_table', [])
 #         all_acronyms = full_structured_data.get('acronyms', [])
 #         all_tiers = full_structured_data.get('tiers', [])
-       
+
 #         # **CRITICAL STEP**: Create the DataFrame from the unpacked list.
 #         structured_df = pd.DataFrame(drug_table_data)
- 
+
 #         # **NOW THIS CHECK IS SAFE**:
 #         if structured_df.empty and not all_acronyms and not all_tiers:
 #             return 'SKIPPED', filename, "No structured data could be extracted.", costs
- 
+
 #         # --- Acronym and Tier processing ---
 #         all_acronyms, all_tiers = _reclassify_definitions(all_acronyms, all_tiers)
 #         all_tiers = _parse_and_split_tier_definitions(all_tiers)
- 
+
 #         for tier_dict in all_tiers:
 #             acronym = tier_dict.get('acronym')
 #             if acronym and str(acronym).strip().isdigit():
 #                 tier_dict['acronym'] = f"Tier {str(acronym).strip()}"
- 
+
 #         dedup_acronyms = deduplicate_dicts(all_acronyms)
 #         dedup_tiers = deduplicate_dicts(all_tiers)
- 
+
 #         logger.info("Filtering out non-formulary definitions before insertion.")
-       
+
 #         # List of keywords that are not true acronyms or tiers
 #         blocklist_keywords = ['prenatal', 'aspirin', 'statin', 'fluoride', 'tobacco', 'nicotine']
- 
+
 #         def is_valid_formulary_definition(item):
 #             acronym = str(item.get('acronym', '')).lower().strip()
 #             if not acronym:
@@ -1399,21 +1590,21 @@ def get_all_plans_with_formulary_url():
 #             if len(acronym.replace(' ', '')) > 20 and acronym.isalpha():
 #                  return False
 #             return True
- 
+
 #         filtered_acronyms = [item for item in dedup_acronyms if is_valid_formulary_definition(item)]
 #         filtered_tiers = [item for item in dedup_tiers if is_valid_formulary_definition(item)]
- 
+
 #         acronyms_removed_count = len(dedup_acronyms) - len(filtered_acronyms)
 #         tiers_removed_count = len(dedup_tiers) - len(filtered_tiers)
- 
+
 #         if acronyms_removed_count > 0 or tiers_removed_count > 0:
 #             logger.warning(
 #                 f"Filtered out {acronyms_removed_count} invalid acronyms and "
 #                 f"{tiers_removed_count} invalid tiers based on keyword blocklist."
 #             )
- 
+
 #         all_definitions = filtered_acronyms + filtered_tiers
- 
+
 #         all_definitions = dedup_acronyms + dedup_tiers
 #         if all_definitions:
 #             # This step is crucial for handling shared formulary documents (cache hits).
@@ -1423,11 +1614,11 @@ def get_all_plans_with_formulary_url():
 #             # are correctly mapped to *both* plans in the reference table,
 #             # mirroring how drug data is mapped in the drug_formulary_details table.
 #             insert_acronyms_to_ref_table(all_definitions, state_name, payer, plan_name, "pp_formulary_names")
- 
+
 #         if structured_df.empty:
 #             logger.info(f"{log_prefix} Acronyms/Tiers processed, but no drug records found.")
 #             return 'SUCCESS', filename, {"processed_records": [], "db_payer_name": db_payer_name}, costs
- 
+
 #         processed_records = []
 #         for _, row in structured_df.iterrows():
 #             try:
@@ -1435,13 +1626,13 @@ def get_all_plans_with_formulary_url():
 #                 requirements_text = str(row.get('drug_requirements', '') or '').strip()
 #                 cleaned_drug_name = clean_drug_name(raw_drug_name)
 #                 if not cleaned_drug_name: continue
- 
+
 #                 raw_tier = row.get('drug_tier', None)
 #                 drug_tier_normalized = normalize_drug_tier(raw_tier) or infer_drug_tier_from_text(requirements_text) or infer_drug_tier_from_text(raw_drug_name)
- 
+
 #                 with get_db_connection() as conn:
 #                     coverage_status = determine_coverage_status(requirements_text, drug_tier_normalized, conn, state_name, db_payer_name)
- 
+
 #                 record = {
 #                     "id": str(uuid.uuid4()), "plan_id": plan_id, "payer_id": payer_id,
 #                     "drug_name": cleaned_drug_name, "state_name": state_name,
@@ -1459,16 +1650,16 @@ def get_all_plans_with_formulary_url():
 #                 logger.warning(f"{log_prefix} Error processing extracted row: {row}. Error: {e}")
 #                 continue
 #             pass
- 
+
 #         if processed_records:
 #             return 'SUCCESS', filename, {"processed_records": processed_records, "db_payer_name": db_payer_name}, costs
 #         else:
 #             return 'SKIPPED', filename, "Data extracted, but no valid drug records could be processed.", costs
- 
+
 #     except Exception as e:
 #         return 'ERROR', filename, f"An unexpected error occurred in worker: {e}\n{traceback.format_exc()}", zero_costs
- 
- 
+
+
 def process_single_pdf_url_worker(plan_info):
     """Worker: Download PDF from URL and process it entirely in-memory."""
     state_name, payer_name, plan_name, plan_id, payer_id, formulary_url, old_file_hash = plan_info
@@ -1477,11 +1668,8 @@ def process_single_pdf_url_worker(plan_info):
     start_time = time.time()
 
     try:
-        # --- NEW: Proactive URL Validation ---
-        # Check for empty URLs or strings that look like phone numbers before making a network request.
         formulary_url = transform_viewer_url(formulary_url)
 
-        # Proactive URL Validation
         if not formulary_url or re.match(r'^[\d\s\(\)-]{7,}$', str(formulary_url).strip()):
             error_message = f"Invalid Formulary URL detected (is blank or resembles a phone number): '{formulary_url}'"
             logger.error(f"{log_prefix} {error_message}")
@@ -1490,6 +1678,12 @@ def process_single_pdf_url_worker(plan_info):
         if not formulary_url.startswith(('http://', 'https://')):
             formulary_url = 'https://' + formulary_url
             logger.info(f"{log_prefix} URL scheme was missing. Corrected to: {formulary_url}")
+
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+            "Accept-Language": "en-US,en;q=0.9",
+        }
 
         # proxy_user = os.getenv("PROXY_USER")
         # proxy_pass = os.getenv("PROXY_PASS")
@@ -1507,15 +1701,7 @@ def process_single_pdf_url_worker(plan_info):
         # else:
         #     logger.info(f"{log_prefix} Proxy environment variables not set. Attempting direct connection.")
 
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-            "Accept-Language": "en-US,en;q=0.9",
-        }
-        
-        # First, try the secure way. If it fails, log a warning and retry insecurely.
         try:
-            #logger.info(f"{log_prefix} Using proxy to download from {formulary_url}")
             with requests.get(formulary_url, timeout=90, headers=headers, stream=True, verify=True) as resp:
                 resp.raise_for_status()
                 content_type = resp.headers.get('Content-Type', '')
@@ -1525,8 +1711,7 @@ def process_single_pdf_url_worker(plan_info):
                     return 'ERROR', plan_name, error_details, zero_costs
                 pdf_content_bytes = resp.content
         except requests.exceptions.SSLError as e:
-            logger.warning(f"{log_prefix} SSL verification failed: {e}. This often means the URL is wrong or the server is misconfigured.")
-            logger.warning(f"{log_prefix} Retrying with SSL verification DISABLED. This is insecure and should only be a last resort.")
+            logger.warning(f"{log_prefix} SSL verification failed: {e}. Retrying with SSL verification DISABLED.")
             with requests.get(formulary_url, timeout=90, headers=headers, stream=True, verify=False) as resp:
                 resp.raise_for_status()
                 content_type = resp.headers.get('Content-Type', '')
@@ -1537,23 +1722,28 @@ def process_single_pdf_url_worker(plan_info):
                 pdf_content_bytes = resp.content
 
         pdf_bytes_io = BytesIO(pdf_content_bytes)
- 
+
         new_file_hash = calculate_bytes_hash(pdf_content_bytes)
- 
+
         if old_file_hash and old_file_hash != new_file_hash:
             logger.info(f"New formulary version detected for plan '{plan_name}' (hash changed from {old_file_hash[:8]}... to {new_file_hash[:8]}...).")
             delete_drug_formulary_records_for_plan(plan_id)
-         
+
         update_plan_file_hash(plan_id, new_file_hash)
 
         cached_data, raw_content = get_cached_result(new_file_hash)
         costs = zero_costs
         full_structured_data = None
 
+        filename_for_config = f"{state_name}_{payer_name}_{plan_name}.pdf"
 
         if cached_data is None:
             logger.info(f"{log_prefix} Cache MISS for new hash. Starting full processing...")
-            full_structured_data, raw_content, costs = process_pdf_with_mistral_ocr(pdf_bytes_io, payer_name)
+            full_structured_data, raw_content, costs = process_pdf_with_mistral_ocr(
+                pdf_bytes_io,
+                payer_name,
+                filename=filename_for_config
+            )
             cache_result(new_file_hash, full_structured_data, raw_content)
         else:
             logger.info(f"{log_prefix} Cache HIT for new hash. Using pre-processed data.")
@@ -1565,12 +1755,15 @@ def process_single_pdf_url_worker(plan_info):
 
         drug_table_data = full_structured_data.get('drug_table', [])
 
+        if drug_table_data:
+            page_numbers = [r.get('page_number') for r in drug_table_data if r.get('page_number')]
+            if page_numbers:
+                logger.info(f"{log_prefix} Initial extraction: {len(drug_table_data)} records from pages {min(page_numbers)}-{max(page_numbers)}")
 
-        # Filter out index page data based on extracted content patterns
         if drug_table_data and _is_extracted_data_from_index_page(drug_table_data):
             logger.warning(f"{log_prefix} Detected index/TOC page based on extracted data patterns. Skipping this page.")
             drug_table_data = []
-        
+
         if drug_table_data:
             logger.info(f"{log_prefix} Step 1: Running group propagation on {len(drug_table_data)} raw records.")
             drug_table_data = _clean_and_propagate_drug_groups(drug_table_data)
@@ -1585,52 +1778,54 @@ def process_single_pdf_url_worker(plan_info):
         all_tiers = full_structured_data.get('tiers', [])
 
         structured_df = pd.DataFrame(drug_table_data)
-########################
+
         if not structured_df.empty:
-            # Heuristic check: Decide if the complex parser is needed.
-            # We check a sample of rows. If any contain a comma followed by a digit (like "10mg, 20mg"),
-            # we assume the complex format is present.
-            should_run_parser = False
-            sample_rows = structured_df.head(10) # Check the first 10 rows
-            for _, row in sample_rows.iterrows():
+            expanded_rows = []
+            for _, row in structured_df.iterrows():
                 drug_name_full = str(row.get('drug_name', ''))
-                if re.search(r',\s*\d', drug_name_full):
-                    should_run_parser = True
-                    logger.info(f"{log_prefix} Complex multi-strength drug name format detected. Applying parser.")
-                    break
-            
-            if should_run_parser:
-                expanded_rows = []
-                for _, row in structured_df.iterrows():
-                    drug_name_full = str(row.get('drug_name', ''))
-                    # All other fields are passed through
-                    other_data = {k: v for k, v in row.items() if k != 'drug_name'}
+                other_data = {k: v for k, v in row.items() if k != 'drug_name'}
 
-                    parsed_drugs = parse_complex_drug_name(drug_name_full)
-                    
-                    if not parsed_drugs:
-                        expanded_rows.append(row.to_dict())
-                        continue
+                is_single_entry = False
+                single_entry_keywords = ['kit', 'pak', 'pack', 'titration']
+                if any(keyword in drug_name_full.lower() for keyword in single_entry_keywords):
+                    is_single_entry = True
 
-                    for parsed_drug in parsed_drugs:
+                if is_single_entry:
+                    expanded_rows.append(row.to_dict())
+                    continue
+
+                parsed_drugs = parse_complex_drug_name(drug_name_full)
+
+                if not parsed_drugs or (len(parsed_drugs) == 1 and not parsed_drugs[0]['strengths']):
+                    expanded_rows.append(row.to_dict())
+                    continue
+
+                for parsed_drug in parsed_drugs:
+                    base_name = parsed_drug['base_name']
+                    brand_name_part = f" ({parsed_drug['brand_name']})" if parsed_drug['brand_name'] else ""
+
+                    if parsed_drug['strengths']:
                         for strength in parsed_drug['strengths']:
-                            new_drug_name = f"{parsed_drug['base_name']} {strength}".strip()
-                            if parsed_drug['brand_name']:
-                                new_drug_name += f" ({parsed_drug['brand_name']})"
-                            
+                            new_drug_name = f"{base_name} {strength}{brand_name_part}".strip()
                             new_row = other_data.copy()
                             new_row["drug_name"] = new_drug_name
                             expanded_rows.append(new_row)
-                structured_df = pd.DataFrame(expanded_rows)
-            else:
-                logger.info(f"{log_prefix} Simple drug name format detected. Skipping complex multi-strength parser.")
-#########################
+                    elif base_name:
+                        new_drug_name = f"{base_name}{brand_name_part}".strip()
+                        new_row = other_data.copy()
+                        new_row["drug_name"] = new_drug_name
+                        expanded_rows.append(new_row)
+
+            structured_df = pd.DataFrame(expanded_rows)
+            if expanded_rows:
+                 logger.info(f"{log_prefix} After complex parsing, DataFrame has {len(structured_df)} rows.")
+
         if structured_df.empty and not all_acronyms and not all_tiers:
             return 'SKIPPED', plan_name, "No structured data extracted from URL PDF.", costs
 
         all_acronyms, all_tiers = _reclassify_definitions(all_acronyms, all_tiers)
         all_tiers = _parse_and_split_tier_definitions(all_tiers)
-        
+
         for tier_dict in all_tiers:
             acronym = tier_dict.get('acronym')
             if acronym and str(acronym).strip().isdigit():
@@ -1642,11 +1837,11 @@ def process_single_pdf_url_worker(plan_info):
         all_definitions = dedup_acronyms + dedup_tiers
         if all_definitions:
             insert_acronyms_to_ref_table(all_definitions, state_name, payer_name, plan_name, "pp_formulary_names")
-        
+
         if structured_df.empty:
             logger.info(f"{log_prefix} Acronyms/Tiers processed, but no drug records found.")
             return 'SUCCESS', plan_name, {"processed_records": [], "db_payer_name": payer_name}, costs
- 
+
         if not structured_df.empty:
             requirement_tier_pairs = set()
             for _, row in structured_df.iterrows():
@@ -1656,7 +1851,7 @@ def process_single_pdf_url_worker(plan_info):
                 requirement_tier_pairs.add((req_code, tier))
             with get_db_connection() as conn:
                 coverage_map = batch_determine_coverage_status(requirement_tier_pairs, conn, state_name, payer_name)
- 
+
         processed_records = []
         for _, row in structured_df.iterrows():
             cleaned_drug_name = clean_drug_name(str(row.get('drug_name', '') or ''))
@@ -1664,9 +1859,9 @@ def process_single_pdf_url_worker(plan_info):
             requirements_text = str(row.get('drug_requirements', '') or '').strip()
             requirements_text = normalize_requirement_code(requirements_text)
             drug_tier_normalized = normalize_drug_tier(row.get('drug_tier', None)) or infer_drug_tier_from_text(requirements_text) or infer_drug_tier_from_text(cleaned_drug_name)
- 
+
             coverage_status = coverage_map.get((requirements_text, drug_tier_normalized))
-            
+
             if (
                 coverage_status and coverage_status.lower() == "covered"
                 and "pa" in requirements_text.lower()
@@ -1684,7 +1879,6 @@ def process_single_pdf_url_worker(plan_info):
                 "plan_name": plan_name, "payer_name": payer_name,
                 "file_name": f"{state_name}_{payer_name}_{plan_name}.pdf",
                 "ndc_code": None, "jcode": None, "coverage_details": None,
-                "ndc_code": None, "jcode": None, "coverage_details": None,
             }
             processed_records.append(record)
 
@@ -1692,21 +1886,19 @@ def process_single_pdf_url_worker(plan_info):
             end_time = time.time()
             total_time = end_time - start_time
             logger.info(f"{log_prefix} Total processing time (worker start to DB push): {total_time:.2f} seconds.")
-            with open("worker_timing.log", "a", encoding="utf-8") as f:
-                f.write(f"{log_prefix} | Total time: {total_time:.2f} seconds\n")
             return 'SUCCESS', plan_name, {"processed_records": processed_records, "db_payer_name": payer_name}, costs
         else:
             return 'SKIPPED', plan_name, "Data extracted, but no valid drug records were processed.", costs
 
-    except requests.exceptions.ProxyError as e:
-        logger.error(f"{log_prefix} Proxy Error: Could not connect to the proxy. {e}", exc_info=True)
-        return 'ERROR', plan_name, f"Proxy Error: {e}", zero_costs
+    except requests.exceptions.ConnectionError as e:
+        logger.error(f"{log_prefix} A network connection error occurred: {e}", exc_info=True)
+        logger.error(f"{log_prefix} This is often caused by a firewall, a missing/incorrect proxy configuration, or the server being down.")
+        logger.error(f"{log_prefix} Please check your network connection and ensure that if you are behind a proxy, the HTTP_PROXY and HTTPS_PROXY environment variables are set correctly.")
+        return 'ERROR', plan_name, f"Connection Error: {e}", zero_costs
     except Exception as e:
-        logger.error(f"{log_prefix} Error: {e}", exc_info=True)
+        logger.error(f"{log_prefix} An unexpected error occurred in worker: {e}", exc_info=True)
         return 'ERROR', plan_name, str(e), zero_costs
- 
 
-# Replace the existing process_pdfs_from_urls_in_parallel function with this one
 
 def process_pdfs_from_urls_in_parallel():
     """Process PDFs by downloading from URLs in plan_details, in parallel."""
@@ -1730,11 +1922,11 @@ def process_pdfs_from_urls_in_parallel():
             plan_name_log = plan_info[2]
             try:
                 status, _, result_data, costs = future.result(timeout=URL_PROCESSING_TIMEOUT)
-                
+
                 if status == 'SUCCESS':
                     logger.info(f"Aggregating results for SUCCESSFUL plan: {plan_name_log}")
                     success_count += 1
-                    
+
                     processed_records = result_data.get("processed_records", [])
                     if processed_records:
                         logger.info(f"Deduplicating {len(processed_records)} records before insertion for plan '{plan_name_log}'.")
@@ -1749,7 +1941,7 @@ def process_pdfs_from_urls_in_parallel():
                             )
                             if key not in unique_records:
                                 unique_records[key] = record
-                        
+
                         deduplicated_data = list(unique_records.values())
                         records_removed = len(processed_records) - len(deduplicated_data)
                         if records_removed > 0:
@@ -1758,58 +1950,62 @@ def process_pdfs_from_urls_in_parallel():
                         # FINAL FRAGMENT FILTER: Block any remaining orphan dosage rows before DB insertion
                         if deduplicated_data:
                             fragment_pattern = re.compile(r'^[/\d\(\)\.]+.*?(mg|ml|mcg|hr|%|tab|cap|gm|gram|unit)', re.IGNORECASE)
+                            # Keywords often found in headers or non-drug text that should be blocked.
+                            junk_keywords = {'index', 'contents', 'introduction', 'appendix', 'formulary', 'drug', 'tier', 'notes'}
+
                             validated_data = []
-                            blocked_fragments = 0
-                            
+                            blocked_records = 0
+
                             for record in deduplicated_data:
                                 drug_name = str(record.get('drug_name', '')).strip()
-                                
-                                # Block pure dosage fragments
+                                page_number = record.get('page_number')
+                                drug_requirements = record.get('drug_requirements')
+
+                                if page_number is not None and page_number <= 2 and not drug_requirements:
+                                    if len(drug_name) < 5 or not re.search(r'[a-zA-Z]{3,}', drug_name):
+                                        logger.warning(f"🚫 BLOCKED Page {page_number} record (missing requirements + suspicious name): '{drug_name}'")
+                                        blocked_records += 1
+                                        continue
+
                                 if fragment_pattern.match(drug_name):
-                                    #logger.warning(f"🚫 BLOCKED FRAGMENT before DB insertion: '{drug_name}' (Tier: {record.get('drug_tier')}, Req: {record.get('drug_requirements')})")
-                                    blocked_fragments += 1
+                                    logger.warning(f"🚫 BLOCKED FRAGMENT before DB insertion: '{drug_name}'")
+                                    blocked_records += 1
                                     continue
-                                
-                                # Block if drug name is too short and doesn't contain at least 3-letter word
-                                if not re.search(r'[a-zA-Z]{3,}', drug_name):
-                                    #logger.warning(f"🚫 BLOCKED INVALID NAME before DB insertion: '{drug_name}'")
-                                    blocked_fragments += 1
+
+                                name_parts = drug_name.split()
+                                if not re.search(r'[a-zA-Z]{3,}', drug_name) or (len(name_parts) == 1 and name_parts[0].lower() in junk_keywords):
+                                    logger.warning(f"🚫 BLOCKED INVALID NAME before DB insertion: '{drug_name}'")
+                                    blocked_records += 1
                                     continue
-                                
+
                                 validated_data.append(record)
-                            
-                            if blocked_fragments > 0:
-                                logger.warning(f"Blocked {blocked_fragments} fragment/invalid records before DB insertion for '{plan_name_log}'.")
-                            
+
+                            if blocked_records > 0:
+                                logger.warning(f"Blocked {blocked_records} invalid/junk records before DB insertion for '{plan_name_log}'.")
+
                             if validated_data:
                                 logger.info(f"Inserting {len(validated_data)} validated records for plan '{plan_name_log}' into the database.")
                                 insert_drug_formulary_data(validated_data)
-                            else:
-                                logger.warning(f"No valid records remaining after fragment filtering for '{plan_name_log}'.")
-                                validated_data = None  # Set to None to skip plan_id tracking below
-                        
-                        if validated_data:
-                            
-                            plan_id = validated_data[0].get('plan_id')
-                            if plan_id and plan_id not in successfully_processed_plan_ids:
-                                successfully_processed_plan_ids.append(plan_id)
+                                plan_id = validated_data[0].get('plan_id')
+                                if plan_id and plan_id not in successfully_processed_plan_ids:
+                                    successfully_processed_plan_ids.append(plan_id)
 
                     payer_name = result_data['db_payer_name']
                     if costs['mistral_pages'] > 0:
                         track_mistral_cost(payer_name, costs['mistral_pages'])
                     if costs['bedrock_tokens'] > 0:
                         track_bedrock_cost_precalculated(payer_name, costs['bedrock_tokens'], costs['bedrock_cost'], costs['bedrock_calls'])
-                
+
                 elif status == 'SKIPPED':
                     logger.warning(f"Skipped plan: {plan_name_log}. Reason: {result_data}")
                     skipped_count += 1
                 elif status == 'ERROR':
                     logger.error(f"Error processing plan: {plan_name_log}. Reason: {result_data}")
                     error_count += 1
-            
+
             except concurrent.futures.TimeoutError:
                 error_count += 1
-                logger.error(f"CRITICAL: Processing timed out for plan: {plan_name_log} after {URL_PROCESSING_TIMEOUT} seconds. The worker is likely stuck. Moving on.")
+                logger.error(f"CRITICAL: Processing timed out for plan: {plan_name_log} after {URL_PROCESSING_TIMEOUT} seconds.")
             except Exception as e:
                 logger.error(f"A critical error occurred while processing result for {plan_name_log}: {e}", exc_info=True)
                 error_count += 1
@@ -1839,14 +2035,14 @@ def _parse_and_split_tier_definitions(tier_list: list) -> list:
             parts = acronym_raw.split(' - ', 1)
             new_acronym = parts[0].strip()
             new_expansion = parts[1].strip()
-            
+
             tier_dict['acronym'] = new_acronym
-            
+
             if not expansion_raw:
                 tier_dict['expansion'] = new_expansion
-        
+
         processed_tiers.append(tier_dict)
-        
+
     return processed_tiers
 
 def _reclassify_definitions(acronyms_list: list, tiers_list: list) -> Tuple[list, list]:
@@ -1858,7 +2054,7 @@ def _reclassify_definitions(acronyms_list: list, tiers_list: list) -> Tuple[list
 
     corrected_acronyms = []
     corrected_tiers = []
-    
+
     TIER_KEYWORDS = {'aca', 'preventive', 'specialty', 'preferred', 'generic', 'brand'}
 
     for item in tiers_list:
@@ -1869,7 +2065,7 @@ def _reclassify_definitions(acronyms_list: list, tiers_list: list) -> Tuple[list
             corrected_tiers.append(item)
         else:
             corrected_acronyms.append(item)
-            
+
     for item in acronyms_list:
         if not isinstance(item, dict): continue
         acronym = str(item.get('acronym') or '').strip().lower()
@@ -1898,11 +2094,11 @@ def is_valid_formulary_definition(item: dict) -> bool:
 
     if len(acronym.split()) > 3:
         return False
-        
+
     sim_score = similarity(acronym, expansion)
     if sim_score > 0.75:
         return False
-        
+
     if acronym.isdigit():
         return False
 
