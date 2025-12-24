@@ -48,21 +48,21 @@ DRUG_EXTRACTION_SCHEMA = {
       "items": {
         "type": "object",
         "properties": {
-          "Drug Pub Name": {
+          "Drug Name": {
             "type": "string",
             "description": "Name of the drug (aliases: Prescription Drug Name, Drug Name, Name of the Drug, PRODUCT DESCRIPTION, Medication, Product, Drug)"
           },
-          "Pub Tier": {
+          "drug tier": {
             "type": "string",
             "description": "Tier of the drug. If NO tier is specified in headers or columns, return null or empty string. Do NOT use default values like 'Unknown' or 'Not Specified'."
           },
-          "Drug Edit": {
+          "requirements": {
             "type": "string",
             "description": "Any requirements or limits for the drug (aliases: Requirements/Limits, Special Code, Coverage Requirements & Limits, Restrictions/Limits, Notes, Drug Status, Necessary actions, Limits on use, category, Requirements, Coverage Requirements and Limits, Restrictions, LIMITS & RESTRICTIONS, Limits and Restrictions, Gen 4, Gen 5)"
           }
         },
         "required": [
-          "Drug Pub Name"
+          "Drug Name"
         ]
       }
     },
@@ -1304,9 +1304,9 @@ def extract_structured_data_with_llm(page_markdown: str, mistral_client: Mistral
             drug_table = []
             for item in structured_response.get("DrugInformation", []):
                 drug_table.append({
-                    "drug_name": item.get("Drug Pub Name"),
-                    "drug_tier": item.get("Pub Tier"),
-                    "drug_requirements": item.get("Drug Edit")
+                    "drug_name": item.get("Drug Name"),
+                    "drug_tier": item.get("drug tier"),
+                    "drug_requirements": item.get("requirements")
                 })
 
             acronyms = []
