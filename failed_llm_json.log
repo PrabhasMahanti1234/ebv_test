@@ -1,0 +1,107 @@
+=== JSON Parse Error at 2025-12-23 16:36:02 ===
+Error: Expecting value: line 20 column 19 (char 670)
+Error Line 20, Column 19
+Problematic segment around error:
+     Line 18:     {
+     Line 19:       "tier": 3,
+ >>> Line 20:       "includes": $$$ Non-preferred",
+     Line 21:       "tips": "Many tier 3 drugs have lower cost options in tier 1 or 2. Ask your prescriber if the drugs in the lower tiers could work for you and help reduce your out-of-pocket costs."
+     Line 22:     },
+
+Cleaned JSON String:
+{
+  "drug_table": [
+    {
+      "tier": 0,
+      "includes": "$0 Preventive",
+      "tips": "Use tier 0 preventive care drugs taken on a regular basis to help prevent the onset or recurrence of a disease or condition."
+    },
+    {
+      "tier": 1,
+      "includes": "$ Generic",
+      "tips": "Use tier 1 generic drugs instead of brand name drugs to help reduce your out-of-pocket costs."
+    },
+    {
+      "tier": 2,
+      "includes": "$$ Preferred",
+      "tips": "Use tier 2 preferred brand name drugs to help reduce out-of-pocket costs. They will generally have lower copayments than non-preferred brand name drugs"
+    },
+    {
+      "tier": 3,
+      "includes": $$$ Non-preferred",
+      "tips": "Many tier 3 drugs have lower cost options in tier 1 or 2. Ask your prescriber if the drugs in the lower tiers could work for you and help reduce your out-of-pocket costs."
+    },
+    {
+      "tier": 4,
+      "includes": $$$$ Specialty",
+      "tips": "These drugs are sometimes used for complex and chronic conditions and may require special monitoring and handling. They are generally highest in copay and cost."
+    },
+    {
+      "tier": "CM",
+      "includes": "Oral chemotherapy",
+      "tips": "Drugs used for oral chemotherapy may have a designated copay or coinsurance based on state laws or client preference."
+    }
+  ],
+  "acronyms": {
+    "PA": "Prior Authorization"
+  },
+  "tiers": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    "CM"
+  ]
+}
+
+Original Response (first 2000 chars):
+Here is the drug information extracted as JSON:
+
+{
+  "drug_table": [
+    {
+      "tier": 0,
+      "includes": "$0 Preventive",
+      "tips": "Use tier 0 preventive care drugs taken on a regular basis to help prevent the onset or recurrence of a disease or condition."
+    },
+    {
+      "tier": 1,
+      "includes": "$ Generic",
+      "tips": "Use tier 1 generic drugs instead of brand name drugs to help reduce your out-of-pocket costs."
+    },
+    {
+      "tier": 2,
+      "includes": "$$ Preferred",
+      "tips": "Use tier 2 preferred brand name drugs to help reduce out-of-pocket costs. They will generally have lower copayments than non-preferred brand name drugs"
+    },
+    {
+      "tier": 3,
+      "includes": $$$ Non-preferred",
+      "tips": "Many tier 3 drugs have lower cost options in tier 1 or 2. Ask your prescriber if the drugs in the lower tiers could work for you and help reduce your out-of-pocket costs."
+    },
+    {
+      "tier": 4,
+      "includes": $$$$ Specialty",
+      "tips": "These drugs are sometimes used for complex and chronic conditions and may require special monitoring and handling. They are generally highest in copay and cost."
+    },
+    {
+      "tier": "CM",
+      "includes": "Oral chemotherapy",
+      "tips": "Drugs used for oral chemotherapy may have a designated copay or coinsurance based on state laws or client preference."
+    }
+  ],
+  "acronyms": {
+    "PA": "Prior Authorization"
+  },
+  "tiers": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    "CM"
+  ]
+}
+================================================================================
+
