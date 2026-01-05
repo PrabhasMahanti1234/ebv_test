@@ -14,6 +14,8 @@ import json
 from functools import wraps
 from pathlib import Path
 from config import MAX_RETRIES, BACKOFF_MULTIPLIER, RATE_LIMIT_DELAY, COST_TRACKER, BEDROCK_COST_PER_1K_TOKENS, MISTRAL_OCR_COST_PER_1K_PAGES, bedrock
+from langdetect import detect
+from langdetect.lang_detect_exception import LangDetectException
 
 logger = logging.getLogger(__name__)
 
@@ -180,9 +182,9 @@ def clean_drug_name(text: str) -> str:
     cleaned_text = re.sub(r'\\', ' ', cleaned_text)  # Remove stray backslashes
     
     # Step 5: Scientific notation normalization
-    cleaned_text = re.sub(r'(\d+)\s*X\s*10\s*EXP\s*(\d+)', r'\1×10^\2', cleaned_text, flags=re.IGNORECASE)
-    cleaned_text = re.sub(r'(\d+)\s*EXP\s*(\d+)', r'\1×10^\2', cleaned_text)
-    cleaned_text = re.sub(r'(\d+)\s*\*\s*10\s*\^\s*(\d+)', r'\1×10^\2', cleaned_text)
+    cleaned_text = re.sub(r'(\d+)\s*X\s*10\s*EXP\s*(\d+)', r'\1Ã—10^\2', cleaned_text, flags=re.IGNORECASE)
+    cleaned_text = re.sub(r'(\d+)\s*EXP\s*(\d+)', r'\1Ã—10^\2', cleaned_text)
+    cleaned_text = re.sub(r'(\d+)\s*\*\s*10\s*\^\s*(\d+)', r'\1Ã—10^\2', cleaned_text)
     
     # Step 6: Remove HTML tags
     cleaned_text = re.sub(r'<[^>]+>', '', cleaned_text)
@@ -235,6 +237,11 @@ def extract_requirements_from_drug_name(drug_name_cell):
     requirement_patterns = [
         r'\s+(DL,LA|LA,DL|DL|LA|AV,DL|DL,AV|MO|AV|CI|PDS|CI,DL$)',
         r'\s+(PA|ST|QL|BvD|SP|TI|NM)(?:\s|$)',
+        # Capture parenthesized requirements like (QL), (PA, QL), (Gen 4), (Gen 5)
+        # Matches content inside parens that looks like codes or "Gen X", separated by commas/spaces
+        r'\s*\(((?:PA|ST|QL|SP|NM|VAC|Gen\s*\d+|[A-Z]{2,})(?:,\s*(?:PA|ST|QL|SP|NM|VAC|Gen\s*\d+|[A-Z]{2,}))*)\)',
+        # Capture square bracket requirements like [NP], [SP]
+        r'\s*\[([^\]]+)\]',
         # This regex says: match 2-3 letters, UNLESS those letters are a unit like MG or ML
         fr'\s+(?!(?:{units_not_to_ignore})\b)([A-Z]{{2,3}}(?:,[A-Z]{{2,3}})*)$',
         r'\s*\^?\s*\{([^}]+)\}\s*\$?\s*$'
@@ -249,6 +256,12 @@ def extract_requirements_from_drug_name(drug_name_cell):
         for match in matches:
             val = match.group(0).strip()
             if val:
+                # Strip parentheses if present
+                if val.startswith('(') and val.endswith(')'):
+                    val = val[1:-1].strip()
+                elif val.startswith('[') and val.endswith(']'):
+                    val = val[1:-1].strip()
+                
                 extracted_requirements.append(val)
                 # Remove the matched requirement from the drug name
                 cleaned_name = cleaned_name.replace(match.group(0), '').strip()
@@ -383,8 +396,8 @@ def normalize_requirement_code(code: str) -> str:
 def determine_coverage_status(requirements_text, tier_text, conn, state_name, payer_name):
     """
     Determine coverage status by checking requirements in expansion table.
-    - If ANY requirement is 'Covered with Conditions' → return 'Covered with Conditions'
-    - If ALL requirements are 'Covered' → return 'Covered'
+    - If ANY requirement is 'Covered with Conditions' â†’ return 'Covered with Conditions'
+    - If ALL requirements are 'Covered' â†’ return 'Covered'
     - Default to 'Covered' if no requirements
     - No hard-coding of requirement codes or statuses; all logic is table-driven.
     """
@@ -527,10 +540,10 @@ Given the following expansion text: "{expansion_text}", decide if the drug is:
 - "Covered" (if no restrictions are indicated)
 
 Task: Decide if the drug is:
-- "Covered with Conditions" → if it requires prior authorization, step therapy, quantity limits, specialty restrictions, or is non-formulary
-- "Covered" → if no restrictions are indicated
+- "Covered with Conditions" â†’ if it requires prior authorization, step therapy, quantity limits, specialty restrictions, or is non-formulary
+- "Covered" â†’ if no restrictions are indicated
 
-⚠️ Important: Respond with ONLY one of these exact phrases:
+âš ï¸ Important: Respond with ONLY one of these exact phrases:
 - Covered
 - Covered with Conditions
 No explanation, no extra text.
@@ -650,9 +663,9 @@ def clean_special_chars(cleaned_text):
     cleaned_text = re.sub(r'\\', ' ', cleaned_text)  # Remove stray backslashes
     
     # Step 5: Scientific notation normalization
-    cleaned_text = re.sub(r'(\d+)\s*X\s*10\s*EXP\s*(\d+)', r'\1×10^\2', cleaned_text, flags=re.IGNORECASE)
-    cleaned_text = re.sub(r'(\d+)\s*EXP\s*(\d+)', r'\1×10^\2', cleaned_text)
-    cleaned_text = re.sub(r'(\d+)\s*\*\s*10\s*\^\s*(\d+)', r'\1×10^\2', cleaned_text)
+    cleaned_text = re.sub(r'(\d+)\s*X\s*10\s*EXP\s*(\d+)', r'\1Ã—10^\2', cleaned_text, flags=re.IGNORECASE)
+    cleaned_text = re.sub(r'(\d+)\s*EXP\s*(\d+)', r'\1Ã—10^\2', cleaned_text)
+    cleaned_text = re.sub(r'(\d+)\s*\*\s*10\s*\^\s*(\d+)', r'\1Ã—10^\2', cleaned_text)
     
     # Step 6: Remove HTML tags
     cleaned_text = re.sub(r'<[^>]+>', '', cleaned_text)
@@ -707,21 +720,19 @@ def parse_complex_drug_name(drug_name_full: str):
         # Return the original name in the expected structure if it's a kit
         return [{'base_name': drug_name_full, 'strengths': [], 'brand_name': None}]
 
-    # --- NEW ROBUST REGEX ---
     # This regex is designed to capture a wide variety of strength formats,
-    # including decimals, slashes for concentrations, and different units.
+    # including decimals, slashes for concentrations (e.g., 10mg/5ml), and
+    # compound units (e.g., 12mcg/hr).
     strength_pattern = re.compile(
-        r'\b(\d*\.?\d+\s*(?:mcg|mg|gm|g|ml|hr|%|unit(?:s)?)(?:/[\d.]+\s*(?:ml|hr|mg))?)\b', 
+        r'\b(\d*\.?\d+\s*(?:mcg|mg|gm|g|ml|hr|%|unit(?:s)?)(?:/(?:\d*\.?\d+)?\s*(?:mcg|mg|ml|hr|g|gm))?)\b',
         re.IGNORECASE
     )
-    
-    # --- SPLITTING LOGIC ---
+     
     # Use a more robust delimiter that looks for a semicolon or a clear drug form.
     # The capturing group ensures the forms (TABS, SOLN, etc.) are kept.
     delimiters = r';\s*|\s+(TABS|SOLN|CHEW|CP12|SUSP|TB12|CPEP|TBEC|PT24|SUBL|CONC)\b'
     drug_parts = re.split(delimiters, drug_name_full)
-    
-    # --- FIXED RECONSTRUCTION LOGIC ---
+     
     # This new loop correctly handles the `None` values that re.split can produce
     # when using a regex with both capturing and non-capturing groups.
     reconstructed_parts = []
@@ -839,3 +850,19 @@ def transform_viewer_url(url: str) -> str:
 
     # If no rules match, return the original URL
     return url
+
+def is_english(text: str) -> bool:
+    """
+    Checks if a given string is detected as English.
+    Returns True if English, False otherwise. Handles errors gracefully.
+    """
+    if not text or not isinstance(text, str) or not text.strip():
+        return False # Not enough text to evaluate
+
+    try:
+        # The detect() function returns the language code (e.g., 'en', 'es')
+        return detect(text) == 'en'
+    except LangDetectException:
+        # This can happen on very short or ambiguous text (like "PA" or "1").
+        # We will assume these are valid, as they are not definitively non-English.
+        return True

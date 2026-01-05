@@ -20,6 +20,7 @@ from mistralai.models import DocumentURLChunk
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from io import BytesIO
 from pathlib import Path
+from utils import is_english
 
 from config import (
     PDF_FOLDER, PROCESS_COUNT, MISTRAL_API_KEY, BEDROCK_MODEL_ID, BEDROCK_COST_PER_1K_TOKENS,bedrock,
@@ -37,17 +38,106 @@ from utils import (
 
 logger = logging.getLogger(__name__)
 
-MAX_PDF_PAGES = 2000
-PROMPTS_DIR = Path(__file__).parent / "prompts"
-DEFAULT_PROMPT_FILE = PROMPTS_DIR / "default.txt"
-PROMPT_MAPPINGS_FILE = PROMPTS_DIR / "prompt_mappings.json"
-ENHANCED_PDF_DPI = 300  # High resolution for better table recognition
-USE_ENHANCED_PDF = True  # Toggle to enable/disable PDF enhancement before OCR
+DRUG_EXTRACTION_SCHEMA = ocr_annotation_schema = {
+  "type": "json_schema",
+  "json_schema": {
+    "name": "drug_extraction_schema",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "drug_table": {
+          "type": "array",
+          "description": "Extract ONLY actual formulary drug rows. Skip index, TOC, category-only, or header rows.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "drug_name": {
+                "type": "string",
+                "description": "Exact drug or therapeutic name as shown in formulary (include form/strength if present)."
+              },
 
-# Cache prompts in memory to avoid repeated file reads
-_PROMPT_CACHE = {}
-_AVAILABLE_PROMPTS = {}
-_PROMPT_MAPPINGS = {}
+              "drug_tier": {
+                "type": ["string", "null"],
+                "description": "Tier value if present (numeric, letter, $0, or blank)."
+              },
+
+              "drug_requirements": {
+                "type": ["string", "null"],
+                "description": "Flattened requirements string for compatibility (e.g., 'B; N', 'PA; QL (30/day)')."
+              },
+
+              "vdp_flags": {
+                "type": ["object", "null"],
+                "description": "Structured representation for Texas VDP rows.",
+                "properties": {
+                  "brand_generic_other": {
+                    "type": ["string", "null"],
+                    "description": "Column 1 value: B, G, or O."
+                  },
+                  "preference_status": {
+                    "type": ["string", "null"],
+                    "description": "Column 3 value: P, N, R, or NR."
+                  }
+                }
+              },
+
+              "pa_form_link": {
+                "type": ["string", "null"],
+                "description": "PA Form hyperlink if present in VDP tables."
+              },
+
+              "category": {
+                "type": ["string", "null"],
+                "description": "Therapeutic category header if applicable."
+              },
+
+              "page_number": {
+                "type": ["integer", "null"],
+                "description": "Actual page number in the source document."
+              }
+            },
+            "required": ["drug_name"]
+          }
+        },
+
+        "acronyms": {
+          "type": "array",
+          "description": "Legend or abbreviation definitions found in the document.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "acronym": { "type": "string" },
+              "expansion": { "type": "string" },
+              "explanation": { "type": ["string", "null"] }
+            },
+            "required": ["acronym", "expansion"]
+          }
+        },
+
+        "tiers": {
+          "type": "array",
+          "description": "Tier or color legend definitions if present.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "acronym": { "type": "string" },
+              "expansion": { "type": "string" },
+              "explanation": { "type": ["string", "null"] }
+            },
+            "required": ["acronym", "expansion"]
+          }
+        }
+      },
+      "required": ["drug_table", "acronyms", "tiers"]
+    }
+  }
+}
+
+
+MAX_PDF_PAGES = 2000
+ENHANCED_PDF_DPI = 200  # High resolution for better table recognition
+USE_ENHANCED_PDF = False  # Toggle to enable/disable PDF enhancement before OCR (DISABLED for speed)
+
 
 
 # json5 is not a standard library, so we handle its absence gracefully.
@@ -81,10 +171,9 @@ except ImportError:
 def initialize_worker():
     """
     An initializer function for each worker in the ProcessPoolExecutor.
-    This ensures that the prompt configuration is loaded only once per process.
     """
-    #logger.info(f"Initializing worker process {os.getpid()}...")
-    _load_prompts_config()
+    pass # logging config removed
+    pass # _load_prompts_config() removed
 
 def enhance_pdf(pdf_input, dpi=ENHANCED_PDF_DPI):
     """
@@ -263,50 +352,159 @@ def _extract_partial_json_arrays(json_string: str) -> dict:
     """
     default_output = {"drug_table": [], "acronyms": [], "tiers": []}
 
-    # Pattern to match array sections: "key": [...]
-    array_pattern = r'"(\w+)":\s*(\[[\s\S]*?\])'
-
+    # Pattern to match array sections: "key": [...] (with proper brace matching)
+    # This handles nested arrays and objects better
     extracted = {}
 
-    for match in re.finditer(array_pattern, json_string):
-        key = match.group(1)
-        array_str = match.group(2)
-
-        if key not in ['drug_table', 'acronyms', 'tiers']:
-            continue
-
-        try:
-            # Try to parse just this array
-            # First fix trailing commas in the array
-            array_str = re.sub(r',\s*(\])', r'\1', array_str)
-            # Try to extract valid JSON objects/strings from the array
-            parsed_array = json.loads(array_str)
-            extracted[key] = parsed_array
-        except:
-            # If parsing fails, try to extract objects using regex
-            if key == 'drug_table':
-                # Extract drug objects: {"drug_name": "...", "drug_tier": "...", ...}
-                drug_objects = []
-                object_pattern = r'\{[^}]*"drug_name"[^}]*\}'
-                for obj_match in re.finditer(object_pattern, array_str):
-                    try:
-                        obj_str = obj_match.group(0)
-                        obj_str = re.sub(r',\s*(\})', r'\1', obj_str)
-                        obj = json.loads(obj_str)
-                        drug_objects.append(obj)
-                    except:
-                        continue
-                extracted[key] = drug_objects
-            else:
-                # For acronyms and tiers, try simpler extraction
-                extracted[key] = []
-
-    # Fill missing keys with empty lists
     for key in ['drug_table', 'acronyms', 'tiers']:
-        if key not in extracted:
+        try:
+            # Find the key and its array
+            key_pattern = rf'"{key}"\s*:\s*\['
+            match = re.search(key_pattern, json_string)
+            if not match:
+                extracted[key] = []
+                continue
+            
+            # Find the matching closing bracket
+            start_pos = match.end() - 1  # Position of opening [
+            bracket_count = 0
+            end_pos = -1
+            
+            for i in range(start_pos, len(json_string)):
+                if json_string[i] == '[':
+                    bracket_count += 1
+                elif json_string[i] == ']':
+                    bracket_count -= 1
+                    if bracket_count == 0:
+                        end_pos = i
+                        break
+            
+            if end_pos == -1:
+                extracted[key] = []
+                continue
+            
+            # Extract the array string including brackets
+            array_str = json_string[start_pos:end_pos + 1]
+            
+            # Clean and parse
+            array_str = re.sub(r',\s*(\])', r'\1', array_str)  # Remove trailing commas
+            array_str = re.sub(r',\s*(\})', r'\1', array_str)  # Remove trailing commas before }
+            
+            try:
+                parsed_array = json.loads(array_str)
+                extracted[key] = parsed_array if isinstance(parsed_array, list) else []
+            except json.JSONDecodeError:
+                # If still failing, try object-by-object extraction for drug_table
+                if key == 'drug_table':
+                    drug_objects = []
+                    # More flexible pattern that handles nested braces
+                    brace_depth = 0
+                    current_obj = ""
+                    in_object = False
+                    
+                    for char in array_str[1:-1]:  # Skip the outer [ ]
+                        if char == '{':
+                            brace_depth += 1
+                            in_object = True
+                            current_obj += char
+                        elif char == '}':
+                            current_obj += char
+                            brace_depth -= 1
+                            if brace_depth == 0 and in_object:
+                                # Try to parse this object
+                                try:
+                                    clean_obj = re.sub(r',\s*\}', '}', current_obj)
+                                    obj = json.loads(clean_obj)
+                                    if 'drug_name' in obj:
+                                        drug_objects.append(obj)
+                                except:
+                                    pass
+                                current_obj = ""
+                                in_object = False
+                        elif in_object:
+                            current_obj += char
+                    
+                    extracted[key] = drug_objects
+                else:
+                    # For acronyms and tiers, try simple string extraction
+                    if key == 'acronyms':
+                        # Try to extract dictionary objects
+                        try:
+                            items = re.findall(r'\{[^}]+\}', array_str)
+                            acronym_list = []
+                            for item in items:
+                                try:
+                                    acronym_list.append(json.loads(item))
+                                except:
+                                    pass
+                            extracted[key] = acronym_list
+                        except:
+                            extracted[key] = []
+                    else:
+                        extracted[key] = []
+        except Exception as e:
+            logger.debug(f"Failed to extract {key}: {e}")
             extracted[key] = []
 
     return extracted
+
+
+# def robust_json_repair(json_string: str):
+#     """
+#     Attempts to repair common JSON errors from LLMs, primarily focusing on trailing commas,
+#     escaping backslashes, and stripping non-JSON content before parsing.
+#     """
+#     default_output = {"drug_table": [], "acronyms": [], "tiers": []}
+
+#     if not isinstance(json_string, str) or not json_string.strip():
+#         return default_output
+
+#     # 1. Find the start and end of the main JSON object.
+#     start_index = json_string.find('{')
+#     end_index = json_string.rfind('}')
+
+#     if start_index == -1 or end_index == -1:
+#         logger.warning("Could not find a JSON object in the LLM response.")
+#         return default_output
+
+#     # Extract the JSON part of the string.
+#     json_string = json_string[start_index : end_index + 1]
+
+#     # 2. Escape every backslash by doubling it.
+#     json_string = json_string.replace("\\", "\\\\")
+
+#     # 3. Fix the most common LLM error: trailing commas before '}' or ']'.
+#     json_string = re.sub(r',\s*([}\]])', r'\1', json_string)
+
+#     # 4. Attempt to parse the cleaned JSON.
+#     try:
+#         # Use json5 for more lenient parsing if available.
+#         if JSON5_AVAILABLE:
+#             try:
+#                 parsed = json5.loads(json_string)
+#                 return _sanitize_output(parsed, default_output)
+#             except Exception as e:
+#                 logger.debug(f"json5 parsing failed, falling back to standard json: {e}")
+
+#         # Fallback to the standard json library.
+#         parsed = json.loads(json_string)
+#         return _sanitize_output(parsed, default_output)
+
+#     except json.JSONDecodeError as e:
+#         logger.error(f"JSON parsing failed definitively after repair attempts: {e}")
+#         logger.debug(f"Problematic JSON string for debugging: {json_string}")
+
+#         # Log the failed JSON to a file for analysis.
+#         try:
+#             with open("failed_llm_json.log", "a", encoding="utf-8") as f:
+#                 f.write(f"=== JSON Parse Error ===\n")
+#                 f.write(f"Original String: {json_string}\n")
+#                 f.write(f"{'='*50}\n\n")
+#         except Exception as log_error:
+#             logging.warning(f"Failed to write to debug log: {log_error}")
+
+#         return default_output
+
 
 
 def robust_json_repair(json_string: str):
@@ -319,24 +517,66 @@ def robust_json_repair(json_string: str):
     if not isinstance(json_string, str) or not json_string.strip():
         return default_output
 
-    # 1. Find the start and end of the main JSON object.
-    start_index = json_string.find('{')
-    end_index = json_string.rfind('}')
+    original_string = json_string
+    
+    # 1. Remove markdown code fences FIRST - LLMs often ignore our instructions
+    lines = json_string.split('\n')
+    cleaned_lines = []
+    for line in lines:
+        stripped = line.strip()
+        # Skip lines that are ONLY markdown fences
+        if stripped in ['```', '```json', '```JSON']:
+            continue
+        # Remove inline markdown fences from the start/end of lines
+        if stripped.startswith('```'):
+            line = line.replace('```json', '').replace('```JSON', '').replace('```', '', 1)
+        if stripped.endswith('```'):
+            line = line[:line.rfind('```')]
+        if line.strip():  # Only keep non-empty lines
+            cleaned_lines.append(line)
+    json_string = '\n'.join(cleaned_lines)
 
-    if start_index == -1 or end_index == -1:
+    # 2. Find the FIRST complete JSON object (not first { to last })
+    # This handles "Extra data" errors from multiple JSON objects
+    start_index = json_string.find('{')
+    if start_index == -1:
         logger.warning("Could not find a JSON object in the LLM response.")
         return default_output
-
-    # Extract the JSON part of the string.
+    
+    # Find the matching closing brace for the first opening brace
+    brace_count = 0
+    end_index = -1
+    for i in range(start_index, len(json_string)):
+        if json_string[i] == '{':
+            brace_count += 1
+        elif json_string[i] == '}':
+            brace_count -= 1
+            if brace_count == 0:
+                end_index = i
+                break
+    
+    if end_index == -1:
+        logger.warning("Could not find matching closing brace for JSON object.")
+        return default_output
+    
+    # Extract ONLY the first complete JSON object
     json_string = json_string[start_index : end_index + 1]
-
-    # 2. Escape every backslash by doubling it.
+    
+    # 3. Escape every backslash by doubling it - BUT be careful with already escaped quotes
+    # First, protect already-escaped quotes
+    json_string = json_string.replace('\\"', '<<<ESCAPED_QUOTE>>>')
     json_string = json_string.replace("\\", "\\\\")
+    # Restore the escaped quotes
+    json_string = json_string.replace('<<<ESCAPED_QUOTE>>>', '\\"')
 
-    # 3. Fix the most common LLM error: trailing commas before '}' or ']'.
+    # 4. Fix the most common LLM error: trailing commas before '}' or ']'.
     json_string = re.sub(r',\s*([}\]])', r'\1', json_string)
+    
+    # 5. Fix missing commas between objects in arrays (common LLM error)
+    # Pattern: }{  should be },{
+    json_string = re.sub(r'\}\s*\{', '},{', json_string)
 
-    # 4. Attempt to parse the cleaned JSON.
+    # 6. Attempt to parse the cleaned JSON.
     try:
         # Use json5 for more lenient parsing if available.
         if JSON5_AVAILABLE:
@@ -351,17 +591,66 @@ def robust_json_repair(json_string: str):
         return _sanitize_output(parsed, default_output)
 
     except json.JSONDecodeError as e:
-        logger.error(f"JSON parsing failed definitively after repair attempts: {e}")
-        logger.debug(f"Problematic JSON string for debugging: {json_string}")
+        logger.error(f"â Œ JSON parsing failed definitively after repair attempts: {e}")
+        logger.error(f"   Error location: Line {e.lineno}, Column {e.colno}")
+        
+        # TRY ONE MORE TIME: Maybe our brace matching was wrong, try simpler approach
+        # Look for drug_table, acronyms, tiers arrays in the original string
+        logger.warning("âš ï¸  Trying alternative extraction from original response...")
+        try:
+            # Try to find and parse just the outermost JSON in original string
+            alt_start = original_string.find('{')
+            if alt_start != -1:
+                # Find content that looks like our expected structure
+                if '"drug_table"' in original_string or '"acronyms"' in original_string:
+                    # Try to extract up to the first occurrence of closing the main object
+                    # This is a heuristic approach
+                    test_string = original_string[alt_start:]
+                    # Try parsing progressively larger chunks
+                    for attempt_end in range(len(test_string) - 1, max(0, len(test_string) - 500), -10):
+                        if test_string[attempt_end] == '}':
+                            try:
+                                test_json = test_string[:attempt_end + 1]
+                                # Quick cleanup
+                                test_json = re.sub(r',\s*([}\]])', r'\1', test_json)
+                                parsed_alt = json.loads(test_json)
+                                if isinstance(parsed_alt, dict):
+                                    result = _sanitize_output(parsed_alt, default_output)
+                                    if result.get('drug_table') or result.get('acronyms'):
+                                        logger.info(f"âœ… Alternative parsing succeeded! Found {len(result.get('drug_table', []))} drugs")
+                                        return result
+                            except:
+                                continue
+        except Exception as alt_error:
+            logger.debug(f"Alternative extraction also failed: {alt_error}")
 
         # Log the failed JSON to a file for analysis.
         try:
             with open("failed_llm_json.log", "a", encoding="utf-8") as f:
-                f.write(f"=== JSON Parse Error ===\n")
-                f.write(f"Original String: {json_string}\n")
-                f.write(f"{'='*50}\n\n")
+                f.write(f"=== JSON Parse Error at {time.strftime('%Y-%m-%d %H:%M:%S')} ===\n")
+                f.write(f"Error: {e}\n")
+                f.write(f"Error Line {e.lineno}, Column {e.colno}\n")
+                f.write(f"Problematic segment around error:\n")
+                # Show lines around the error
+                lines = json_string.split('\n')
+                if e.lineno and 0 < e.lineno <= len(lines):
+                    start_line = max(0, e.lineno - 3)
+                    end_line = min(len(lines), e.lineno + 2)
+                    for i in range(start_line, end_line):
+                        marker = " >>> " if i == e.lineno - 1 else "     "
+                        f.write(f"{marker}Line {i+1}: {lines[i]}\n")
+                f.write(f"\nCleaned JSON String:\n{json_string}\n")
+                f.write(f"\nOriginal Response (first 2000 chars):\n{original_string[:2000]}\n")
+                f.write(f"{'='*80}\n\n")
         except Exception as log_error:
-            logging.warning(f"Failed to write to debug log: {log_error}")
+            logger.warning(f"Failed to write to debug log: {log_error}")
+        
+        # TRY LAST-RESORT EXTRACTION using regex to find individual drug records
+        logger.warning("âš ï¸  Attempting last-resort partial JSON extraction...")
+        partial_data = _extract_partial_json_arrays(original_string)
+        if partial_data and partial_data.get('drug_table'):
+            logger.info(f"âœ… Partial extraction recovered {len(partial_data['drug_table'])} drugs!")
+            return partial_data
 
         return default_output
 
@@ -420,27 +709,32 @@ def _is_extracted_data_from_index_page(drug_table: List[dict]) -> bool:
     page_number_ratio = page_number_pattern_count / total_records
     missing_both_ratio = missing_both_count / total_records
     category_ratio = category_header_count / total_records
+    
+    # DEBUG: Log the ratios for diagnosis
+    logger.info(f"🔍 Index detection stats: total={total_records}, page_num_pattern={page_number_pattern_count} ({page_number_ratio:.1%}), missing_both={missing_both_count} ({missing_both_ratio:.1%}), category_headers={category_header_count} ({category_ratio:.1%})")
 
     # If 40% or more entries have a clear page number pattern, it's an index.
     if page_number_ratio >= 0.4:
-        logger.info(f"Index page detected: {page_number_ratio:.1%} of entries have page number patterns.")
+        logger.info(f"⚠️ Index page detected: {page_number_ratio:.1%} of entries have page number patterns.")
         return True
 
-    # If 95% or more entries are missing BOTH tier and requirements, it's an index.
-    if missing_both_ratio >= 0.95:
-        logger.info(f"Index page detected: {missing_both_ratio:.1%} of entries missing both tier and requirements.")
-        return True
+    # DISABLED: This check was too aggressive - disabled for now
+    # if missing_both_ratio >= 0.98:
+    #     logger.info(f"Index page detected: {missing_both_ratio:.1%} of entries missing both tier and requirements.")
+    #     return True
 
     # If a high percentage of entries are category headers.
     if category_ratio >= 0.6:
-        logger.info(f"Index page detected: {category_ratio:.1%} of entries are category headers.")
+        logger.info(f"⚠️ Index page detected: {category_ratio:.1%} of entries are category headers.")
         return True
 
     # A combination of page numbers and missing data is also a strong signal.
-    if page_number_ratio >= 0.2 and missing_both_ratio >= 0.7:
-        logger.info(f"Index page detected: Page numbers ({page_number_ratio:.1%}) + missing data ({missing_both_ratio:.1%}).")
+    # FIXED: Increased missing_both_ratio threshold from 0.7 to 0.85 to be less aggressive
+    if page_number_ratio >= 0.2 and missing_both_ratio >= 0.85:
+        logger.info(f"⚠️ Index page detected: Page numbers ({page_number_ratio:.1%}) + missing data ({missing_both_ratio:.1%}).")
         return True
-
+    
+    logger.info(f"✅ NOT an index page - passing through")
     return False
 
 def _consolidate_and_clean_drug_table(drug_table: List[dict]) -> List[dict]:
@@ -748,19 +1042,50 @@ def is_index_page(markdown: str) -> bool:
     Returns True if index, False otherwise.
     """
 
-    negative_keywords = ['drug tier', 'coverage details', 'requirements', 'limitations', 'dosage form']
     lower_markdown = markdown.lower()
+    
+    if 'drug name' in lower_markdown and ('tier' in lower_markdown or 'requirements' in lower_markdown):
+        return False
+    lines = markdown.splitlines()
+    upper_markdown = markdown.upper()
+    
+    # === CRITICAL: Check for "Alphabetical Index" with actual drug data FIRST ===
+    # Many formularies title their main drug list "Alphabetical Index" even though it contains actual drugs
+    # This check MUST run before generic "index" keyword matching
+    if 'alphabetical index' in lower_markdown:
+        # Check if it has actual drug data (tier values, dosage forms, requirements)
+        has_tier_column = 'tier' in lower_markdown and '|' in lower_markdown
+        has_category_column = 'category' in lower_markdown and '|' in lower_markdown  # Hennepin Health specific
+        has_special_code_column = 'special code' in lower_markdown and '|' in lower_markdown  # Hennepin Health specific
+        has_dosage_forms = any(form in lower_markdown for form in ['tab', 'cap', 'soln', 'inj', 'mg', 'mcg', 'susp', 'cream'])
+        has_requirements = any(req in lower_markdown for req in ['ql', 'pa', 'st', 'ol', 'inf', 'vac', 'otc', '90ds'])
+        
+        # If it has a tier column AND either dosage forms OR requirements OR special columns, it's a DRUG PAGE
+        if has_tier_column and (has_dosage_forms or has_requirements or has_category_column or has_special_code_column):
+            logger.info(f"âœ… 'Alphabetical Index' page has actual drug data. This is a DRUG PAGE, not an index!")
+            return False
+    
+    # === Check for specific payer table structures (Hennepin Health, etc.) ===
+    # If we detect specific column patterns that indicate drug data pages, it's NOT an index
+    hennepin_health_pattern = ('drug name' in lower_markdown and 'special code' in lower_markdown and 
+                                'tier' in lower_markdown and 'category' in lower_markdown and '|' in lower_markdown)
+    
+    if hennepin_health_pattern:
+        logger.info("âœ… Detected Hennepin Health table structure (Drug Name | Special Code | Tier | Category). This is a DRUG PAGE, not an index!")
+        return False
+    
+    # === Check for drug page indicators BEFORE index keywords ===
+    negative_keywords = ['drug tier', 'coverage details', 'requirements', 'limitations', 'dosage form', 'special code']
     if any(keyword in lower_markdown for keyword in negative_keywords):
         # A high number of table headers for requirements is a very strong signal of a drug page.
         if lower_markdown.count('|') > 20 and 'drug name' in lower_markdown:
              logger.info("Detected drug page characteristics (negative keywords, table structure). Not an index.")
              return False
 
-
-    lines = markdown.splitlines()
-    index_keywords = ['index', 'table of contents', 'contents', 'formulary index']
-    upper_markdown = markdown.upper()
-
+    # === Check for specific index keywords (but NOT "alphabetical index" which was already handled) ===
+    # FIXED: Made more specific to avoid false positives on "Alphabetical Index" drug pages
+    index_keywords = ['table of contents', 'formulary index']  # Removed generic 'index' and 'contents'
+    
     for keyword in index_keywords:
         if keyword.upper() in upper_markdown:
             for line in lines[:10]:  # Check first 10 lines
@@ -840,8 +1165,9 @@ def is_index_page(markdown: str) -> bool:
 
     if len(content_lines) > 0:
         index_line_ratio = index_lines / len(content_lines)
-        # If at least 30% of content lines match the index pattern, it's likely an index page
-        if index_line_ratio >= 0.3:
+        # FIXED: Increased threshold from 30% to 50% to avoid false positives on drug pages
+        # If at least 50% of content lines match the index pattern, it's likely an index page
+        if index_line_ratio >= 0.5:
             logger.info(f"Detected index page based on line patterns: {index_line_ratio:.0%} match.")
             return True
 
@@ -857,21 +1183,26 @@ def is_index_page(markdown: str) -> bool:
 
     # === NEW: Detect table-based index with mostly empty cells (except drug name and page number) ===
     # This catches index pages that are formatted as tables but lack tier/requirement data
+    # FIXED: Made less aggressive for formularies like Hennepin Health where some columns may be empty
     table_rows = [line for line in lines if '|' in line and not line.strip().startswith(':')]
     if len(table_rows) > 5:  # Need at least a few rows to analyze
         empty_cell_pattern = re.compile(r'\|\s*\|')  # Adjacent pipes with only whitespace
         rows_with_empty_cells = sum(1 for row in table_rows if empty_cell_pattern.search(row))
 
         # Also check for tables with very few columns filled (e.g., only 2 out of 5)
+        # FIXED: Increased threshold from "non_empty_cells <= 2" to check for truly sparse tables
         rows_with_mostly_empty = 0
         for row in table_rows:
             cells = [cell.strip() for cell in row.split('|')]
             non_empty_cells = sum(1 for cell in cells if cell)
-            if len(cells) > 3 and non_empty_cells <= 2:  # Most cells empty
+            # FIXED: Only flag if less than 2 cells are filled (was <= 2, now < 2)
+            # This allows tables with Drug Name + Tier (2 columns) to pass through
+            if len(cells) > 4 and non_empty_cells < 2:  # Most cells empty (changed from <= 2)
                 rows_with_mostly_empty += 1
 
         empty_ratio = (rows_with_empty_cells + rows_with_mostly_empty) / len(table_rows)
-        if empty_ratio >= 0.6:  # 60% or more rows have mostly empty cells
+        # FIXED: Increased threshold from 0.6 (60%) to 0.8 (80%) to be less aggressive
+        if empty_ratio >= 0.8:  # 80% or more rows have mostly empty cells (was 60%)
             logger.info(f"Detected index page: Table with {empty_ratio:.0%} of rows having mostly empty cells.")
             return True
 
@@ -936,16 +1267,15 @@ def is_aca_drug_list_page(markdown: str) -> bool:
     return False
 
 @rate_limited_api_call
-def extract_structured_data_with_llm(page_markdown: str, payer_name: str = None):
+def extract_structured_data_with_llm(page_markdown: str, mistral_client: Mistral, payer_name: str = None):
     """
-    Uses Claude 3 Haiku to parse markdown and extract structured drug data.
-    Implements a proper retry loop and robust exception handling.
+    Uses Mistral Chat with structured output to parse markdown and extract drug data.
     """
     costs = {'tokens': 0, 'cost': 0.0, 'calls': 1}
     default_output = {"drug_table": [], "acronyms": [], "tiers": []}
 
-    if not bedrock:
-        logger.error("Bedrock client is not initialized. Cannot extract structured data.")
+    if not mistral_client:
+        logger.error("Mistral client is not provided. Cannot extract structured data.")
         return default_output, costs
 
     if is_index_page(page_markdown):
@@ -956,187 +1286,100 @@ def extract_structured_data_with_llm(page_markdown: str, payer_name: str = None)
         logger.info("Skipping LLM call for ACA Drug List/Preventative Medications page.")
         return default_output, {'tokens': 0, 'cost': 0.0, 'calls': 0}
 
-    system_prompt = get_payer_prompt(payer_name)
-    user_message = f"<INPUT_MARKDOWN>\n{page_markdown}\n</INPUT_MARKDOWN>"
+    user_message = f"Extract drug formulary information from the following text:\n\n{page_markdown}"
 
-    last_exception = None
 
     for attempt in range(MAX_RETRIES):
         try:
-            body = json.dumps({
-                "anthropic_version": "bedrock-2023-05-31",
-                "max_tokens": 4096,
-                "system": system_prompt,
-                "messages": [{"role": "user", "content": user_message}]
-            })
-            response = bedrock.invoke_model(body=body, modelId=BEDROCK_MODEL_ID)
+            response = mistral_client.chat.complete(
+                model="mistral-large-latest",
+    messages=[
+    {"role": "system", "content": (
+        "You are a professional medical data extractor. You will receive a page from a drug formulary. "
+        "IMPORTANT: Drug Tiers are often found in SECTION HEADERS above the drug list (e.g., 'Tier 1 - Generic', 'Tier 2'). "
+        "If a drug row does not have a specific tier column, you MUST use the most recent Section Header as the Tier for that drug. "
+        "CRITICAL EXCLUSION: Do NOT mistreat 'Therapeutic Categories' (e.g., 'Pain Relief', 'Cardiovascular', 'Inflammatory Disease') as the Drug Tier. "
+        "If the immediate header is a medical condition or class, LOOK HIGHER up the page for the true Tier Header (e.g. 'Tier 1', 'Generic', 'Preferred Brand'). "
+        "   - Map 'Generic' or 'Generics' -> 'Tier 1' (or T1)"
+        "   - Map 'Preferred Brand' -> 'Tier 2' (or T2)"
+        "   - Map 'Non-Preferred' -> 'Tier 3' (or T3)"
+        "   - Map 'Specialty' -> 'Tier 4' (or T4)"
+        "   - CRITICAL: Only apply these mappings if they appear in SECTION HEADERS."
+        "LAYOUT SPECIFIC: If the page has columns labeled 'Preferred' and 'Non-Preferred', treat these as TIERS. "
+        "   - Drugs under 'Preferred' -> Tier = 'Preferred' "
+        "   - Drugs under 'Non-Preferred' -> Tier = 'Non-Preferred' "
+        "If you absolutely cannot find a Tier Header (and it's not the Preferred/Non-Preferred layout), return null (empty) for the Tier field. "
+        "REQUIREMENTS extraction: "
+        "   - Check for codes in PARENTHESES (e.g. (QL), (PA)) or SQUARE BRACKETS (e.g. [NP], [SP], [DL]). "
+        "   - EXTRACT these codes into the 'Drug Edit' field. "
+        "   - Do NOT map [NP] or [SP] text to the Drug Tier field UNLESS it is clearly a column header. Keep them in Drug Edit. "
+        "   - Check for 'GEN 5' or 'Gen 5'. "
+        "Do NOT use the document title (e.g., '3-Tier Drug List') as the tier. "
+        "IMPORTANT: Some pages may have a 'Legend' or 'Introduction' at the top. Ignore the intro for drug rows, "
+        "but YOU MUST extract any 'Tier Definitions' or 'Keys' (like 'T1 = Tier 1', 'QL = Quantity Limit') "
+        "but YOU MUST extract any 'Tier Definitions' or 'Keys' (like 'T1 = Tier 1', 'QL = Quantity Limit') "
+        "and put them into the 'FormularyAbbreviations' list. "
+        "Extract every single drug listed in the tables below it. "
+        f"Output JSON matching this schema: {json.dumps(DRUG_EXTRACTION_SCHEMA)}"
+    )},
+    {"role": "user", "content": user_message}
+],
+                response_format={"type": "json_object", "schema": DRUG_EXTRACTION_SCHEMA},
+                temperature=0
+            )
 
-            raw_body = response.get('body').read()
-            # handle bytes or str
-            if isinstance(raw_body, (bytes, bytearray)):
-                try:
-                    response_body = json.loads(raw_body.decode('utf-8'))
-                except Exception:
-                    response_body = json.loads(raw_body.decode('latin-1'))
-            else:
-                response_body = json.loads(raw_body)
+            response_content = response.choices[0].message.content
 
-            response_text = response_body.get('content', [{}])[0].get('text', '')
-            usage = response_body.get('usage', {}) or {}
-            total_tokens = usage.get('input_tokens', 0) + usage.get('output_tokens', 0)
+            usage = response.usage
+            total_tokens = usage.total_tokens
             costs['tokens'] = total_tokens
-            costs['cost'] = (total_tokens / 1000.0) * BEDROCK_COST_PER_1K_TOKENS
+            costs['cost'] = (total_tokens / 1000.0) * 0.002 # Placeholder cost
 
-            logger.debug(f"Raw LLM response (first 500 chars): {response_text[:500]}...")
+            try:
+                structured_response = json.loads(response_content)
+            except json.JSONDecodeError:
+                logger.error("Failed to parse JSON response from Mistral.")
+                continue
 
-            # Use the robust repair and parsing function.
-            structured_data = robust_json_repair(response_text)
+            # Map to internal structure
+            drug_table = []
+            for item in structured_response.get("DrugInformation", []):
+                drug_table.append({
+                    "drug_name": item.get("Drug Name"),
+                    "drug_tier": item.get("drug tier"),
+                    "drug_requirements": item.get("requirements")
+                })
+
+            acronyms = []
+            for item in structured_response.get("FormularyAbbreviations", []):
+                acronyms.append({
+                    "acronym": item.get("Acronym"),
+                    "expansion": item.get("Expansion"),
+                    "explanation": item.get("Explanation")
+                })
+            
+            structured_data = {
+                "drug_table": drug_table,
+                "acronyms": acronyms,
+                "tiers": [] 
+            }
 
             logger.info(
                 f"Successfully processed page. Extracted: "
-                f"{len(structured_data.get('drug_table', []))} drugs, "
-                f"{len(structured_data.get('acronyms', []))} acronyms, "
-                f"{len(structured_data.get('tiers', []))} tiers."
+                f"{len(structured_data['drug_table'])} drugs, "
+                f"{len(structured_data['acronyms'])} acronyms."
             )
-
-            # Defensive filtering to remove non-English terms the LLM might have missed.
-            blocklist = {'nivel'}
-            for key in ['acronyms', 'tiers']:
-                if key in structured_data and isinstance(structured_data[key], list):
-                    filtered_list = []
-                    for item in structured_data[key]:
-                        if isinstance(item, dict):
-                            acronym = str(item.get('acronym') or '').lower()
-                            expansion = str(item.get('expansion') or '').lower()
-                            # Only keep the item if neither field contains a blocked word
-                            if acronym not in blocklist and expansion not in blocklist:
-                                filtered_list.append(item)
-                        elif isinstance(item, str):
-                            # Also filter out simple strings that are in the blocklist
-                            if item.lower() not in blocklist:
-                                logger.warning(f"LLM returned a string '{item}' in list '{key}'. Converting to dict.")
-                                filtered_list.append({'acronym': item, 'expansion': '', 'explanation': ''})
-                    structured_data[key] = filtered_list
 
             return structured_data, costs
 
         except Exception as e:
-            last_exception = e
-            logger.error(f"Error in Claude 3 Haiku LLM data extraction (attempt {attempt+1}/{MAX_RETRIES}): {e}")
+            logger.error(f"Error in Mistral LLM data extraction (attempt {attempt+1}/{MAX_RETRIES}): {e}")
             if attempt < MAX_RETRIES - 1:
-                delay = min(30, (BACKOFF_MULTIPLIER ** attempt) + random.random())
-                logger.info(f"Retrying after {delay} seconds due to error: {e}")
-                time.sleep(delay)
-                continue
+                time.sleep(BACKOFF_MULTIPLIER ** attempt)
             else:
-                response_text_for_log = locals().get('response_text', 'No response text captured')
-                try:
-                    with open("llm_errors.log", "a", encoding="utf-8") as f:
-                        f.write(f"=== LLM Error ===\n")
-                        f.write(f"Error: {e}\n")
-                        f.write(f"Response text: {response_text_for_log}\n")
-                        f.write(f"Traceback: {traceback.format_exc()}\n")
-                        f.write(f"{'='*50}\n\n")
-                except Exception as log_error:
-                    logger.warning(f"Failed to write to error log: {log_error}")
-                return {"drug_table": [], "acronyms": [], "tiers": []}, costs
-
-    # If somehow we exit loop without returning (defensive)
-    logger.error(f"All attempts failed for LLM call. Last exception: {last_exception}")
+                return default_output, costs
+    
     return default_output, costs
-
-def _load_prompts_config():
-    """Scans the prompts directory and loads all prompts and mappings into memory."""
-    global _AVAILABLE_PROMPTS, _PROMPT_MAPPINGS, _PROMPT_CACHE
-
-    if _AVAILABLE_PROMPTS: # Already loaded
-        return
-
-    logger.info("[PROMPT SELECTION] Initializing and caching prompts from disk...")
-    if not PROMPTS_DIR.is_dir():
-        logger.warning(f"Prompts directory not found: {PROMPTS_DIR}")
-        return
-
-    # Scan for all .txt files and create a mapping of normalized_name -> file_path
-    for file_path in PROMPTS_DIR.glob("*.txt"):
-        normalized_name = file_path.stem.lower().replace(" ", "_").replace("-", "_")
-        _AVAILABLE_PROMPTS[normalized_name] = file_path
-
-    # Load the fuzzy matching configuration from the new JSON file
-    if PROMPT_MAPPINGS_FILE.exists():
-        try:
-            with open(PROMPT_MAPPINGS_FILE, 'r', encoding='utf-8') as f:
-                _PROMPT_MAPPINGS = json.load(f)
-            logger.info(f"Loaded {len(_PROMPT_MAPPINGS)} fuzzy prompt mappings from {PROMPT_MAPPINGS_FILE.name}")
-        except Exception as e:
-            logger.error(f"Failed to load prompt mappings from {PROMPT_MAPPINGS_FILE.name}: {e}")
-
-
-def get_payer_prompt(payer_name: str = None) -> str:
-    """
-    Loads a payer-specific prompt, falling back to a default.
-    This version is optimized to scan the directory once and uses a config file for fuzzy matching.
-    """
-    # Ensure prompts and mappings are loaded into memory
-    _load_prompts_config()
-
-    # Helper to load a prompt from file and cache it
-    def _load_and_cache_prompt(file_path: Path, prompt_key: str) -> str:
-        if prompt_key in _PROMPT_CACHE:
-            return _PROMPT_CACHE[prompt_key]
-        try:
-            with open(file_path, 'r', encoding='utf-8') as f:
-                prompt = f.read().strip()
-            _PROMPT_CACHE[prompt_key] = prompt
-            return prompt
-        except Exception as e:
-            logger.error(f"Failed to read prompt file {file_path.name}: {e}")
-            return None # Return None to trigger fallback
-
-    # 1. Handle default case
-    if not payer_name or not payer_name.strip():
-        logger.info("[PROMPT SELECTION] No payer name provided. Using DEFAULT prompt.")
-        return _load_and_cache_prompt(DEFAULT_PROMPT_FILE, 'default') or _load_default_prompt()
-
-    # 2. Try for an exact match using the normalized name
-    payer_normalized = payer_name.strip().lower().replace(" ", "_").replace("-", "_")
-    if payer_normalized in _AVAILABLE_PROMPTS:
-        prompt_file = _AVAILABLE_PROMPTS[payer_normalized]
-        logger.info(f"[PROMPT SELECTION] ✓ Found direct match for '{payer_name}' -> {prompt_file.name}")
-        return _load_and_cache_prompt(prompt_file, payer_normalized) or _load_default_prompt()
-
-    # 3. Try for a fuzzy match using the mappings configuration
-    for key, prompt_filename_stem in _PROMPT_MAPPINGS.items():
-        if key.lower() in payer_name.strip().lower():
-            if prompt_filename_stem in _AVAILABLE_PROMPTS:
-                prompt_file = _AVAILABLE_PROMPTS[prompt_filename_stem]
-                logger.info(f"[PROMPT SELECTION] ✓ Found fuzzy match for '{payer_name}' via key '{key}' -> {prompt_file.name}")
-                return _load_and_cache_prompt(prompt_file, prompt_filename_stem) or _load_default_prompt()
-            else:
-                 logger.warning(f"Fuzzy mapping for '{key}' points to a non-existent prompt file: '{prompt_filename_stem}.txt'")
-
-
-    # 4. Fallback to default
-    logger.info(f"[PROMPT SELECTION] ✗ No specific prompt found for '{payer_name}'. Using DEFAULT.")
-    return _load_and_cache_prompt(DEFAULT_PROMPT_FILE, 'default') or _load_default_prompt()
-
-
-def _load_default_prompt() -> str:
-    """Loads the default prompt from file."""
-    try:
-        if DEFAULT_PROMPT_FILE.exists():
-            with open(DEFAULT_PROMPT_FILE, 'r', encoding='utf-8') as f:
-                prompt = f.read().strip()
-            logger.info(f"[PROMPT SELECTION] ✓ Loaded DEFAULT prompt file: {DEFAULT_PROMPT_FILE.name}")
-            return prompt
-        else:
-            logger.warning(f"[PROMPT SELECTION] Default prompt file not found: {DEFAULT_PROMPT_FILE}. Using hardcoded fallback prompt.")
-            # Fallback to a basic prompt if file doesn't exist
-            return """You are a data extraction expert for pharmaceutical formularies. Extract drug information and return as JSON with keys: "drug_table", "acronyms", "tiers"."""
-    except Exception as e:
-        logger.error(f"[PROMPT SELECTION] Error loading default prompt from {DEFAULT_PROMPT_FILE.name}: {e}. Using hardcoded fallback prompt.")
-        return """You are a data extraction expert for pharmaceutical formularies. Extract drug information and return as JSON with keys: "drug_table", "acronyms", "tiers"."""
-
 
 
 def create_resilient_mistral_client():
@@ -1264,17 +1507,64 @@ def process_pdf_with_mistral_ocr(pdf_input, payer_name=None, filename: Optional[
     mistral_client = create_resilient_mistral_client()
 
     try:
+        # --- OPTIMIZATION: Extract only the pages we need BEFORE uploading ---
+        # This dramatically reduces upload size and processing time
+        
+        # First, determine which pages to process
+        temp_page_count = num_pages if 'num_pages' in locals() else 0
+        if temp_page_count == 0 and PYPDF2_AVAILABLE and isinstance(pdf_input, BytesIO):
+            try:
+                pdf_input.seek(0)
+                reader = PyPDF2.PdfReader(pdf_input)
+                temp_page_count = len(reader.pages)
+                pdf_input.seek(0)
+            except:
+                temp_page_count = 100  # Fallback
+        
+        page_indices = _get_pages_to_process(filename, temp_page_count or 100)
+        pages_to_extract = [p + 1 for p in page_indices]  # 1-based page numbers
+        
+        logger.info(f"📄 [OPTIMIZATION] Extracting only pages {pages_to_extract} from {temp_page_count}-page PDF before upload...")
+        
+        # Extract only needed pages using PyMuPDF
         pdf_to_process = pdf_input
-        # --- PDF Enhancement Step ---
+        if PYMUPDF_AVAILABLE and pages_to_extract:
+            try:
+                if isinstance(pdf_input, BytesIO):
+                    pdf_input.seek(0)
+                    src_doc = fitz.open(stream=pdf_input.getvalue(), filetype="pdf")
+                else:
+                    src_doc = fitz.open(str(pdf_input))
+                
+                # Create a new PDF with only the needed pages
+                extracted_doc = fitz.open()
+                for page_num in pages_to_extract:
+                    if 1 <= page_num <= len(src_doc):
+                        extracted_doc.insert_pdf(src_doc, from_page=page_num-1, to_page=page_num-1)
+                
+                extracted_bytes = extracted_doc.tobytes()
+                extracted_doc.close()
+                src_doc.close()
+                
+                pdf_to_process = BytesIO(extracted_bytes)
+                logger.info(f"✅ [OPTIMIZATION] Extracted {len(pages_to_extract)} pages ({len(extracted_bytes)/1024:.1f} KB) from original PDF.")
+                
+            except Exception as e:
+                logger.warning(f"⚠️ Page extraction failed: {e}. Using full PDF.")
+                if isinstance(pdf_input, BytesIO):
+                    pdf_input.seek(0)
+                pdf_to_process = pdf_input
+        
+        # --- PDF Enhancement Step (now only enhances the extracted pages) ---
         if USE_ENHANCED_PDF:
-            enhanced_pdf_bytes = enhance_pdf(pdf_input)
+            enhanced_pdf_bytes = enhance_pdf(pdf_to_process)
             if enhanced_pdf_bytes:
                 pdf_to_process = enhanced_pdf_bytes
                 logger.info("Proceeding with enhanced PDF for OCR.")
             else:
                 logger.warning("PDF enhancement failed. Falling back to original PDF.")
-                if isinstance(pdf_input, BytesIO):
-                    pdf_input.seek(0) # Ensure original stream is at the start for fallback
+                if isinstance(pdf_to_process, BytesIO):
+                    pdf_to_process.seek(0)
         
         # --- Document Upload and OCR ---
         if isinstance(pdf_to_process, BytesIO):
@@ -1307,10 +1597,513 @@ def process_pdf_with_mistral_ocr(pdf_input, payer_name=None, filename: Optional[
         if not uploaded_file:
             return {"drug_table": [], "acronyms": [], "tiers": []}, "", total_costs
 
+        # --------------------------------------------------------------------------
+        # PRIMARY FLOW: Native Mistral OCR with Structured JSON Output
+        # Using ocr.process() with document_annotation_format - FAST like playground!
+        # NOTE: document_annotation_format has a LIMIT of 8 pages per request
+        # For larger documents, we process in chunks of 8 pages
+        # --------------------------------------------------------------------------
+        MAX_PAGES_PER_OCR_REQUEST = 4  # Mistral API limit for document_annotation_format
+        
+        logger.info(f"--- [PRIMARY FLOW] Native OCR Extraction for {filename} ---")
+        try:
+            num_pages_in_upload = len(pages_to_extract) if 'pages_to_extract' in locals() else 1
+            
+            # Check if we need to process in chunks
+            if num_pages_in_upload > MAX_PAGES_PER_OCR_REQUEST:
+                logger.info(f"📄 Document has {num_pages_in_upload} pages, exceeds {MAX_PAGES_PER_OCR_REQUEST} page limit. Processing in chunks...")
+                
+                # We need to process in chunks - delete the current uploaded file and process chunks
+                try:
+                    mistral_client.files.delete(file_id=uploaded_file.id)
+                except: pass
+                
+                # Split pages into chunks of 8
+                all_structured_data = []
+                all_acronyms = []
+                total_pages_processed = 0
+                
+                page_chunks = [pages_to_extract[i:i + MAX_PAGES_PER_OCR_REQUEST] 
+                              for i in range(0, len(pages_to_extract), MAX_PAGES_PER_OCR_REQUEST)]
+                
+                logger.info(f"📦 Split into {len(page_chunks)} chunks of up to {MAX_PAGES_PER_OCR_REQUEST} pages each")
+                
+                for chunk_idx, chunk_pages in enumerate(page_chunks):
+                    logger.info(f"🔄 Processing chunk {chunk_idx + 1}/{len(page_chunks)} (pages {chunk_pages[0]}-{chunk_pages[-1]})")
+                    
+                    # Extract this chunk of pages from the original PDF
+                    try:
+                        if isinstance(pdf_input, BytesIO):
+                            pdf_input.seek(0)
+                            src_doc = fitz.open(stream=pdf_input.getvalue(), filetype="pdf")
+                        else:
+                            src_doc = fitz.open(str(pdf_input))
+                        
+                        chunk_doc = fitz.open()
+                        for page_num in chunk_pages:
+                            if 1 <= page_num <= len(src_doc):
+                                chunk_doc.insert_pdf(src_doc, from_page=page_num-1, to_page=page_num-1)
+                        
+                        chunk_bytes = chunk_doc.tobytes()
+                        chunk_doc.close()
+                        src_doc.close()
+                        
+                        chunk_pdf = BytesIO(chunk_bytes)
+                        
+                        # Upload chunk
+                        chunk_uploaded = mistral_client.files.upload(
+                            file={"file_name": f"chunk_{chunk_idx}.pdf", "content": chunk_pdf.getvalue()},
+                            purpose="ocr"
+                        )
+                        
+                        chunk_signed_url = mistral_client.files.get_signed_url(file_id=chunk_uploaded.id, expiry=300)
+                        
+                        # Define schema - handles format like "DRUG NAME (PA, QL)" 
+                        # Drug name = text before parentheses, requirements = text inside parentheses
+                        ocr_annotation_schema = {
+  "type": "json_schema",
+  "json_schema": {
+    "name": "drug_extraction_schema",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "drug_table": {
+          "type": "array",
+          "description": "Extract ONLY actual formulary drug rows. Skip index, TOC, category-only, or header rows.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "drug_name": {
+                "type": "string",
+                "description": "Exact drug or therapeutic name as shown in formulary (include form/strength if present)."
+              },
+
+              "drug_tier": {
+                "type": ["string", "null"],
+                "description": "Tier value if present (numeric, letter, $0, or blank)."
+              },
+
+              "drug_requirements": {
+                "type": ["string", "null"],
+                "description": "Flattened requirements string for compatibility (e.g., 'B; N', 'PA; QL (30/day)')."
+              },
+
+              "vdp_flags": {
+                "type": ["object", "null"],
+                "description": "Structured representation for Texas VDP rows.",
+                "properties": {
+                  "brand_generic_other": {
+                    "type": ["string", "null"],
+                    "description": "Column 1 value: B, G, or O."
+                  },
+                  "preference_status": {
+                    "type": ["string", "null"],
+                    "description": "Column 3 value: P, N, R, or NR."
+                  }
+                }
+              },
+
+              "pa_form_link": {
+                "type": ["string", "null"],
+                "description": "PA Form hyperlink if present in VDP tables."
+              },
+
+              "category": {
+                "type": ["string", "null"],
+                "description": "Therapeutic category header if applicable."
+              },
+
+              "page_number": {
+                "type": ["integer", "null"],
+                "description": "Actual page number in the source document."
+              }
+            },
+            "required": ["drug_name"]
+          }
+        },
+
+        "acronyms": {
+          "type": "array",
+          "description": "Legend or abbreviation definitions found in the document.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "acronym": { "type": "string" },
+              "expansion": { "type": "string" },
+              "explanation": { "type": ["string", "null"] }
+            },
+            "required": ["acronym", "expansion"]
+          }
+        },
+
+        "tiers": {
+          "type": "array",
+          "description": "Tier or color legend definitions if present.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "acronym": { "type": "string" },
+              "expansion": { "type": "string" },
+              "explanation": { "type": ["string", "null"] }
+            },
+            "required": ["acronym", "expansion"]
+          }
+        }
+      },
+      "required": ["drug_table", "acronyms", "tiers"]
+    }
+  }
+}
+
+                        # Process chunk with OCR
+                        chunk_response = mistral_client.ocr.process(
+                            model="mistral-ocr-latest",
+                            document=DocumentURLChunk(document_url=chunk_signed_url.url),
+                            document_annotation_format=ocr_annotation_schema,
+                            include_image_base64=False
+                        )
+                        
+                        # Extract data from chunk response
+                        logger.info(f"🔍 Chunk {chunk_idx + 1}: Processing response for pages {chunk_pages}")
+                        logger.info(f"🔍 Chunk {chunk_idx + 1}: Has document_annotation: {hasattr(chunk_response, 'document_annotation')}")
+                        logger.info(f"🔍 Chunk {chunk_idx + 1}: Num pages in response: {len(chunk_response.pages) if hasattr(chunk_response, 'pages') else 0}")
+                        
+                        chunk_drugs_found = 0
+                        
+                        if hasattr(chunk_response, 'document_annotation') and chunk_response.document_annotation:
+                            chunk_json = chunk_response.document_annotation
+                            if isinstance(chunk_json, str):
+                                chunk_json = json.loads(chunk_json)
+                            
+                            drug_info_list = chunk_json.get("DrugInformation", [])
+                            logger.info(f"🔍 Chunk {chunk_idx + 1}: Document-level has {len(drug_info_list)} drugs")
+                            
+                            for item in drug_info_list:
+                                if isinstance(item, dict):
+                                    drug_name = item.get("Drug Name", "")
+                                    # Skip index/TOC entries - they typically have no tier or requirements
+                                    if not drug_name or len(drug_name) < 2:
+                                        continue
+                                    
+                                    # PAGE MAPPING: OCR's page_number is within the extracted chunk (1, 2, 3...)
+                                    # We need to map it back to original page numbers using chunk_pages
+                                    ocr_page_num = item.get("page_number")
+                                    
+                                    # DEBUG: Log what OCR returned
+                                    if chunk_drugs_found < 3:  # Log first 3 for debugging
+                                        logger.info(f"🔍 Chunk {chunk_idx + 1}: Drug '{drug_name[:30]}...' has ocr_page_num={ocr_page_num}")
+                                    
+                                    if ocr_page_num and isinstance(ocr_page_num, int) and 1 <= ocr_page_num <= len(chunk_pages):
+                                        # Map OCR page (1-based index within chunk) to original page number
+                                        actual_page = chunk_pages[ocr_page_num - 1]
+                                    else:
+                                        # If no page number or invalid, distribute evenly across chunk pages
+                                        # Use a simple heuristic: assign based on position in list
+                                        position_ratio = chunk_drugs_found / max(len(drug_info_list), 1)
+                                        page_index = min(int(position_ratio * len(chunk_pages)), len(chunk_pages) - 1)
+                                        actual_page = chunk_pages[page_index]
+                                    
+                                    logger.debug(f"Chunk {chunk_idx + 1}: OCR page_num={ocr_page_num} -> mapped to original page {actual_page}")
+                                    
+                                    all_structured_data.append({
+                                        "drug_name": drug_name,
+                                        "drug_tier": item.get("drug tier"),
+                                        "drug_requirements": item.get("requirements"),
+                                        "category": item.get("category"),
+                                        "page_number": actual_page
+                                    })
+                                    chunk_drugs_found += 1
+                            
+                            for item in chunk_json.get("FormularyAbbreviations", []):
+                                if isinstance(item, dict):
+                                    all_acronyms.append({
+                                        "acronym": item.get("Acronym"),
+                                        "expansion": item.get("Expansion"),
+                                        "explanation": item.get("Explanation")
+                                    })
+                        
+                        logger.info(f"🔍 Chunk {chunk_idx + 1}: Document-level extraction found {chunk_drugs_found} drugs")
+                        
+                        # Also check page-level annotations
+                        page_level_drugs_found = 0
+                        for page_idx, page in enumerate(chunk_response.pages):
+                            # PAGE MAPPING: Map extracted page index to original page number
+                            page_num = chunk_pages[page_idx] if page_idx < len(chunk_pages) else page_idx + 1
+                            logger.info(f"🔍 Chunk {chunk_idx + 1}, page_idx {page_idx} -> checking page-level for original page {page_num}")
+                            logger.info(f"🔍 Page {page_num} has document_annotation: {hasattr(page, 'document_annotation') and bool(page.document_annotation)}")
+                            
+                            if hasattr(page, 'document_annotation') and page.document_annotation:
+                                page_json = page.document_annotation
+                                if isinstance(page_json, str):
+                                    page_json = json.loads(page_json)
+                                if isinstance(page_json, dict):
+                                    drugs_on_page = page_json.get("DrugInformation", [])
+                                    if drugs_on_page:
+                                        logger.info(f"✅ Page-level annotation: Found {len(drugs_on_page)} drugs on original page {page_num}")
+                                    for item in drugs_on_page:
+                                        if isinstance(item, dict):
+                                            all_structured_data.append({
+                                                "drug_name": item.get("Drug Name"),
+                                                "drug_tier": item.get("drug tier"),
+                                                "drug_requirements": item.get("requirements"),
+                                                "category": item.get("category"),
+                                                "page_number": page_num
+                                            })
+                                            page_level_drugs_found += 1
+                                    for item in page_json.get("FormularyAbbreviations", []):
+                                        if isinstance(item, dict):
+                                            all_acronyms.append({
+                                                "acronym": item.get("Acronym"),
+                                                "expansion": item.get("Expansion"),
+                                                "explanation": item.get("Explanation")
+                                            })
+                        
+                        logger.info(f"🔍 Chunk {chunk_idx + 1}: Page-level extraction found {page_level_drugs_found} additional drugs")
+                        logger.info(f"📊 Chunk {chunk_idx + 1} TOTAL: {chunk_drugs_found + page_level_drugs_found} drugs from pages {chunk_pages}")
+                        
+                        total_pages_processed += len(chunk_response.pages)
+                        
+                        # Cleanup chunk file
+                        try:
+                            mistral_client.files.delete(file_id=chunk_uploaded.id)
+                        except: pass
+                        
+                        logger.info(f"✅ Chunk {chunk_idx + 1} complete: {len(chunk_response.pages)} pages, found {len(all_structured_data)} drugs so far")
+                        
+                    except Exception as chunk_error:
+                        logger.warning(f"⚠️ Chunk {chunk_idx + 1} failed: {chunk_error}")
+                        continue
+                
+                # Return combined results from all chunks
+                full_structured_data = {
+                    "drug_table": all_structured_data,
+                    "acronyms": all_acronyms,
+                    "tiers": []
+                }
+                
+                total_costs['mistral_pages'] = total_pages_processed
+                total_costs['mistral_cost'] = (total_pages_processed / 1000.0) * MISTRAL_OCR_COST_PER_1K_PAGES
+                
+                logger.info(f"✅ [PRIMARY FLOW SUCCESS] Chunked OCR extraction completed for {filename}.")
+                logger.info(f"📊 Extracted {len(all_structured_data)} drugs, {len(all_acronyms)} acronyms from {total_pages_processed} page(s) in {len(page_chunks)} chunks.")
+                
+                # Log page distribution for verification
+                if all_structured_data:
+                    page_counts = {}
+                    for drug in all_structured_data:
+                        p = drug.get('page_number')
+                        page_counts[p] = page_counts.get(p, 0) + 1
+                    logger.info(f"📄 Page distribution: {dict(sorted(page_counts.items()))}")
+                    # Log sample drugs for debugging
+                    logger.info(f"🔍 Sample drugs from extraction:")
+                    for i, drug in enumerate(all_structured_data[:5]):
+                        logger.info(f"   Drug {i+1}: '{drug.get('drug_name', '')[:50]}...' on page {drug.get('page_number')}")
+                else:
+                    logger.warning(f"⚠️ NO DRUGS EXTRACTED from chunked processing!")
+                
+                logger.info(f"🚀 RETURNING from chunked processing: {len(all_structured_data)} drugs in drug_table")
+                return full_structured_data, "[CHUNKED OCR EXTRACTION]", total_costs
+            
+            # For documents <= 8 pages, process normally (single request)
+            signed_url = mistral_client.files.get_signed_url(file_id=uploaded_file.id, expiry=300)
+            logger.info(f"--- [PRIMARY FLOW] Processing {num_pages_in_upload} page(s) with mistral-ocr-latest ---")
+
+            # Define the structured output schema for native OCR
+            # Handles format like "DRUG NAME (PA, QL)" - extracts drug name and parenthesis codes separately
+            ocr_annotation_schema = {
+                "type": "json_schema",
+                "json_schema": {
+                    "name": "drug_extraction_schema",
+                    "schema": {
+                        "type": "object",
+                        "title": "StructuredData",
+                        "properties": {
+                            "DrugInformation": {
+                                "type": "array",
+                                "description": "Extract drugs ONLY from actual drug listing pages. SKIP Index pages, Table of Contents, Introduction, Appendix, and pages that only list drug names alphabetically without tier/requirements columns. Only extract from pages with FULL drug details (name + tier OR name + requirements).",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "Drug Name": {"type": "string", "description": "COMPLETE drug name with form and dosage. Examples: 'APTIVUS ORAL CAPSULE 250 MG', 'atazanavir oral capsule 150 mg, 300 mg'. Include ALL dosages/strengths listed."},
+                                        "drug tier": {"type": ["string", "null"], "description": "From 'Drug Tier' column (1, 2, 3, 4) OR from page header. Null if not shown."},
+                                        "requirements": {"type": ["string", "null"], "description": "From 'Requirements/Limits' column. Include FULL text: 'QL (120 per 30 days)', 'PA', 'PA; LA'. Null if none."},
+                                        "category": {"type": ["string", "null"], "description": "Section header: 'Infections', 'HIV/AIDS', etc. Null if none."},
+                                        "page_number": {"type": ["integer", "null"], "description": "The actual page number where this drug is found in the document."}
+                                    }
+                                }
+                            },
+                            "FormularyAbbreviations": {
+                                "type": "array",
+                                "description": "Abbreviation definitions found in legends/keys",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "Acronym": {"type": "string", "description": "The abbreviation code (PA, QL, ST, etc.)"},
+                                        "Expansion": {"type": "string", "description": "What it stands for (Prior Authorization, Quantity Limit, etc.)"},
+                                        "Explanation": {"type": ["string", "null"], "description": "Additional explanation if any"}
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            # Use native OCR endpoint with structured output - THIS IS FAST!
+            ocr_response = mistral_client.ocr.process(
+                model="mistral-ocr-latest",
+                document=DocumentURLChunk(document_url=signed_url.url),
+                document_annotation_format=ocr_annotation_schema,
+                include_image_base64=False
+            )
+
+            # Process OCR response - extract structured data
+            original_pages = pages_to_extract if 'pages_to_extract' in locals() else []
+            all_structured_data = []
+            all_acronyms = []
+            
+            logger.info(f"OCR response has {len(ocr_response.pages)} pages")
+            
+            # Debug: Log the structure of the OCR response to understand where data is
+            logger.info(f"OCR response attributes: {dir(ocr_response)}")
+            if hasattr(ocr_response, 'document_annotation'):
+                logger.info(f"document_annotation found: {ocr_response.document_annotation}")
+            
+            # Try to find structured data in multiple possible locations
+            structured_json = None
+            
+            # Option 1: Check for document-level annotation
+            if hasattr(ocr_response, 'document_annotation') and ocr_response.document_annotation:
+                try:
+                    if isinstance(ocr_response.document_annotation, str):
+                        structured_json = json.loads(ocr_response.document_annotation)
+                    else:
+                        structured_json = ocr_response.document_annotation
+                    logger.info(f"Found structured data in document_annotation")
+                except:
+                    pass
+            
+            # Option 2: Check pages for markdown content and parse JSON from it
+            if not structured_json:
+                for page_idx, page in enumerate(ocr_response.pages):
+                    # FIXED PAGE MAPPING: Map extracted page index to original page number
+                    page_num = original_pages[page_idx] if page_idx < len(original_pages) else page_idx + 1
+                    logger.debug(f"Non-chunked page_idx {page_idx} -> mapped to original page {page_num}")
+                    logger.info(f"Page {page_num} attributes: {dir(page)}")
+                    
+                    # Check page.document_annotation
+                    if hasattr(page, 'document_annotation') and page.document_annotation:
+                        try:
+                            if isinstance(page.document_annotation, str):
+                                page_json = json.loads(page.document_annotation)
+                            else:
+                                page_json = page.document_annotation
+                            logger.info(f"Found structured data in page.document_annotation")
+                            
+                            # Extract from page-level structured data
+                            if isinstance(page_json, dict):
+                                drugs_on_page = page_json.get("DrugInformation", [])
+                                if drugs_on_page:
+                                    logger.info(f"Page-level annotation: Found {len(drugs_on_page)} drugs on original page {page_num}")
+                                for item in drugs_on_page:
+                                    if isinstance(item, dict):
+                                        all_structured_data.append({
+                                            "drug_name": item.get("Drug Name"),
+                                            "drug_tier": item.get("drug tier"),
+                                            "drug_requirements": item.get("requirements"),
+                                            "category": item.get("category"),
+                                            "page_number": page_num
+                                        })
+                                for item in page_json.get("FormularyAbbreviations", []):
+                                    if isinstance(item, dict):
+                                        all_acronyms.append({
+                                            "acronym": item.get("Acronym"),
+                                            "expansion": item.get("Expansion"),
+                                            "explanation": item.get("Explanation")
+                                        })
+                        except Exception as e:
+                            logger.debug(f"Could not parse page.document_annotation: {e}")
+                    
+                    # Check page.annotations
+                    if hasattr(page, 'annotations') and page.annotations:
+                        logger.info(f"Page {page_num} has {len(page.annotations)} annotations")
+                        for annotation in page.annotations:
+                            logger.info(f"Annotation type: {type(annotation)}, attrs: {dir(annotation)}")
+            
+            # If we found document-level structured_json, process it
+            if structured_json and isinstance(structured_json, dict):
+                logger.info(f"Processing document-level structured JSON with keys: {structured_json.keys()}")
+                for item in structured_json.get("DrugInformation", []):
+                    if isinstance(item, dict):
+                        # FIXED PAGE MAPPING: OCR's page_number is within the extracted document (1, 2, 3...)
+                        # We need to map it back to original page numbers using original_pages
+                        ocr_page_num = item.get("page_number")
+                        if ocr_page_num and original_pages and 1 <= ocr_page_num <= len(original_pages):
+                            # Map OCR page (1-based index within extracted doc) to original page number
+                            actual_page = original_pages[ocr_page_num - 1]
+                        elif original_pages:
+                            # Fallback to first page of extracted doc
+                            actual_page = original_pages[0]
+                        else:
+                            actual_page = ocr_page_num  # Last resort: use as-is
+                        
+                        logger.debug(f"Document-level: OCR page_num={ocr_page_num} -> mapped to original page {actual_page}")
+                        
+                        all_structured_data.append({
+                            "drug_name": item.get("Drug Name"),
+                            "drug_tier": item.get("drug tier"),
+                            "drug_requirements": item.get("requirements"),
+                            "category": item.get("category"),
+                            "page_number": actual_page
+                        })
+                for item in structured_json.get("FormularyAbbreviations", []):
+                    if isinstance(item, dict):
+                        all_acronyms.append({
+                            "acronym": item.get("Acronym"),
+                            "expansion": item.get("Expansion"),
+                            "explanation": item.get("Explanation")
+                        })
+
+            full_structured_data = {
+                "drug_table": all_structured_data,
+                "acronyms": all_acronyms,
+                "tiers": []
+            }
+
+            # Track costs for native OCR
+            total_costs['mistral_pages'] = len(ocr_response.pages)
+            total_costs['mistral_cost'] = (total_costs['mistral_pages'] / 1000.0) * MISTRAL_OCR_COST_PER_1K_PAGES
+
+            logger.info(f"✅ [PRIMARY FLOW SUCCESS] Native OCR extraction completed for {filename}.")
+            logger.info(f"📊 Extracted {len(all_structured_data)} drugs, {len(all_acronyms)} acronyms from {total_costs['mistral_pages']} page(s).")
+            
+            # Log page distribution for verification
+            if all_structured_data:
+                page_counts = {}
+                for drug in all_structured_data:
+                    p = drug.get('page_number')
+                    page_counts[p] = page_counts.get(p, 0) + 1
+                logger.info(f"📄 Page distribution: {dict(sorted(page_counts.items()))}")
+
+            # Delete file and return
+            try:
+                mistral_client.files.delete(file_id=uploaded_file.id)
+            except: pass
+            
+            return full_structured_data, "[NATIVE OCR EXTRACTION]", total_costs
+
+        except Exception as primary_error:
+            logger.warning(f"âš ï¸ [PRIMARY FLOW FAILED] Unified extraction failed for {filename}: {primary_error}")
+            logger.info("--- [BACKUP FLOW] Falling back to traditional OCR + Per-Page LLM processing ---")
+
+        # --------------------------------------------------------------------------
+        # BACKUP FLOW: Original OCR + Per-Page LLM Loop
+        # --------------------------------------------------------------------------
         signed_url = mistral_client.files.get_signed_url(file_id=uploaded_file.id, expiry=120)
+        
         ocr_response = mistral_client.ocr.process(
             document=DocumentURLChunk(document_url=signed_url.url),
-            model="mistral-ocr-latest",
+            model="mistral-ocr-2512",
             include_image_base64=False
         )
 
@@ -1320,34 +2113,47 @@ def process_pdf_with_mistral_ocr(pdf_input, payer_name=None, filename: Optional[
 
         all_structured_data, all_acronyms, all_tiers = [], [], []
 
-        page_indices_to_process = _get_pages_to_process(filename, page_count)
+        # Since we already extracted only the needed pages, process ALL pages in this (smaller) document
+        # Map extracted page index to original page number for tracking
+        original_page_numbers = pages_to_extract if 'pages_to_extract' in locals() else list(range(1, page_count + 1))
+        page_indices_to_process = list(range(page_count))  # Process all pages in the extracted doc
 
         if not page_indices_to_process:
             logger.warning(f"No valid pages selected for processing for file '{filename}'. Skipping LLM stage.")
         else:
-            logger.info(f"Processing {len(page_indices_to_process)} pages in parallel with up to {LLM_PAGE_WORKERS} workers...")
+            logger.info(f"[BACKUP FLOW] Processing {len(page_indices_to_process)} extracted pages in parallel with up to {LLM_PAGE_WORKERS} workers...")
+            logger.info(f"Original page numbers being processed: {original_page_numbers}")
+            
             with ThreadPoolExecutor(max_workers=LLM_PAGE_WORKERS) as executor:
+                # Map extracted index to original page number
                 future_to_page = {
-                    executor.submit(extract_structured_data_with_llm, ocr_response.pages[page_idx].markdown, payer_name): page_idx + 1
-                    for page_idx in page_indices_to_process
+                    executor.submit(extract_structured_data_with_llm, ocr_response.pages[idx].markdown, mistral_client, payer_name): (idx, original_page_numbers[idx] if idx < len(original_page_numbers) else idx + 1)
+                    for idx in page_indices_to_process
                 }
 
                 for future in as_completed(future_to_page):
-                    page_num = future_to_page[future]
+                    extracted_idx, original_page_num = future_to_page[future]
                     try:
                         structured_records, llm_costs = future.result()
-                        logger.info(f"--- Completed processing for Page {page_num}/{page_count} ---")
+                        logger.info(f"--- Completed processing for Original Page {original_page_num} (Extracted index {extracted_idx}) ---")
                         total_costs['bedrock_tokens'] += llm_costs.get('tokens', 0)
                         total_costs['bedrock_cost'] += llm_costs.get('cost', 0)
                         total_costs['bedrock_calls'] += llm_costs.get('calls', 0)
                         if structured_records:
+                            extracted_count = len(structured_records.get('drug_table', []))
                             for drug in structured_records.get('drug_table', []):
-                                drug['page_number'] = page_num
+                                if isinstance(drug, dict):
+                                    drug['page_number'] = original_page_num  # Use original page number
+                                else:
+                                    logger.warning(f"Skipping non-dict item in drug_table: {drug}")
+                                    continue
                                 all_structured_data.append(drug)
+                            if extracted_count > 0:
+                                logger.debug(f"Assigned page_number={original_page_num} to {extracted_count} drugs from this page")
                             all_acronyms.extend(structured_records.get('acronyms', []))
                             all_tiers.extend(structured_records.get('tiers', []))
                     except Exception as exc:
-                        logger.error(f"Page {page_num} generated an exception during result processing: {exc}")
+                        logger.error(f"Page {original_page_num} generated an exception during result processing: {exc}")
 
         full_raw_content = "\n\n--- PAGE BREAK ---\n\n".join([p.markdown for p in ocr_response.pages])
         
@@ -1668,6 +2474,11 @@ def process_single_pdf_url_worker(plan_info):
     start_time = time.time()
 
     try:
+        formulary_url = str(formulary_url).strip().replace('\u2026', '').replace('...', '')
+
+        clean_url = str(formulary_url).strip().split(' ')[0]
+        clean_url = clean_url.replace('\u2026', '').replace('...', '')
+
         formulary_url = transform_viewer_url(formulary_url)
 
         if not formulary_url or re.match(r'^[\d\s\(\)-]{7,}$', str(formulary_url).strip()):
@@ -1738,31 +2549,51 @@ def process_single_pdf_url_worker(plan_info):
         filename_for_config = f"{state_name}_{payer_name}_{plan_name}.pdf"
 
         if cached_data is None:
-            logger.info(f"{log_prefix} Cache MISS for new hash. Starting full processing...")
+            logger.info(f"🔄 {log_prefix} Cache MISS for new hash. Starting full processing...")
             full_structured_data, raw_content, costs = process_pdf_with_mistral_ocr(
                 pdf_bytes_io,
                 payer_name,
                 filename=filename_for_config
             )
+            logger.info(f"🔍 {log_prefix} process_pdf_with_mistral_ocr returned: {len(full_structured_data.get('drug_table', []))} drugs")
             cache_result(new_file_hash, full_structured_data, raw_content)
         else:
-            logger.info(f"{log_prefix} Cache HIT for new hash. Using pre-processed data.")
+            logger.info(f"💾 {log_prefix} Cache HIT for new hash. Using pre-processed data.")
             full_structured_data = cached_data
+            # Log cached data details
+            cached_drug_count = len(full_structured_data.get('drug_table', [])) if isinstance(full_structured_data, dict) else 0
+            logger.info(f"🔍 {log_prefix} Cached data has {cached_drug_count} drugs")
+            if cached_drug_count == 0:
+                logger.warning(f"⚠️ {log_prefix} Cache has ZERO drugs! Consider clearing cache for this hash: {new_file_hash}")
 
         if not isinstance(full_structured_data, dict):
             logger.error(f"{log_prefix} Corrupted cache or processing error. Expected a dictionary, got {type(full_structured_data)}")
             full_structured_data = {"drug_table": [], "acronyms": [], "tiers": []}
 
         drug_table_data = full_structured_data.get('drug_table', [])
+        
+        logger.info(f"🔍 {log_prefix} RECEIVED from process_pdf_with_mistral_ocr: {len(drug_table_data)} records")
 
         if drug_table_data:
             page_numbers = [r.get('page_number') for r in drug_table_data if r.get('page_number')]
             if page_numbers:
                 logger.info(f"{log_prefix} Initial extraction: {len(drug_table_data)} records from pages {min(page_numbers)}-{max(page_numbers)}")
+                logger.info(f"{log_prefix} Page distribution: {dict(pd.Series(page_numbers).value_counts().sort_index())}")
+            else:
+                logger.warning(f"🔍 {log_prefix} NO PAGE NUMBERS in any of the {len(drug_table_data)} records!")
+            
+            # Log sample drugs
+            logger.info(f"🔍 {log_prefix} Sample drugs received:")
+            for i, drug in enumerate(drug_table_data[:5]):
+                logger.info(f"   Drug {i+1}: '{drug.get('drug_name', '')[:50]}' | page={drug.get('page_number')} | tier={drug.get('drug_tier')}")
 
-        if drug_table_data and _is_extracted_data_from_index_page(drug_table_data):
-            logger.warning(f"{log_prefix} Detected index/TOC page based on extracted data patterns. Skipping this page.")
-            drug_table_data = []
+        # Check for index page but with detailed logging
+        if drug_table_data:
+            is_index = _is_extracted_data_from_index_page(drug_table_data)
+            logger.info(f"🔍 {log_prefix} _is_extracted_data_from_index_page returned: {is_index}")
+            if is_index:
+                logger.warning(f"⚠️ {log_prefix} Detected index/TOC page based on extracted data patterns. Clearing {len(drug_table_data)} records!")
+                drug_table_data = []
 
         if drug_table_data:
             logger.info(f"{log_prefix} Step 1: Running group propagation on {len(drug_table_data)} raw records.")
@@ -1834,6 +2665,27 @@ def process_single_pdf_url_worker(plan_info):
         dedup_acronyms = deduplicate_dicts(all_acronyms)
         dedup_tiers = deduplicate_dicts(all_tiers)
 
+        def is_fully_english(item: dict) -> bool:
+            """An inner helper function to check if all text fields in a dict are English."""
+            acronym = item.get('acronym', '')
+            expansion = item.get('expansion', '')
+            explanation = item.get('explanation', '')
+            
+            # A record is valid ONLY IF the acronym, expansion, AND explanation are all English.
+            return is_english(acronym) and is_english(expansion) and is_english(explanation)
+
+        # Apply the new, stricter filter
+        english_acronyms = [item for item in dedup_acronyms if is_fully_english(item)]
+        english_tiers = [item for item in dedup_tiers if is_fully_english(item)]
+
+        acronyms_removed = len(dedup_acronyms) - len(english_acronyms)
+        tiers_removed = len(dedup_tiers) - len(english_tiers)
+
+        if acronyms_removed > 0:
+            logger.warning(f"Filtered out {acronyms_removed} non-English or mixed-language acronyms.")
+        if tiers_removed > 0:
+            logger.warning(f"Filtered out {tiers_removed} non-English or mixed-language tiers.")
+
         all_definitions = dedup_acronyms + dedup_tiers
         if all_definitions:
             insert_acronyms_to_ref_table(all_definitions, state_name, payer_name, plan_name, "pp_formulary_names")
@@ -1853,6 +2705,8 @@ def process_single_pdf_url_worker(plan_info):
                 coverage_map = batch_determine_coverage_status(requirement_tier_pairs, conn, state_name, payer_name)
 
         processed_records = []
+        page_number_tracking = {}  # Track page numbers being assigned
+        
         for _, row in structured_df.iterrows():
             cleaned_drug_name = clean_drug_name(str(row.get('drug_name', '') or ''))
             if not cleaned_drug_name: continue
@@ -1867,11 +2721,13 @@ def process_single_pdf_url_worker(plan_info):
                 and "pa" in requirements_text.lower()
             ):
                 coverage_status = "Covered with Conditions"
+            
+            page_num = row.get('page_number', None)
             record = {
                 "id": str(uuid.uuid4()), "plan_id": plan_id, "payer_id": payer_id,
                 "drug_name": cleaned_drug_name, "state_name": state_name, "coverage_status": coverage_status,
                 "drug_tier": drug_tier_normalized, "drug_requirements": requirements_text or None,
-                "page_number": row.get('page_number', None),
+                "page_number": page_num,
                 "is_prior_authorization_required": "Yes" if detect_prior_authorization(requirements_text) else "No",
                 "is_step_therapy_required": "Yes" if detect_step_therapy(requirements_text) else "No",
                 "is_quantity_limit_applied": "Yes" if "ql" in (requirements_text or "").lower() else "No",
@@ -1881,6 +2737,13 @@ def process_single_pdf_url_worker(plan_info):
                 "ndc_code": None, "jcode": None, "coverage_details": None,
             }
             processed_records.append(record)
+            
+            # Track page numbers for verification
+            if page_num:
+                page_number_tracking[page_num] = page_number_tracking.get(page_num, 0) + 1
+        
+        if page_number_tracking:
+            logger.info(f"{log_prefix} Final records by page (will be saved to DB): {dict(sorted(page_number_tracking.items())[:10])}")
 
         if processed_records:
             end_time = time.time()
@@ -1963,18 +2826,18 @@ def process_pdfs_from_urls_in_parallel():
 
                                 if page_number is not None and page_number <= 2 and not drug_requirements:
                                     if len(drug_name) < 5 or not re.search(r'[a-zA-Z]{3,}', drug_name):
-                                        logger.warning(f"🚫 BLOCKED Page {page_number} record (missing requirements + suspicious name): '{drug_name}'")
+                                        logger.warning(f"ðŸš« BLOCKED Page {page_number} record (missing requirements + suspicious name): '{drug_name}'")
                                         blocked_records += 1
                                         continue
 
                                 if fragment_pattern.match(drug_name):
-                                    logger.warning(f"🚫 BLOCKED FRAGMENT before DB insertion: '{drug_name}'")
+                                    logger.warning(f"ðŸš« BLOCKED FRAGMENT before DB insertion: '{drug_name}'")
                                     blocked_records += 1
                                     continue
 
                                 name_parts = drug_name.split()
                                 if not re.search(r'[a-zA-Z]{3,}', drug_name) or (len(name_parts) == 1 and name_parts[0].lower() in junk_keywords):
-                                    logger.warning(f"🚫 BLOCKED INVALID NAME before DB insertion: '{drug_name}'")
+                                    logger.warning(f"ðŸš« BLOCKED INVALID NAME before DB insertion: '{drug_name}'")
                                     blocked_records += 1
                                     continue
 

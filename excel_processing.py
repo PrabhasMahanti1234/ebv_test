@@ -197,9 +197,13 @@ def populate_payer_and_plan_tables():
     
     df = pd.read_excel(EXCEL_FILE_PATH, sheet_name="Sheet1")
     logger.info(f"Loaded {len(df)} records from Excel")
+
+    if df.empty:
+        logger.warning(f"Excel file {EXCEL_FILE_PATH} is empty. No records to process.")
+        return
     
     # Clean the column names
-    df.columns = df.columns.str.replace('\n', ' ').str.strip()
+    df.columns = df.columns.astype(str).str.replace('\n', ' ').str.strip()
     logger.info("Cleaned DataFrame column names.")
     
     # Rename the misspelled column to the correct name if it exists
@@ -252,7 +256,7 @@ def populate_payer_and_plan_tables():
                     return None
                 
                 # Convert to string first
-                cleaned_str = str(value)
+                cleaned_str = str(value).encode('ascii', 'ignore').decode('ascii') 
                 
                 # Regex to remove control characters and other non-printing chars,
                 # including the BOM (\ufeff). This is more comprehensive.

@@ -106,7 +106,7 @@ bedrock = boto3.client(
 #
 PDF_PAGE_PROCESSING_CONFIG = {
     # Example: Process pages 1-10, 20-30, and 90-100 for all files.
-    "default": ["1-10", "20-25", "99-110"]
+    "default": ["8-18"]
 
     # Example: Process all pages for Cigna, but only a few for others.
     # "Cigna": "all",

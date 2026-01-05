@@ -1,177 +1,109 @@
 import logging
-import pandas as pd
-from datetime import datetime
-from pathlib import Path
-import uuid
-import multiprocessing
-
-from config import ALL_PROCESSED_DATA, COST_TRACKER
-from database import ensure_database_schema, insert_drug_formulary_data, update_plan_and_payer_statuses, update_drug_formulary_status
+import json
+import time
+from database import ensure_database_schema, update_drug_formulary_status, update_plan_and_payer_statuses
 from excel_processing import populate_payer_and_plan_tables
 from pdf_processing import process_pdfs_from_urls_in_parallel
-from utils import validate_required_files, detect_step_therapy
-from product_mapper import map_products_to_formulary
+from config import COST_TRACKER
 
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 logger = logging.getLogger(__name__)
 
-def safe_create_directory(path):
-    """Safely create a directory if it does not exist."""
-    try:
-        Path(path).mkdir(parents=True, exist_ok=True)
-        return True
-    except Exception as e:
-        logger.error(f"Failed to create directory {path}: {e}")
-        return False
- 
-def save_cumulative_exports(all_processed_data):
-    """
-    Save all processed data to Excel and CSV files with enhanced error handling and new columns.
-    NOTE: This function is no longer called in the main PDF-by-PDF flow but is kept for potential future use.
-    """
-    if not all_processed_data:
-        logger.warning("No data to export")
-        return
-    
-    full_df = pd.DataFrame(all_processed_data)
-    
-    # Ensure all required boolean/status columns exist with a default value
-    required_columns = {
-        "is_prior_authorization_required": "No",
-        "is_step_therapy_required": "No", 
-        "is_quantity_limit_applied": "No",
-        "status": "processing"
-    }
-    
-    for col, default_value in required_columns.items():
-        if col not in full_df.columns:
-            logger.warning(f"Adding missing column '{col}' with default value '{default_value}'")
-            full_df[col] = default_value
-    
-    # Normalize boolean columns to "Yes" or "No"
-    for col in ["is_prior_authorization_required", "is_step_therapy_required", "is_quantity_limit_applied"]:
-         full_df[col] = full_df[col].apply(lambda x: "Yes" if str(x).strip().lower() in ["yes", "true", "1"] else "No")
 
-    output_dir = Path("output_exports")
-    if not safe_create_directory(output_dir):
-        logger.error("Failed to create output directory")
-        return
+def print_cost_summary():
+    """Print a detailed cost summary for the run."""
+    print("\n" + "=" * 80)
+    print("                         COST SUMMARY REPORT")
+    print("=" * 80)
     
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    # Global totals
+    print(f"\n{'GLOBAL TOTALS':^80}")
+    print("-" * 80)
+    print(f"  Total Pages Processed (Mistral OCR): {COST_TRACKER['total_pages']:,}")
+    print(f"  Total Tokens Used (Bedrock LLM):     {COST_TRACKER['total_tokens']:,}")
+    print(f"  Total LLM Calls:                     {COST_TRACKER['total_llm_calls']:,}")
+    print(f"  Total PDFs Processed:                {COST_TRACKER['total_pdfs_processed']:,}")
+    print("-" * 80)
+    print(f"  TOTAL ESTIMATED COST:                ${COST_TRACKER['total_cost']:.6f}")
+    print("=" * 80)
     
-    try:
-        excel_path = output_dir / f"drug_formulary_complete_{timestamp}.xlsx"
+    # Per-payer breakdown
+    if COST_TRACKER['payer_costs']:
+        print(f"\n{'PER-PAYER COST BREAKDOWN':^80}")
+        print("-" * 80)
+        print(f"{'Payer Name':<30} {'Pages':>8} {'Tokens':>10} {'LLM Calls':>10} {'Cost':>12}")
+        print("-" * 80)
         
-        # Define the desired column order for the Excel export
-        column_order = [
-            "payer_name", "plan_name", "state_name", "drug_name", 
-            "drug_tier", "drug_requirements", "coverage_status",
-            "is_prior_authorization_required", "is_step_therapy_required",
-            "is_quantity_limit_applied",
-            "status", "file_name", "id", "plan_id", "payer_id",
-            "product_labeler_code", "product_proprietaryname"
-        ]
+        for payer_name, costs in sorted(COST_TRACKER['payer_costs'].items()):
+            print(f"{payer_name[:30]:<30} {costs['mistral_ocr_pages']:>8,} {costs['bedrock_tokens']:>10,} {costs['llm_calls']:>10,} ${costs['total_cost']:>10.6f}")
         
-        # Reorder dataframe columns, adding any missing ones
-        excel_df = full_df.reindex(columns=column_order)
-        
-        excel_df.to_excel(excel_path, index=False)
-        logger.info(f"Successfully exported data to Excel: {excel_path}")
-        
-    except Exception as e:
-        logger.error(f"Error exporting to Excel: {e}")
-        
-    try:
-        csv_path = output_dir / f"drug_formulary_complete_{timestamp}.csv"
-        full_df.to_csv(csv_path, index=False)
-        logger.info(f"Successfully exported data to CSV: {csv_path}")
-        
-    except Exception as e:
-        logger.error(f"Error exporting to CSV: {e}")
+        print("-" * 80)
+    
+    print("\n")
+    
+    # Return cost data as dictionary for JSON output
+    return {
+        "total_pages": COST_TRACKER['total_pages'],
+        "total_tokens": COST_TRACKER['total_tokens'],
+        "total_llm_calls": COST_TRACKER['total_llm_calls'],
+        "total_pdfs_processed": COST_TRACKER['total_pdfs_processed'],
+        "total_cost_usd": round(COST_TRACKER['total_cost'], 6),
+        "payer_breakdown": {
+            payer: {
+                "mistral_ocr_pages": costs['mistral_ocr_pages'],
+                "bedrock_tokens": costs['bedrock_tokens'],
+                "bedrock_cost_usd": round(costs['bedrock_cost'], 6),
+                "mistral_cost_usd": round(costs['mistral_cost'], 6),
+                "total_cost_usd": round(costs['total_cost'], 6),
+                "llm_calls": costs['llm_calls'],
+                "pdfs_processed": costs['pdfs_processed']
+            }
+            for payer, costs in COST_TRACKER['payer_costs'].items()
+        }
+    }
+
+
 
 
 def main():
-    """Main function to run the entire data processing pipeline"""
-    try:
-        logger.info("========================================")
-        logger.info("STARTING DRUG FORMULARY PROCESSING")
-        logger.info("========================================")
-        
-        # Step 0: Initial Setup
-        ensure_database_schema()
-        validate_required_files()
-        
-        # Step 1: Populate Payer and Plan tables from Excel
-        populate_payer_and_plan_tables()
-        
-        # Step 2: Process PDFs in parallel from URLs (now handles its own DB insertion)
-        # This function now returns a list of successfully processed plan IDs.
-        processed_plan_ids, _ = process_pdfs_from_urls_in_parallel()
-        
-        # Step 3 is now integrated into Step 2. We just need to update statuses.
-        if processed_plan_ids:
-            logger.info("STEP 3: Database insertion was handled in real-time during PDF processing.")
-            
-            # We still need to update the final status for the drugs that were inserted
-            logger.info("Updating status to 'completed' for all inserted drug records.")
-            update_drug_formulary_status(processed_plan_ids)
-            
-            # The export step is skipped as the primary goal is real-time DB insertion.
-            logger.info("Skipping cumulative data export as data is now in the database.")
-            # Step 4: Save cumulative data after all processing and DB operations
-            # logger.info("STEP 4: Saving Cumulative Data")
-            # save_cumulative_exports(deduplicated_data)
+	start_time = time.time()
+	logger.info("Starting pipeline")
+	ensure_database_schema()
+	populate_payer_and_plan_tables()
+	processed_plan_ids, all_processed_data = process_pdfs_from_urls_in_parallel()
 
-        else:
-            logger.warning("No data was processed or inserted into the database.")
+	if processed_plan_ids:
+		update_drug_formulary_status(processed_plan_ids)
+		update_plan_and_payer_statuses(processed_plan_ids)
 
-        # Step 5: Update final statuses in the database (This uses processed_plan_ids)
-        logger.info("STEP 5: Updating final plan and payer statuses.")
-        update_plan_and_payer_statuses(processed_plan_ids)
-        
-        # Step 6: Map products to formulary
-        logger.info("STEP 6: Mapping products to formulary")
-        try:
-            records_mapped = map_products_to_formulary()
-            logger.info(f"Successfully mapped {records_mapped:,} drug records to product master data.")
-        except Exception as e:
-            logger.error(f"Product mapping failed, but continuing: {e}")
-            # Don't raise - allow the pipeline to complete even if mapping fails
+	end_time = time.time()
+	elapsed_time = end_time - start_time
+	
+	logger.info("Pipeline finished")
+	
+	# Print cost summary
+	cost_data = print_cost_summary()
+	
+	# Prepare final output JSON
+	final_output = {
+		"run_summary": {
+			"status": "completed",
+			"total_processing_time_seconds": round(elapsed_time, 2),
+			"total_plans_processed": len(processed_plan_ids),
+			"processed_plan_ids": processed_plan_ids
+		},
+		"cost_summary": cost_data
+	}
+	
+	# Print final JSON output to terminal
+	print("\n" + "=" * 80)
+	print("                         FINAL OUTPUT JSON")
+	print("=" * 80)
+	print(json.dumps(final_output, indent=2))
+	print("=" * 80 + "\n")
+	
+	return final_output
 
-        logger.info("========================================")
-        logger.info("DRUG FORMULARY PROCESSING COMPLETE")
-        logger.info("========================================")
-        
-    except Exception as e:
-        logger.critical(f"A critical error occurred in the main pipeline: {e}")
-        import traceback
-        traceback.print_exc()
-    finally:
-        # Final cost report
-        logger.info("\n--- FINAL COST & USAGE REPORT ---")
-        for payer, costs in COST_TRACKER['payer_costs'].items():
-            logger.info(f"\nPayer: {payer}")
-            logger.info(f"  - PDFs Processed: {costs['pdfs_processed']}")
-            logger.info(f"  - Mistral Pages: {costs['mistral_ocr_pages']}")
-            logger.info(f"  - Mistral Cost: ${costs['mistral_cost']:.4f}")
-            logger.info(f"  - Bedrock LLM Calls: {costs['llm_calls']}")
-            logger.info(f"  - Bedrock Tokens: {costs['bedrock_tokens']}")
-            logger.info(f"  - Bedrock Cost: ${costs['bedrock_cost']:.8f}")
-            logger.info(f"  - Payer Total Cost: ${costs['total_cost']:.8f}")
-        
-        logger.info("\n--- OVERALL TOTALS ---")
-        logger.info(f"Total PDFs Processed: {COST_TRACKER['total_pdfs_processed']}")
-        logger.info(f"Total Mistral Pages: {COST_TRACKER['total_pages']}")
-        logger.info(f"Total LLM Calls: {COST_TRACKER['total_llm_calls']}")
-        logger.info(f"Total Bedrock Tokens: {COST_TRACKER['total_tokens']}")
-        logger.info(f"GRAND TOTAL COST: ${COST_TRACKER['total_cost']:.8f}")
-
-if __name__ == "__main__":
-
-    try:
-        multiprocessing.set_start_method('spawn')
-    except RuntimeError:
-        # The start method can only be set once. This is to prevent errors
-        # in environments like Jupyter notebooks where the script might be re-run.
-        pass
-
-    main()
+if __name__ == '__main__':
+	main()
