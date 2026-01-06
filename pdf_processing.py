@@ -22,10 +22,13 @@ from io import BytesIO
 from pathlib import Path
 from utils import is_english
 
+import threading
+
 from config import (
     PDF_FOLDER, PROCESS_COUNT, MISTRAL_API_KEY, BEDROCK_MODEL_ID, BEDROCK_COST_PER_1K_TOKENS,bedrock,
     MISTRAL_OCR_COST_PER_1K_PAGES, BEDROCK_COST_PER_1K_TOKENS, LLM_PAGE_WORKERS,
-    MAX_RETRIES, BACKOFF_MULTIPLIER, CLIENT_TIMEOUT, CONNECT_TIMEOUT, PDF_PAGE_PROCESSING_CONFIG
+    MAX_RETRIES, BACKOFF_MULTIPLIER, CLIENT_TIMEOUT, CONNECT_TIMEOUT, PDF_PAGE_PROCESSING_CONFIG,
+    OCR_CHUNK_WORKERS, MISTRAL_OCR_RATE_LIMIT, ENABLE_PAGE_PREFILTER, MIN_PAGE_TEXT_LENGTH, SKIP_INDEX_PAGES
 )
 from database import get_db_connection, batch_determine_coverage_status, get_cached_result, cache_result, update_plan_file_hash, insert_acronyms_to_ref_table, insert_drug_formulary_data, delete_drug_formulary_records_for_plan
 from utils import (
@@ -174,6 +177,269 @@ def initialize_worker():
     """
     pass # logging config removed
     pass # _load_prompts_config() removed
+
+
+# -----------------------------
+# OPTIMIZATION HELPERS
+# -----------------------------
+
+# Thread-safe rate limiter for Mistral OCR API (Optimization 7)
+_mistral_last_call_time = 0
+_mistral_rate_lock = threading.Lock()
+
+def mistral_rate_limited_call(func):
+    """
+    A fast rate limiter specifically for Mistral OCR calls.
+    Uses MISTRAL_OCR_RATE_LIMIT instead of the slower RATE_LIMIT_DELAY.
+    """
+    def wrapper(*args, **kwargs):
+        global _mistral_last_call_time
+        with _mistral_rate_lock:
+            elapsed = time.time() - _mistral_last_call_time
+            if elapsed < MISTRAL_OCR_RATE_LIMIT:
+                time.sleep(MISTRAL_OCR_RATE_LIMIT - elapsed)
+            _mistral_last_call_time = time.time()
+        return func(*args, **kwargs)
+    return wrapper
+
+
+def prefilter_pages_with_pymupdf(pdf_input: BytesIO, page_indices: List[int]) -> List[int]:
+    """
+    OPTIMIZATION 5: Smart page pre-filtering using PyMuPDF text extraction.
+    Quickly scans pages and removes those that are likely empty, index pages, or TOC.
+    This runs BEFORE OCR to avoid wasting API calls on useless pages.
+    
+    Args:
+        pdf_input: BytesIO object containing the PDF
+        page_indices: List of 1-based page numbers to consider
+        
+    Returns:
+        Filtered list of 1-based page numbers worth processing
+    """
+    if not ENABLE_PAGE_PREFILTER or not PYMUPDF_AVAILABLE:
+        logger.info("📄 Page pre-filtering disabled or PyMuPDF not available")
+        return page_indices
+    
+    filtered_pages = []
+    skipped_pages = []
+    
+    try:
+        pdf_input.seek(0)
+        src_doc = fitz.open(stream=pdf_input.getvalue(), filetype="pdf")
+        
+        for page_num in page_indices:
+            if page_num < 1 or page_num > len(src_doc):
+                continue
+                
+            page = src_doc[page_num - 1]
+            text = page.get_text().strip()
+            text_lower = text.lower()
+            
+            # Skip pages with very little text (blank or image-only pages)
+            if len(text) < MIN_PAGE_TEXT_LENGTH:
+                skipped_pages.append((page_num, "too little text"))
+                continue
+            
+            # Skip pages that look like index/TOC (Optimization 5)
+            if SKIP_INDEX_PAGES:
+                # Check first 500 chars for index indicators
+                header_text = text_lower[:500]
+                index_indicators = [
+                    "table of contents",
+                    "alphabetical index",
+                    "drug index",
+                    "index of drugs",
+                    "formulary index",
+                    "............",  # Common in TOC
+                    "...........",
+                ]
+                
+                is_index = False
+                for indicator in index_indicators:
+                    if indicator in header_text:
+                        is_index = True
+                        break
+                
+                # Also check for page number patterns typical in TOC (e.g., "drug name ... 42")
+                if not is_index:
+                    # Count lines that end with just a number (common TOC pattern)
+                    lines = text.split('\n')
+                    toc_pattern_count = 0
+                    for line in lines[:30]:  # Check first 30 lines
+                        line = line.strip()
+                        if re.match(r'^.{10,}\.{3,}\s*\d+$', line) or re.match(r'^.{10,}\s+\d+$', line):
+                            toc_pattern_count += 1
+                    
+                    if toc_pattern_count > 10:  # If many lines match TOC pattern
+                        is_index = True
+                
+                if is_index:
+                    skipped_pages.append((page_num, "index/TOC page"))
+                    continue
+            
+            # Page passed all filters
+            filtered_pages.append(page_num)
+        
+        src_doc.close()
+        
+        if skipped_pages:
+            logger.info(f"📄 [PRE-FILTER] Skipped {len(skipped_pages)} pages: {skipped_pages[:5]}{'...' if len(skipped_pages) > 5 else ''}")
+        
+        logger.info(f"📄 [PRE-FILTER] Kept {len(filtered_pages)} of {len(page_indices)} pages after filtering")
+        
+    except Exception as e:
+        logger.warning(f"⚠️ Page pre-filtering failed: {e}. Using original page list.")
+        return page_indices
+    
+    return filtered_pages if filtered_pages else page_indices
+
+
+def process_single_chunk_parallel(chunk_info: dict) -> dict:
+    """
+    OPTIMIZATION 1: Process a single chunk of pages for parallel execution.
+    This function is designed to be called by ThreadPoolExecutor for concurrent chunk processing.
+    
+    Args:
+        chunk_info: Dictionary containing:
+            - chunk_idx: Index of this chunk
+            - chunk_pages: List of original page numbers in this chunk
+            - pdf_bytes: The original PDF as bytes
+            - mistral_client: Mistral client instance
+            - ocr_schema: The OCR annotation schema
+            
+    Returns:
+        Dictionary with extracted drugs, acronyms, and page count
+    """
+    chunk_idx = chunk_info['chunk_idx']
+    chunk_pages = chunk_info['chunk_pages']
+    pdf_bytes = chunk_info['pdf_bytes']
+    ocr_schema = chunk_info['ocr_schema']
+    
+    result = {
+        'chunk_idx': chunk_idx,
+        'drugs': [],
+        'acronyms': [],
+        'pages_processed': 0,
+        'error': None
+    }
+    
+    try:
+        # Create a fresh Mistral client for this thread (thread-safe)
+        timeout = httpx.Timeout(CLIENT_TIMEOUT, connect=CONNECT_TIMEOUT)
+        transport = httpx.HTTPTransport(retries=MAX_RETRIES)
+        client = httpx.Client(timeout=timeout, transport=transport)
+        mistral_client = Mistral(api_key=MISTRAL_API_KEY, client=client)
+        
+        # Extract pages for this chunk
+        src_doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+        chunk_doc = fitz.open()
+        
+        for page_num in chunk_pages:
+            if 1 <= page_num <= len(src_doc):
+                chunk_doc.insert_pdf(src_doc, from_page=page_num-1, to_page=page_num-1)
+        
+        chunk_bytes = chunk_doc.tobytes()
+        chunk_doc.close()
+        src_doc.close()
+        
+        # Apply Mistral rate limiting (Optimization 7)
+        @mistral_rate_limited_call
+        def upload_chunk():
+            return mistral_client.files.upload(
+                file={"file_name": f"chunk_{chunk_idx}.pdf", "content": chunk_bytes},
+                purpose="ocr"
+            )
+        
+        chunk_uploaded = upload_chunk()
+        chunk_signed_url = mistral_client.files.get_signed_url(file_id=chunk_uploaded.id, expiry=300)
+        
+        # Process chunk with OCR
+        ocr_response = mistral_client.ocr.process(
+            model="mistral-ocr-latest",
+            document=DocumentURLChunk(document_url=chunk_signed_url.url),
+            document_annotation_format=ocr_schema,
+            include_image_base64=False
+        )
+        
+        result['pages_processed'] = len(ocr_response.pages)
+        
+        # Extract from document-level annotation
+        if hasattr(ocr_response, 'document_annotation') and ocr_response.document_annotation:
+            chunk_json = ocr_response.document_annotation
+            if isinstance(chunk_json, str):
+                chunk_json = json.loads(chunk_json)
+            
+            drug_info_list = chunk_json.get("DrugInformation", [])
+            
+            for item in drug_info_list:
+                if isinstance(item, dict):
+                    drug_name = item.get("Drug Name", "")
+                    if not drug_name or len(drug_name) < 2:
+                        continue
+                    
+                    # Map OCR page number to original page number
+                    ocr_page_num = item.get("page_number")
+                    if ocr_page_num and isinstance(ocr_page_num, int) and 1 <= ocr_page_num <= len(chunk_pages):
+                        actual_page = chunk_pages[ocr_page_num - 1]
+                    else:
+                        actual_page = chunk_pages[0] if chunk_pages else 1
+                    
+                    result['drugs'].append({
+                        "drug_name": drug_name,
+                        "drug_tier": item.get("drug tier"),
+                        "drug_requirements": item.get("requirements"),
+                        "category": item.get("category"),
+                        "page_number": actual_page
+                    })
+            
+            for item in chunk_json.get("FormularyAbbreviations", []):
+                if isinstance(item, dict):
+                    result['acronyms'].append({
+                        "acronym": item.get("Acronym"),
+                        "expansion": item.get("Expansion"),
+                        "explanation": item.get("Explanation")
+                    })
+        
+        # Also check page-level annotations
+        for page_idx, page in enumerate(ocr_response.pages):
+            page_num = chunk_pages[page_idx] if page_idx < len(chunk_pages) else page_idx + 1
+            
+            if hasattr(page, 'document_annotation') and page.document_annotation:
+                page_json = page.document_annotation
+                if isinstance(page_json, str):
+                    page_json = json.loads(page_json)
+                if isinstance(page_json, dict):
+                    for item in page_json.get("DrugInformation", []):
+                        if isinstance(item, dict):
+                            result['drugs'].append({
+                                "drug_name": item.get("Drug Name"),
+                                "drug_tier": item.get("drug tier"),
+                                "drug_requirements": item.get("requirements"),
+                                "category": item.get("category"),
+                                "page_number": page_num
+                            })
+                    for item in page_json.get("FormularyAbbreviations", []):
+                        if isinstance(item, dict):
+                            result['acronyms'].append({
+                                "acronym": item.get("Acronym"),
+                                "expansion": item.get("Expansion"),
+                                "explanation": item.get("Explanation")
+                            })
+        
+        # Cleanup
+        try:
+            mistral_client.files.delete(file_id=chunk_uploaded.id)
+        except:
+            pass
+        
+        logger.info(f"✅ Chunk {chunk_idx + 1} complete: {len(result['drugs'])} drugs from pages {chunk_pages}")
+        
+    except Exception as e:
+        result['error'] = str(e)
+        logger.warning(f"⚠️ Chunk {chunk_idx + 1} failed: {e}")
+    
+    return result
+
 
 def enhance_pdf(pdf_input, dpi=ENHANCED_PDF_DPI):
     """
@@ -1618,261 +1884,143 @@ def process_pdf_with_mistral_ocr(pdf_input, payer_name=None, filename: Optional[
                     mistral_client.files.delete(file_id=uploaded_file.id)
                 except: pass
                 
-                # Split pages into chunks of 8
+                # =====================================================================
+                # OPTIMIZATION 5: Smart page pre-filtering BEFORE chunking
+                # =====================================================================
+                if isinstance(pdf_input, BytesIO):
+                    pdf_input.seek(0)
+                    filtered_pages = prefilter_pages_with_pymupdf(pdf_input, pages_to_extract)
+                    pdf_input.seek(0)
+                else:
+                    filtered_pages = pages_to_extract
+                
+                if len(filtered_pages) < len(pages_to_extract):
+                    logger.info(f"🚀 [OPTIMIZATION 5] Pre-filtering reduced pages from {len(pages_to_extract)} to {len(filtered_pages)}")
+                
+                # Split filtered pages into chunks
                 all_structured_data = []
                 all_acronyms = []
                 total_pages_processed = 0
                 
-                page_chunks = [pages_to_extract[i:i + MAX_PAGES_PER_OCR_REQUEST] 
-                              for i in range(0, len(pages_to_extract), MAX_PAGES_PER_OCR_REQUEST)]
+                page_chunks = [filtered_pages[i:i + MAX_PAGES_PER_OCR_REQUEST] 
+                              for i in range(0, len(filtered_pages), MAX_PAGES_PER_OCR_REQUEST)]
                 
                 logger.info(f"📦 Split into {len(page_chunks)} chunks of up to {MAX_PAGES_PER_OCR_REQUEST} pages each")
                 
-                for chunk_idx, chunk_pages in enumerate(page_chunks):
-                    logger.info(f"🔄 Processing chunk {chunk_idx + 1}/{len(page_chunks)} (pages {chunk_pages[0]}-{chunk_pages[-1]})")
-                    
-                    # Extract this chunk of pages from the original PDF
-                    try:
-                        if isinstance(pdf_input, BytesIO):
-                            pdf_input.seek(0)
-                            src_doc = fitz.open(stream=pdf_input.getvalue(), filetype="pdf")
-                        else:
-                            src_doc = fitz.open(str(pdf_input))
-                        
-                        chunk_doc = fitz.open()
-                        for page_num in chunk_pages:
-                            if 1 <= page_num <= len(src_doc):
-                                chunk_doc.insert_pdf(src_doc, from_page=page_num-1, to_page=page_num-1)
-                        
-                        chunk_bytes = chunk_doc.tobytes()
-                        chunk_doc.close()
-                        src_doc.close()
-                        
-                        chunk_pdf = BytesIO(chunk_bytes)
-                        
-                        # Upload chunk
-                        chunk_uploaded = mistral_client.files.upload(
-                            file={"file_name": f"chunk_{chunk_idx}.pdf", "content": chunk_pdf.getvalue()},
-                            purpose="ocr"
-                        )
-                        
-                        chunk_signed_url = mistral_client.files.get_signed_url(file_id=chunk_uploaded.id, expiry=300)
-                        
-                        # Define schema - handles format like "DRUG NAME (PA, QL)" 
-                        # Drug name = text before parentheses, requirements = text inside parentheses
-                        ocr_annotation_schema = {
-  "type": "json_schema",
-  "json_schema": {
-    "name": "drug_extraction_schema",
-    "schema": {
-      "type": "object",
-      "properties": {
-        "drug_table": {
-          "type": "array",
-          "description": "Extract ONLY actual formulary drug rows. Skip index, TOC, category-only, or header rows.",
-          "items": {
-            "type": "object",
-            "properties": {
-              "drug_name": {
-                "type": "string",
-                "description": "Exact drug or therapeutic name as shown in formulary (include form/strength if present)."
-              },
-
-              "drug_tier": {
-                "type": ["string", "null"],
-                "description": "Tier value if present (numeric, letter, $0, or blank)."
-              },
-
-              "drug_requirements": {
-                "type": ["string", "null"],
-                "description": "Flattened requirements string for compatibility (e.g., 'B; N', 'PA; QL (30/day)')."
-              },
-
-              "vdp_flags": {
-                "type": ["object", "null"],
-                "description": "Structured representation for Texas VDP rows.",
-                "properties": {
-                  "brand_generic_other": {
-                    "type": ["string", "null"],
-                    "description": "Column 1 value: B, G, or O."
-                  },
-                  "preference_status": {
-                    "type": ["string", "null"],
-                    "description": "Column 3 value: P, N, R, or NR."
-                  }
+                # =====================================================================
+                # OPTIMIZATION 1: PARALLEL CHUNK PROCESSING
+                # Process multiple chunks concurrently using ThreadPoolExecutor
+                # =====================================================================
+                
+                # Define the OCR annotation schema once for all chunks
+                # IMPORTANT: Keys must match what the reading code expects (DrugInformation, Drug Name, etc.)
+                ocr_annotation_schema = {
+                    "type": "json_schema",
+                    "json_schema": {
+                        "name": "drug_extraction_schema",
+                        "schema": {
+                            "type": "object",
+                            "title": "StructuredData",
+                            "properties": {
+                                "DrugInformation": {
+                                    "type": "array",
+                                    "description": "Extract drugs ONLY from actual drug listing pages. SKIP Index pages, Table of Contents, Introduction, Appendix, and pages that only list drug names alphabetically without tier/requirements columns.",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "Drug Name": {
+                                                "type": "string",
+                                                "description": "COMPLETE drug name with form and dosage. Examples: 'APTIVUS ORAL CAPSULE 250 MG', 'atazanavir oral capsule 150 mg, 300 mg'. Include ALL dosages/strengths listed."
+                                            },
+                                            "drug tier": {
+                                                "type": ["string", "null"],
+                                                "description": "From 'Drug Tier' column (1, 2, 3, 4) OR from page header. Null if not shown."
+                                            },
+                                            "requirements": {
+                                                "type": ["string", "null"],
+                                                "description": "From 'Requirements/Limits' column. Include FULL text: 'QL (120 per 30 days)', 'PA', 'PA; LA'. Null if none."
+                                            },
+                                            "category": {
+                                                "type": ["string", "null"],
+                                                "description": "Section header: 'Infections', 'HIV/AIDS', etc. Null if none."
+                                            },
+                                            "page_number": {
+                                                "type": ["integer", "null"],
+                                                "description": "The actual page number where this drug is found in the document."
+                                            }
+                                        }
+                                    }
+                                },
+                                "FormularyAbbreviations": {
+                                    "type": "array",
+                                    "description": "Abbreviation definitions found in legends/keys",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "Acronym": {"type": "string", "description": "The abbreviation code (PA, QL, ST, etc.)"},
+                                            "Expansion": {"type": "string", "description": "What it stands for (Prior Authorization, Quantity Limit, etc.)"},
+                                            "Explanation": {"type": ["string", "null"], "description": "Additional explanation if any"}
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
-              },
-
-              "pa_form_link": {
-                "type": ["string", "null"],
-                "description": "PA Form hyperlink if present in VDP tables."
-              },
-
-              "category": {
-                "type": ["string", "null"],
-                "description": "Therapeutic category header if applicable."
-              },
-
-              "page_number": {
-                "type": ["integer", "null"],
-                "description": "Actual page number in the source document."
-              }
-            },
-            "required": ["drug_name"]
-          }
-        },
-
-        "acronyms": {
-          "type": "array",
-          "description": "Legend or abbreviation definitions found in the document.",
-          "items": {
-            "type": "object",
-            "properties": {
-              "acronym": { "type": "string" },
-              "expansion": { "type": "string" },
-              "explanation": { "type": ["string", "null"] }
-            },
-            "required": ["acronym", "expansion"]
-          }
-        },
-
-        "tiers": {
-          "type": "array",
-          "description": "Tier or color legend definitions if present.",
-          "items": {
-            "type": "object",
-            "properties": {
-              "acronym": { "type": "string" },
-              "expansion": { "type": "string" },
-              "explanation": { "type": ["string", "null"] }
-            },
-            "required": ["acronym", "expansion"]
-          }
-        }
-      },
-      "required": ["drug_table", "acronyms", "tiers"]
-    }
-  }
-}
-
-                        # Process chunk with OCR
-                        chunk_response = mistral_client.ocr.process(
-                            model="mistral-ocr-latest",
-                            document=DocumentURLChunk(document_url=chunk_signed_url.url),
-                            document_annotation_format=ocr_annotation_schema,
-                            include_image_base64=False
-                        )
-                        
-                        # Extract data from chunk response
-                        logger.info(f"🔍 Chunk {chunk_idx + 1}: Processing response for pages {chunk_pages}")
-                        logger.info(f"🔍 Chunk {chunk_idx + 1}: Has document_annotation: {hasattr(chunk_response, 'document_annotation')}")
-                        logger.info(f"🔍 Chunk {chunk_idx + 1}: Num pages in response: {len(chunk_response.pages) if hasattr(chunk_response, 'pages') else 0}")
-                        
-                        chunk_drugs_found = 0
-                        
-                        if hasattr(chunk_response, 'document_annotation') and chunk_response.document_annotation:
-                            chunk_json = chunk_response.document_annotation
-                            if isinstance(chunk_json, str):
-                                chunk_json = json.loads(chunk_json)
-                            
-                            drug_info_list = chunk_json.get("DrugInformation", [])
-                            logger.info(f"🔍 Chunk {chunk_idx + 1}: Document-level has {len(drug_info_list)} drugs")
-                            
-                            for item in drug_info_list:
-                                if isinstance(item, dict):
-                                    drug_name = item.get("Drug Name", "")
-                                    # Skip index/TOC entries - they typically have no tier or requirements
-                                    if not drug_name or len(drug_name) < 2:
-                                        continue
-                                    
-                                    # PAGE MAPPING: OCR's page_number is within the extracted chunk (1, 2, 3...)
-                                    # We need to map it back to original page numbers using chunk_pages
-                                    ocr_page_num = item.get("page_number")
-                                    
-                                    # DEBUG: Log what OCR returned
-                                    if chunk_drugs_found < 3:  # Log first 3 for debugging
-                                        logger.info(f"🔍 Chunk {chunk_idx + 1}: Drug '{drug_name[:30]}...' has ocr_page_num={ocr_page_num}")
-                                    
-                                    if ocr_page_num and isinstance(ocr_page_num, int) and 1 <= ocr_page_num <= len(chunk_pages):
-                                        # Map OCR page (1-based index within chunk) to original page number
-                                        actual_page = chunk_pages[ocr_page_num - 1]
-                                    else:
-                                        # If no page number or invalid, distribute evenly across chunk pages
-                                        # Use a simple heuristic: assign based on position in list
-                                        position_ratio = chunk_drugs_found / max(len(drug_info_list), 1)
-                                        page_index = min(int(position_ratio * len(chunk_pages)), len(chunk_pages) - 1)
-                                        actual_page = chunk_pages[page_index]
-                                    
-                                    logger.debug(f"Chunk {chunk_idx + 1}: OCR page_num={ocr_page_num} -> mapped to original page {actual_page}")
-                                    
-                                    all_structured_data.append({
-                                        "drug_name": drug_name,
-                                        "drug_tier": item.get("drug tier"),
-                                        "drug_requirements": item.get("requirements"),
-                                        "category": item.get("category"),
-                                        "page_number": actual_page
-                                    })
-                                    chunk_drugs_found += 1
-                            
-                            for item in chunk_json.get("FormularyAbbreviations", []):
-                                if isinstance(item, dict):
-                                    all_acronyms.append({
-                                        "acronym": item.get("Acronym"),
-                                        "expansion": item.get("Expansion"),
-                                        "explanation": item.get("Explanation")
-                                    })
-                        
-                        logger.info(f"🔍 Chunk {chunk_idx + 1}: Document-level extraction found {chunk_drugs_found} drugs")
-                        
-                        # Also check page-level annotations
-                        page_level_drugs_found = 0
-                        for page_idx, page in enumerate(chunk_response.pages):
-                            # PAGE MAPPING: Map extracted page index to original page number
-                            page_num = chunk_pages[page_idx] if page_idx < len(chunk_pages) else page_idx + 1
-                            logger.info(f"🔍 Chunk {chunk_idx + 1}, page_idx {page_idx} -> checking page-level for original page {page_num}")
-                            logger.info(f"🔍 Page {page_num} has document_annotation: {hasattr(page, 'document_annotation') and bool(page.document_annotation)}")
-                            
-                            if hasattr(page, 'document_annotation') and page.document_annotation:
-                                page_json = page.document_annotation
-                                if isinstance(page_json, str):
-                                    page_json = json.loads(page_json)
-                                if isinstance(page_json, dict):
-                                    drugs_on_page = page_json.get("DrugInformation", [])
-                                    if drugs_on_page:
-                                        logger.info(f"✅ Page-level annotation: Found {len(drugs_on_page)} drugs on original page {page_num}")
-                                    for item in drugs_on_page:
-                                        if isinstance(item, dict):
-                                            all_structured_data.append({
-                                                "drug_name": item.get("Drug Name"),
-                                                "drug_tier": item.get("drug tier"),
-                                                "drug_requirements": item.get("requirements"),
-                                                "category": item.get("category"),
-                                                "page_number": page_num
-                                            })
-                                            page_level_drugs_found += 1
-                                    for item in page_json.get("FormularyAbbreviations", []):
-                                        if isinstance(item, dict):
-                                            all_acronyms.append({
-                                                "acronym": item.get("Acronym"),
-                                                "expansion": item.get("Expansion"),
-                                                "explanation": item.get("Explanation")
-                                            })
-                        
-                        logger.info(f"🔍 Chunk {chunk_idx + 1}: Page-level extraction found {page_level_drugs_found} additional drugs")
-                        logger.info(f"📊 Chunk {chunk_idx + 1} TOTAL: {chunk_drugs_found + page_level_drugs_found} drugs from pages {chunk_pages}")
-                        
-                        total_pages_processed += len(chunk_response.pages)
-                        
-                        # Cleanup chunk file
+                
+                # Prepare PDF bytes for parallel processing
+                if isinstance(pdf_input, BytesIO):
+                    pdf_input.seek(0)
+                    pdf_bytes_for_parallel = pdf_input.getvalue()
+                else:
+                    with open(str(pdf_input), 'rb') as f:
+                        pdf_bytes_for_parallel = f.read()
+                
+                # Prepare chunk info for parallel processing
+                chunk_infos = [
+                    {
+                        'chunk_idx': chunk_idx,
+                        'chunk_pages': chunk_pages,
+                        'pdf_bytes': pdf_bytes_for_parallel,
+                        'ocr_schema': ocr_annotation_schema
+                    }
+                    for chunk_idx, chunk_pages in enumerate(page_chunks)
+                ]
+                
+                logger.info(f"🚀 [OPTIMIZATION 1] Processing {len(page_chunks)} chunks in PARALLEL with {OCR_CHUNK_WORKERS} workers...")
+                start_parallel_time = time.time()
+                
+                # Process chunks in parallel using ThreadPoolExecutor
+                with ThreadPoolExecutor(max_workers=OCR_CHUNK_WORKERS) as executor:
+                    future_to_chunk = {
+                        executor.submit(process_single_chunk_parallel, chunk_info): chunk_info['chunk_idx']
+                        for chunk_info in chunk_infos
+                    }
+                    
+                    completed_chunks = 0
+                    for future in as_completed(future_to_chunk):
+                        chunk_idx = future_to_chunk[future]
                         try:
-                            mistral_client.files.delete(file_id=chunk_uploaded.id)
-                        except: pass
+                            result = future.result()
+                            completed_chunks += 1
+                            
+                            if result['error']:
+                                logger.warning(f"⚠️ Chunk {chunk_idx + 1} returned with error: {result['error']}")
+                            else:
+                                all_structured_data.extend(result['drugs'])
+                                all_acronyms.extend(result['acronyms'])
+                                total_pages_processed += result['pages_processed']
+                                
+                                logger.info(f"📊 Chunk {chunk_idx + 1}/{len(page_chunks)} complete. "
+                                           f"Total drugs so far: {len(all_structured_data)} "
+                                           f"({completed_chunks}/{len(page_chunks)} chunks done)")
                         
-                        logger.info(f"✅ Chunk {chunk_idx + 1} complete: {len(chunk_response.pages)} pages, found {len(all_structured_data)} drugs so far")
-                        
-                    except Exception as chunk_error:
-                        logger.warning(f"⚠️ Chunk {chunk_idx + 1} failed: {chunk_error}")
-                        continue
+                        except Exception as exc:
+                            logger.error(f"⚠️ Chunk {chunk_idx + 1} generated exception: {exc}")
+                
+                parallel_duration = time.time() - start_parallel_time
+                logger.info(f"⏱️ [OPTIMIZATION 1] Parallel processing completed in {parallel_duration:.1f}s "
+                           f"(avg {parallel_duration/len(page_chunks):.2f}s per chunk)")
                 
                 # Return combined results from all chunks
                 full_structured_data = {
@@ -1884,7 +2032,7 @@ def process_pdf_with_mistral_ocr(pdf_input, payer_name=None, filename: Optional[
                 total_costs['mistral_pages'] = total_pages_processed
                 total_costs['mistral_cost'] = (total_pages_processed / 1000.0) * MISTRAL_OCR_COST_PER_1K_PAGES
                 
-                logger.info(f"✅ [PRIMARY FLOW SUCCESS] Chunked OCR extraction completed for {filename}.")
+                logger.info(f"✅ [PRIMARY FLOW SUCCESS] Parallel chunked OCR extraction completed for {filename}.")
                 logger.info(f"📊 Extracted {len(all_structured_data)} drugs, {len(all_acronyms)} acronyms from {total_pages_processed} page(s) in {len(page_chunks)} chunks.")
                 
                 # Log page distribution for verification
@@ -1899,10 +2047,10 @@ def process_pdf_with_mistral_ocr(pdf_input, payer_name=None, filename: Optional[
                     for i, drug in enumerate(all_structured_data[:5]):
                         logger.info(f"   Drug {i+1}: '{drug.get('drug_name', '')[:50]}...' on page {drug.get('page_number')}")
                 else:
-                    logger.warning(f"⚠️ NO DRUGS EXTRACTED from chunked processing!")
+                    logger.warning(f"⚠️ NO DRUGS EXTRACTED from parallel chunked processing!")
                 
-                logger.info(f"🚀 RETURNING from chunked processing: {len(all_structured_data)} drugs in drug_table")
-                return full_structured_data, "[CHUNKED OCR EXTRACTION]", total_costs
+                logger.info(f"🚀 RETURNING from parallel chunked processing: {len(all_structured_data)} drugs in drug_table")
+                return full_structured_data, "[PARALLEL CHUNKED OCR EXTRACTION]", total_costs
             
             # For documents <= 8 pages, process normally (single request)
             signed_url = mistral_client.files.get_signed_url(file_id=uploaded_file.id, expiry=300)

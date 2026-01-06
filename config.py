@@ -49,9 +49,23 @@ ALL_RAW_CONTENT = {}
 mistral_client = Mistral(api_key=MISTRAL_API_KEY)
 
 # Add these constants after the existing configuration
-RATE_LIMIT_DELAY = 1.0  # Minimum seconds between API calls
+RATE_LIMIT_DELAY = 1.0  # Minimum seconds between API calls (for Bedrock)
 MAX_RETRIES = 5
 BACKOFF_MULTIPLIER = 2
+
+# -----------------------------
+# Optimization Settings
+# -----------------------------
+# Parallel OCR chunk processing (Optimization 1)
+OCR_CHUNK_WORKERS = 10  # Number of OCR chunks to process in parallel
+
+# Mistral-specific rate limiting (Optimization 7) - Mistral has higher limits than Bedrock
+MISTRAL_OCR_RATE_LIMIT = 0.1  # 100ms between Mistral OCR calls (much faster than Bedrock)
+
+# Smart page pre-filtering (Optimization 5)
+ENABLE_PAGE_PREFILTER = True  # Enable/disable page pre-filtering before OCR
+MIN_PAGE_TEXT_LENGTH = 100  # Minimum text characters to consider a page worth processing
+SKIP_INDEX_PAGES = True  # Skip pages that look like index/TOC pages
 
 # Add these constants after your existing configuration
 BEDROCK_COST_PER_1K_TOKENS = 0.00022  # $0.00022 per 1000 tokens
@@ -106,7 +120,7 @@ bedrock = boto3.client(
 #
 PDF_PAGE_PROCESSING_CONFIG = {
     # Example: Process pages 1-10, 20-30, and 90-100 for all files.
-    "default": ["8-18"]
+    "default": ["1-91"]
 
     # Example: Process all pages for Cigna, but only a few for others.
     # "Cigna": "all",
