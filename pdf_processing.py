@@ -363,6 +363,9 @@ def process_single_chunk_parallel(chunk_info: dict) -> dict:
         
         result['pages_processed'] = len(ocr_response.pages)
         
+        # Log chunk info for debugging page mapping
+        logger.info(f"Chunk {chunk_idx + 1}: Processing {len(chunk_pages)} pages. Original PDF page numbers: {chunk_pages}")
+        
         # Extract from document-level annotation
         if hasattr(ocr_response, 'document_annotation') and ocr_response.document_annotation:
             chunk_json = ocr_response.document_annotation
@@ -371,25 +374,54 @@ def process_single_chunk_parallel(chunk_info: dict) -> dict:
             
             drug_info_list = chunk_json.get("DrugInformation", [])
             
-            for item in drug_info_list:
+            for drug_idx, item in enumerate(drug_info_list):
                 if isinstance(item, dict):
                     drug_name = item.get("Drug Name", "")
                     if not drug_name or len(drug_name) < 2:
                         continue
                     
-                    # Map OCR page number to original page number
+                    # =====================================================================
+                    # PAGE NUMBER MAPPING - Store ACTUAL PDF page numbers
+                    # =====================================================================
+                    # chunk_pages contains the ORIGINAL PDF page numbers (e.g., [5, 6, 7, 8])
+                    # OCR may return page_number in two ways:
+                    #   1. Chunk-relative (1, 2, 3, 4) - position within the extracted chunk
+                    #   2. Printed page number - what's literally printed on the PDF page
+                    # 
+                    # We want to store the ACTUAL PDF page number (physical position in PDF)
+                    # =====================================================================
+                    
                     ocr_page_num = item.get("page_number")
+                    
+                    # Case 1: OCR returned a chunk-relative page number (1 to len(chunk_pages))
                     if ocr_page_num and isinstance(ocr_page_num, int) and 1 <= ocr_page_num <= len(chunk_pages):
-                        actual_page = chunk_pages[ocr_page_num - 1]
+                        # Map chunk-relative page to original PDF page number
+                        actual_pdf_page = chunk_pages[ocr_page_num - 1]
+                        logger.debug(f"Chunk {chunk_idx + 1}: Drug '{drug_name[:30]}' - OCR page {ocr_page_num} → PDF page {actual_pdf_page}")
+                    
+                    # Case 2: OCR returned a page number that matches one of our original PDF pages
+                    elif ocr_page_num and isinstance(ocr_page_num, int) and ocr_page_num in chunk_pages:
+                        # OCR returned the actual PDF page number directly
+                        actual_pdf_page = ocr_page_num
+                        logger.debug(f"Chunk {chunk_idx + 1}: Drug '{drug_name[:30]}' - OCR returned PDF page {actual_pdf_page} directly")
+                    
+                    # Case 3: Fallback - distribute evenly based on position in list
                     else:
-                        actual_page = chunk_pages[0] if chunk_pages else 1
+                        if len(drug_info_list) > 0 and len(chunk_pages) > 0:
+                            # Calculate which PDF page this drug likely belongs to
+                            position_ratio = drug_idx / len(drug_info_list)
+                            page_index = min(int(position_ratio * len(chunk_pages)), len(chunk_pages) - 1)
+                            actual_pdf_page = chunk_pages[page_index]
+                        else:
+                            actual_pdf_page = chunk_pages[0] if chunk_pages else 1
+                        logger.debug(f"Chunk {chunk_idx + 1}: Drug '{drug_name[:30]}' - No valid page ({ocr_page_num}) → estimated PDF page {actual_pdf_page}")
                     
                     result['drugs'].append({
                         "drug_name": drug_name,
                         "drug_tier": item.get("drug tier"),
                         "drug_requirements": item.get("requirements"),
                         "category": item.get("category"),
-                        "page_number": actual_page
+                        "page_number": actual_pdf_page  # Store the actual PDF page number
                     })
             
             for item in chunk_json.get("FormularyAbbreviations", []):
@@ -401,22 +433,32 @@ def process_single_chunk_parallel(chunk_info: dict) -> dict:
                     })
         
         # Also check page-level annotations
+        # PAGE MAPPING: page_idx is 0-based index within the chunk (0, 1, 2, 3)
+        # chunk_pages[page_idx] gives the ACTUAL PDF page number (e.g., 5, 6, 7, 8)
         for page_idx, page in enumerate(ocr_response.pages):
-            page_num = chunk_pages[page_idx] if page_idx < len(chunk_pages) else page_idx + 1
+            # Map chunk page index to ACTUAL PDF page number
+            if page_idx < len(chunk_pages):
+                actual_pdf_page = chunk_pages[page_idx]
+            else:
+                logger.warning(f"Chunk {chunk_idx + 1}: page_idx {page_idx} out of range for chunk_pages (len={len(chunk_pages)})")
+                actual_pdf_page = chunk_pages[-1] if chunk_pages else page_idx + 1  # Fallback
             
             if hasattr(page, 'document_annotation') and page.document_annotation:
                 page_json = page.document_annotation
                 if isinstance(page_json, str):
                     page_json = json.loads(page_json)
                 if isinstance(page_json, dict):
-                    for item in page_json.get("DrugInformation", []):
+                    drugs_on_page = page_json.get("DrugInformation", [])
+                    if drugs_on_page:
+                        logger.debug(f"Chunk {chunk_idx + 1}: Page-level found {len(drugs_on_page)} drugs on PDF page {actual_pdf_page}")
+                    for item in drugs_on_page:
                         if isinstance(item, dict):
                             result['drugs'].append({
                                 "drug_name": item.get("Drug Name"),
                                 "drug_tier": item.get("drug tier"),
                                 "drug_requirements": item.get("requirements"),
                                 "category": item.get("category"),
-                                "page_number": page_num
+                                "page_number": actual_pdf_page  # Store actual PDF page number
                             })
                     for item in page_json.get("FormularyAbbreviations", []):
                         if isinstance(item, dict):
@@ -432,7 +474,15 @@ def process_single_chunk_parallel(chunk_info: dict) -> dict:
         except:
             pass
         
-        logger.info(f"✅ Chunk {chunk_idx + 1} complete: {len(result['drugs'])} drugs from pages {chunk_pages}")
+        # Log completion with page distribution info
+        if result['drugs']:
+            page_counts = {}
+            for d in result['drugs']:
+                p = d.get('page_number')
+                page_counts[p] = page_counts.get(p, 0) + 1
+            logger.info(f"✅ Chunk {chunk_idx + 1} complete: {len(result['drugs'])} drugs from original pages {chunk_pages}. Distribution: {page_counts}")
+        else:
+            logger.info(f"✅ Chunk {chunk_idx + 1} complete: 0 drugs from original pages {chunk_pages}")
         
     except Exception as e:
         result['error'] = str(e)
