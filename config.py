@@ -36,8 +36,7 @@ DB_CONFIG = {
     "host": os.getenv("DB_HOST"),
     "port": os.getenv("DB_PORT"),
 }
-print(DB_CONFIG)
-# Target fields for structured extraction
+
 TARGET_FIELDS = ["drug_name", "drug_tier", "drug_requirements"]
 DB_FIELDS = ["drug_name", "drug_tier", "drug_requirements"]
 

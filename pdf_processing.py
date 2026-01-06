@@ -41,106 +41,10 @@ from utils import (
 
 logger = logging.getLogger(__name__)
 
-DRUG_EXTRACTION_SCHEMA = ocr_annotation_schema = {
-  "type": "json_schema",
-  "json_schema": {
-    "name": "drug_extraction_schema",
-    "schema": {
-      "type": "object",
-      "properties": {
-        "drug_table": {
-          "type": "array",
-          "description": "Extract ONLY actual formulary drug rows. Skip index, TOC, category-only, or header rows.",
-          "items": {
-            "type": "object",
-            "properties": {
-              "drug_name": {
-                "type": "string",
-                "description": "Exact drug or therapeutic name as shown in formulary (include form/strength if present)."
-              },
-
-              "drug_tier": {
-                "type": ["string", "null"],
-                "description": "Tier value if present (numeric, letter, $0, or blank)."
-              },
-
-              "drug_requirements": {
-                "type": ["string", "null"],
-                "description": "Flattened requirements string for compatibility (e.g., 'B; N', 'PA; QL (30/day)')."
-              },
-
-              "vdp_flags": {
-                "type": ["object", "null"],
-                "description": "Structured representation for Texas VDP rows.",
-                "properties": {
-                  "brand_generic_other": {
-                    "type": ["string", "null"],
-                    "description": "Column 1 value: B, G, or O."
-                  },
-                  "preference_status": {
-                    "type": ["string", "null"],
-                    "description": "Column 3 value: P, N, R, or NR."
-                  }
-                }
-              },
-
-              "pa_form_link": {
-                "type": ["string", "null"],
-                "description": "PA Form hyperlink if present in VDP tables."
-              },
-
-              "category": {
-                "type": ["string", "null"],
-                "description": "Therapeutic category header if applicable."
-              },
-
-              "page_number": {
-                "type": ["integer", "null"],
-                "description": "Actual page number in the source document."
-              }
-            },
-            "required": ["drug_name"]
-          }
-        },
-
-        "acronyms": {
-          "type": "array",
-          "description": "Legend or abbreviation definitions found in the document.",
-          "items": {
-            "type": "object",
-            "properties": {
-              "acronym": { "type": "string" },
-              "expansion": { "type": "string" },
-              "explanation": { "type": ["string", "null"] }
-            },
-            "required": ["acronym", "expansion"]
-          }
-        },
-
-        "tiers": {
-          "type": "array",
-          "description": "Tier or color legend definitions if present.",
-          "items": {
-            "type": "object",
-            "properties": {
-              "acronym": { "type": "string" },
-              "expansion": { "type": "string" },
-              "explanation": { "type": ["string", "null"] }
-            },
-            "required": ["acronym", "expansion"]
-          }
-        }
-      },
-      "required": ["drug_table", "acronyms", "tiers"]
-    }
-  }
-}
-
-
+# PDF Processing Constants
 MAX_PDF_PAGES = 2000
-ENHANCED_PDF_DPI = 200  # High resolution for better table recognition
-USE_ENHANCED_PDF = False  # Toggle to enable/disable PDF enhancement before OCR (DISABLED for speed)
-
+ENHANCED_PDF_DPI = 200
+USE_ENHANCED_PDF = False
 
 
 # json5 is not a standard library, so we handle its absence gracefully.
@@ -353,13 +257,35 @@ def process_single_chunk_parallel(chunk_info: dict) -> dict:
         chunk_uploaded = upload_chunk()
         chunk_signed_url = mistral_client.files.get_signed_url(file_id=chunk_uploaded.id, expiry=300)
         
-        # Process chunk with OCR
-        ocr_response = mistral_client.ocr.process(
-            model="mistral-ocr-latest",
-            document=DocumentURLChunk(document_url=chunk_signed_url.url),
-            document_annotation_format=ocr_schema,
-            include_image_base64=False
-        )
+        # Process chunk with OCR - with retry logic for 500/502 errors
+        max_retries = 3
+        retry_delay = 2  # seconds
+        ocr_response = None
+        
+        for attempt in range(max_retries):
+            try:
+                ocr_response = mistral_client.ocr.process(
+                    model="mistral-ocr-latest",
+                    document=DocumentURLChunk(document_url=chunk_signed_url.url),
+                    document_annotation_format=ocr_schema,
+                    include_image_base64=False
+                )
+                break  # Success, exit retry loop
+            except Exception as e:
+                error_str = str(e)
+                if "500" in error_str or "502" in error_str or "503" in error_str:
+                    if attempt < max_retries - 1:
+                        logger.warning(f"⚠️ Chunk {chunk_idx + 1}: OCR API error (attempt {attempt + 1}/{max_retries}), retrying in {retry_delay}s...")
+                        time.sleep(retry_delay)
+                        retry_delay *= 2  # Exponential backoff
+                    else:
+                        raise  # Re-raise on final attempt
+                else:
+                    raise  # Non-retryable error
+        
+        if ocr_response is None:
+            result['error'] = "OCR API failed after retries"
+            return result
         
         result['pages_processed'] = len(ocr_response.pages)
         
@@ -370,7 +296,32 @@ def process_single_chunk_parallel(chunk_info: dict) -> dict:
         if hasattr(ocr_response, 'document_annotation') and ocr_response.document_annotation:
             chunk_json = ocr_response.document_annotation
             if isinstance(chunk_json, str):
-                chunk_json = json.loads(chunk_json)
+                # Try to parse JSON, with repair for malformed responses
+                try:
+                    chunk_json = json.loads(chunk_json)
+                except json.JSONDecodeError as e:
+                    logger.warning(f"⚠️ Chunk {chunk_idx + 1}: JSON parse error: {e}. Attempting repair...")
+                    # Try to repair common JSON issues
+                    repaired = chunk_json
+                    # Fix unterminated strings by truncating at the error point
+                    if "Unterminated string" in str(e):
+                        # Find the last complete JSON object
+                        try:
+                            # Try to find a valid JSON subset
+                            for end_pos in range(len(repaired) - 1, 0, -1):
+                                test_str = repaired[:end_pos] + '"}]}'
+                                try:
+                                    chunk_json = json.loads(test_str)
+                                    logger.info(f"✅ Chunk {chunk_idx + 1}: JSON repaired successfully")
+                                    break
+                                except:
+                                    continue
+                            else:
+                                chunk_json = {"DrugInformation": [], "FormularyAbbreviations": []}
+                        except:
+                            chunk_json = {"DrugInformation": [], "FormularyAbbreviations": []}
+                    else:
+                        chunk_json = {"DrugInformation": [], "FormularyAbbreviations": []}
             
             drug_info_list = chunk_json.get("DrugInformation", [])
             
@@ -381,47 +332,56 @@ def process_single_chunk_parallel(chunk_info: dict) -> dict:
                         continue
                     
                     # =====================================================================
-                    # PAGE NUMBER MAPPING - Store ACTUAL PDF page numbers
+                    # DRUG DATA MAPPING FOR PDL FORMAT
                     # =====================================================================
-                    # chunk_pages contains the ORIGINAL PDF page numbers (e.g., [5, 6, 7, 8])
-                    # OCR may return page_number in two ways:
-                    #   1. Chunk-relative (1, 2, 3, 4) - position within the extracted chunk
-                    #   2. Printed page number - what's literally printed on the PDF page
-                    # 
-                    # We want to store the ACTUAL PDF page number (physical position in PDF)
+                    # Therapeutic Category → drug_name (already extracted as "Drug Name")
+                    # Comment (number) → drug_tier
+                    # B,G,O + P,N,R,NR combined with ";" → drug_requirements
                     # =====================================================================
                     
+                    # Get the raw values from OCR
+                    bgo = item.get("BGO", "").strip() if item.get("BGO") else ""
+                    pnrnr = item.get("PNRNR", "").strip() if item.get("PNRNR") else ""
+                    
+                    # Combine BGO and PNRNR into drug_requirements
+                    # If OCR already provided combined "requirements", use that as fallback
+                    ocr_requirements = item.get("requirements", "")
+                    
+                    if bgo or pnrnr:
+                        # Combine with semicolon separator: "G; P", "B; N", etc.
+                        parts = [p for p in [bgo, pnrnr] if p]
+                        drug_requirements = "; ".join(parts) if parts else None
+                    elif ocr_requirements:
+                        drug_requirements = ocr_requirements
+                    else:
+                        drug_requirements = None
+                    
+                    # =====================================================================
+                    # PAGE NUMBER MAPPING - Store ACTUAL PDF page numbers
+                    # =====================================================================
                     ocr_page_num = item.get("page_number")
                     
                     # Case 1: OCR returned a chunk-relative page number (1 to len(chunk_pages))
                     if ocr_page_num and isinstance(ocr_page_num, int) and 1 <= ocr_page_num <= len(chunk_pages):
-                        # Map chunk-relative page to original PDF page number
                         actual_pdf_page = chunk_pages[ocr_page_num - 1]
-                        logger.debug(f"Chunk {chunk_idx + 1}: Drug '{drug_name[:30]}' - OCR page {ocr_page_num} → PDF page {actual_pdf_page}")
-                    
                     # Case 2: OCR returned a page number that matches one of our original PDF pages
                     elif ocr_page_num and isinstance(ocr_page_num, int) and ocr_page_num in chunk_pages:
-                        # OCR returned the actual PDF page number directly
                         actual_pdf_page = ocr_page_num
-                        logger.debug(f"Chunk {chunk_idx + 1}: Drug '{drug_name[:30]}' - OCR returned PDF page {actual_pdf_page} directly")
-                    
                     # Case 3: Fallback - distribute evenly based on position in list
                     else:
                         if len(drug_info_list) > 0 and len(chunk_pages) > 0:
-                            # Calculate which PDF page this drug likely belongs to
                             position_ratio = drug_idx / len(drug_info_list)
                             page_index = min(int(position_ratio * len(chunk_pages)), len(chunk_pages) - 1)
                             actual_pdf_page = chunk_pages[page_index]
                         else:
                             actual_pdf_page = chunk_pages[0] if chunk_pages else 1
-                        logger.debug(f"Chunk {chunk_idx + 1}: Drug '{drug_name[:30]}' - No valid page ({ocr_page_num}) → estimated PDF page {actual_pdf_page}")
                     
                     result['drugs'].append({
                         "drug_name": drug_name,
                         "drug_tier": item.get("drug tier"),
-                        "drug_requirements": item.get("requirements"),
+                        "drug_requirements": drug_requirements,
                         "category": item.get("category"),
-                        "page_number": actual_pdf_page  # Store the actual PDF page number
+                        "page_number": actual_pdf_page
                     })
             
             for item in chunk_json.get("FormularyAbbreviations", []):
@@ -453,12 +413,25 @@ def process_single_chunk_parallel(chunk_info: dict) -> dict:
                         logger.debug(f"Chunk {chunk_idx + 1}: Page-level found {len(drugs_on_page)} drugs on PDF page {actual_pdf_page}")
                     for item in drugs_on_page:
                         if isinstance(item, dict):
+                            # Combine BGO and PNRNR for PDL format
+                            bgo = item.get("BGO", "").strip() if item.get("BGO") else ""
+                            pnrnr = item.get("PNRNR", "").strip() if item.get("PNRNR") else ""
+                            ocr_requirements = item.get("requirements", "")
+                            
+                            if bgo or pnrnr:
+                                parts = [p for p in [bgo, pnrnr] if p]
+                                drug_requirements = "; ".join(parts) if parts else None
+                            elif ocr_requirements:
+                                drug_requirements = ocr_requirements
+                            else:
+                                drug_requirements = None
+                            
                             result['drugs'].append({
                                 "drug_name": item.get("Drug Name"),
                                 "drug_tier": item.get("drug tier"),
-                                "drug_requirements": item.get("requirements"),
+                                "drug_requirements": drug_requirements,
                                 "category": item.get("category"),
-                                "page_number": actual_pdf_page  # Store actual PDF page number
+                                "page_number": actual_pdf_page
                             })
                     for item in page_json.get("FormularyAbbreviations", []):
                         if isinstance(item, dict):
@@ -1963,7 +1936,13 @@ def process_pdf_with_mistral_ocr(pdf_input, payer_name=None, filename: Optional[
                 # =====================================================================
                 
                 # Define the OCR annotation schema once for all chunks
-                # IMPORTANT: Keys must match what the reading code expects (DrugInformation, Drug Name, etc.)
+                # IMPORTANT: This schema supports MULTIPLE PDF formats:
+                # 
+                # FORMAT 1 (Traditional): Drug Name | Drug Tier | Requirements/Limits columns
+                # FORMAT 2 (PDL): B,G,O | Comment | P,N,R,NR | Therapeutic Category | PA Form Link
+                #
+                # The extraction code handles both formats dynamically.
+                #
                 ocr_annotation_schema = {
                     "type": "json_schema",
                     "json_schema": {
@@ -1974,41 +1953,53 @@ def process_pdf_with_mistral_ocr(pdf_input, payer_name=None, filename: Optional[
                             "properties": {
                                 "DrugInformation": {
                                     "type": "array",
-                                    "description": "Extract drugs ONLY from actual drug listing pages. SKIP Index pages, Table of Contents, Introduction, Appendix, and pages that only list drug names alphabetically without tier/requirements columns.",
+                                    "description": "Extract drugs from formulary/PDL drug listing tables. Supports multiple formats: 1) Traditional tables with 'Drug Name', 'Drug Tier', 'Requirements' columns, 2) PDL tables with 'B,G,O', 'Comment', 'P,N,R,NR', 'Therapeutic Category' columns. SKIP index pages, TOC, and category header rows.",
                                     "items": {
                                         "type": "object",
                                         "properties": {
                                             "Drug Name": {
                                                 "type": "string",
-                                                "description": "COMPLETE drug name with form and dosage. Examples: 'APTIVUS ORAL CAPSULE 250 MG', 'atazanavir oral capsule 150 mg, 300 mg'. Include ALL dosages/strengths listed."
+                                                "description": "The drug name. In traditional format: from 'Drug Name' column. In PDL format: from 'Therapeutic Category' column. Examples: 'ACCURETIC', 'Lisinopril', 'APTIVUS ORAL CAPSULE 250 MG'."
                                             },
                                             "drug tier": {
                                                 "type": ["string", "null"],
-                                                "description": "From 'Drug Tier' column (1, 2, 3, 4) OR from page header. Null if not shown."
+                                                "description": "The tier/comment value. In traditional format: from 'Drug Tier' column (1, 2, 3, 4). In PDL format: from 'Comment' column (numbers like 6, 11, 12). Null if not present."
                                             },
                                             "requirements": {
                                                 "type": ["string", "null"],
-                                                "description": "From 'Requirements/Limits' column. Include FULL text: 'QL (120 per 30 days)', 'PA', 'PA; LA'. Null if none."
+                                                "description": "Requirements/restrictions. In traditional format: from 'Requirements/Limits' column (e.g., 'PA', 'QL (30/day)', 'ST'). In PDL format: the combined value is built from BGO and PNRNR columns. Null if none."
+                                            },
+                                            "BGO": {
+                                                "type": ["string", "null"],
+                                                "description": "PDL format only: Value from 'B, G or O' column. B=Brand, G=Generic, O=OTC. Null if not in PDL format."
+                                            },
+                                            "PNRNR": {
+                                                "type": ["string", "null"],
+                                                "description": "PDL format only: Value from 'P, N, R or NR' column. P=Preferred, N=Non-Preferred, R=Recommended, NR=Non-Recommended. Null if not in PDL format."
                                             },
                                             "category": {
                                                 "type": ["string", "null"],
-                                                "description": "Section header: 'Infections', 'HIV/AIDS', etc. Null if none."
+                                                "description": "Therapeutic category or section header: 'ACE Inhibitors', 'HIV/AIDS', 'Infections', etc. Null if none."
                                             },
                                             "page_number": {
                                                 "type": ["integer", "null"],
-                                                "description": "The actual page number where this drug is found in the document."
+                                                "description": "The page number where this drug is found in the document."
+                                            },
+                                            "pa_form_link": {
+                                                "type": ["string", "null"],
+                                                "description": "PA Form Link URL if present. Null if none."
                                             }
                                         }
                                     }
                                 },
                                 "FormularyAbbreviations": {
                                     "type": "array",
-                                    "description": "Abbreviation definitions found in legends/keys",
+                                    "description": "Extract ALL abbreviation/legend definitions: 1) Traditional codes (PA=Prior Authorization, QL=Quantity Limit, ST=Step Therapy), 2) PDL codes (B=Brand, G=Generic, P=Preferred, N=Non-Preferred), 3) Comment reference table (numbers with descriptions), 4) Any tier legends.",
                                     "items": {
                                         "type": "object",
                                         "properties": {
-                                            "Acronym": {"type": "string", "description": "The abbreviation code (PA, QL, ST, etc.)"},
-                                            "Expansion": {"type": "string", "description": "What it stands for (Prior Authorization, Quantity Limit, etc.)"},
+                                            "Acronym": {"type": "string", "description": "The abbreviation code (B, G, O, P, N, R, NR, PA, QL, ST, or Comment numbers like 6, 11, 12, etc.)"},
+                                            "Expansion": {"type": "string", "description": "What it stands for (Brand, Generic, Preferred, or for comment numbers: the full comment text)"},
                                             "Explanation": {"type": ["string", "null"], "description": "Additional explanation if any"}
                                         }
                                     }
@@ -2450,59 +2441,6 @@ def deduplicate_dicts(dicts, primary_key='acronym'):
                     current_best[field] = new_value
     return list(merged_entries.values())
 
-# --- WORKER AND ORCHESTRATOR FOR LOCAL PDFS ---
-
-# def process_pdfs_in_parallel():
-#     """Processes all PDFs in a local folder in parallel using a ProcessPoolExecutor."""
-#     logger.info("STEP 2: Processing Local PDF Files in Parallel")
-#     all_processed_data = []
-#     pdf_files = [f for f in os.listdir(PDF_FOLDER) if f.lower().endswith(".pdf")]
-#     if not pdf_files:
-#         logger.warning(f"No PDF files found in '{PDF_FOLDER}'.")
-#         return [], {}
-
-#     # Define a generous timeout for each PDF file in seconds (e.g., 20 minutes)
-#     PDF_PROCESSING_TIMEOUT = 1200
-
-#     logger.info(f"Found {len(pdf_files)} PDFs. Starting parallel processing with up to {PROCESS_COUNT} workers.")
-#     success_count, error_count, skipped_count = 0, 0, 0
-#     with ProcessPoolExecutor(max_workers=PROCESS_COUNT) as executor:
-#         future_to_filename = {executor.submit(process_single_pdf_worker, filename, PDF_FOLDER): filename for filename in pdf_files}
-#         for future in as_completed(future_to_filename):
-#             filename = future_to_filename[future]
-#             try:
-#                 # Wait for the result, but no longer than the timeout
-#                 status, _, result_data, costs = future.result(timeout=PDF_PROCESSING_TIMEOUT)
-
-#                 if status == 'SUCCESS':
-#                     success_count += 1
-#                     payer_name = result_data['db_payer_name']
-#                     if costs['mistral_pages'] > 0:
-#                         track_mistral_cost(payer_name, costs['mistral_pages'])
-#                     if costs['bedrock_tokens'] > 0:
-#                         track_bedrock_cost_precalculated(payer_name, costs['bedrock_tokens'], costs['bedrock_cost'], costs['bedrock_calls'])
-#                     all_processed_data.extend(result_data["processed_records"])
-#                 elif status == 'SKIPPED':
-#                     skipped_count += 1
-#                     logger.warning(f"Skipped file: {filename}. Reason: {result_data}")
-#                 elif status == 'ERROR':
-#                     error_count += 1
-#                     logger.error(f"Error processing file: {filename}. Reason: {result_data}")
-
-#             except concurrent.futures.TimeoutError:
-#                 error_count += 1
-#                 logger.error(f"CRITICAL: Processing timed out for file: {filename} after {PDF_PROCESSING_TIMEOUT} seconds. The worker is likely stuck. Moving on.")
-#             except Exception as e:
-#                 error_count += 1
-#                 logger.error(f"Critical error processing result for {filename}: {e}", exc_info=True)
-
-#     logger.info("--- Local PDF Processing Complete ---")
-#     logger.info(f"Summary: {success_count} successful, {error_count} failed, {skipped_count} skipped")
-#     logger.info(f"Total structured records aggregated: {len(all_processed_data)}")
-#     return all_processed_data, {}
-
-
-# --- WORKER AND ORCHESTRATOR FOR URLS ---
 
 def get_all_plans_with_formulary_url():
     """Fetch all plans marked 'processing' with a non-null formulary_url."""
@@ -2515,153 +2453,6 @@ def get_all_plans_with_formulary_url():
         """)
         return cursor.fetchall()
 
-
-# def process_single_pdf_worker(filename: str, pdf_folder_path: str):
-#     """
-#     Worker function for processing a single local PDF file.
-#     Includes caching, data extraction, normalization, and record creation.
-#     """
-#     log_prefix = f"[Worker for {filename}]"
-#     zero_costs = {'mistral_pages': 0, 'bedrock_tokens': 0, 'bedrock_cost': 0.0, 'bedrock_calls': 0}
-
-#     try:
-#         full_path = os.path.join(pdf_folder_path, filename)
-#         if not os.path.isfile(full_path) or os.path.getsize(full_path) == 0:
-#             return 'ERROR', filename, "File not found or is empty.", zero_costs
-
-#         state_name, payer, plan_name = extract_metadata_from_filename(filename)
-#         plan_id, payer_id, db_payer_name, db_plan_name, formulary_url = get_plan_and_payer_info(state_name, payer, plan_name)
-#         if not plan_id:
-#             return 'SKIPPED', filename, f"Plan not found in DB for: {state_name}, {payer}, {plan_name}", zero_costs
-
-#         file_hash = calculate_file_hash(full_path)
-#         update_plan_file_hash(plan_id, file_hash)
-
-#         # --- CORRECTED CACHING LOGIC ---
-#         cached_data, raw_content = get_cached_result(file_hash)
-#         costs = zero_costs
-#         full_structured_data = None  # Initialize
-
-#         if cached_data is None: # Cache MISS
-#             logger.info(f"{log_prefix} Cache MISS. Starting full processing...")
-#             full_structured_data, raw_content, costs = process_pdf_with_mistral_ocr(full_path, db_payer_name)
-#             cache_result(file_hash, full_structured_data, raw_content)
-#         else: # Cache HIT
-#             logger.info(f"{log_prefix} Cache HIT. Using pre-processed data.")
-#             full_structured_data = cached_data
-
-#         # --- UNPACK DATA FOR POST-PROCESSING ---
-#         if not isinstance(full_structured_data, dict):
-#             logger.error(f"{log_prefix} Corrupted cache or processing error. Expected a dictionary, got {type(full_structured_data)}")
-#             full_structured_data = {"drug_table": [], "acronyms": [], "tiers": []}
-
-#         drug_table_data = full_structured_data.get('drug_table', [])
-#         all_acronyms = full_structured_data.get('acronyms', [])
-#         all_tiers = full_structured_data.get('tiers', [])
-
-#         # **CRITICAL STEP**: Create the DataFrame from the unpacked list.
-#         structured_df = pd.DataFrame(drug_table_data)
-
-#         # **NOW THIS CHECK IS SAFE**:
-#         if structured_df.empty and not all_acronyms and not all_tiers:
-#             return 'SKIPPED', filename, "No structured data could be extracted.", costs
-
-#         # --- Acronym and Tier processing ---
-#         all_acronyms, all_tiers = _reclassify_definitions(all_acronyms, all_tiers)
-#         all_tiers = _parse_and_split_tier_definitions(all_tiers)
-
-#         for tier_dict in all_tiers:
-#             acronym = tier_dict.get('acronym')
-#             if acronym and str(acronym).strip().isdigit():
-#                 tier_dict['acronym'] = f"Tier {str(acronym).strip()}"
-
-#         dedup_acronyms = deduplicate_dicts(all_acronyms)
-#         dedup_tiers = deduplicate_dicts(all_tiers)
-
-#         logger.info("Filtering out non-formulary definitions before insertion.")
-
-#         # List of keywords that are not true acronyms or tiers
-#         blocklist_keywords = ['prenatal', 'aspirin', 'statin', 'fluoride', 'tobacco', 'nicotine']
-
-#         def is_valid_formulary_definition(item):
-#             acronym = str(item.get('acronym', '')).lower().strip()
-#             if not acronym:
-#                 return False
-#             # Rule 1: Check if the acronym starts with any blocked keyword.
-#             if any(acronym.startswith(keyword) for keyword in blocklist_keywords):
-#                 return False
-#             # Rule 2: Filter out items that are clearly drug names (long text without numbers/special chars).
-#             if len(acronym.replace(' ', '')) > 20 and acronym.isalpha():
-#                  return False
-#             return True
-
-#         filtered_acronyms = [item for item in dedup_acronyms if is_valid_formulary_definition(item)]
-#         filtered_tiers = [item for item in dedup_tiers if is_valid_formulary_definition(item)]
-
-#         acronyms_removed_count = len(dedup_acronyms) - len(filtered_acronyms)
-#         tiers_removed_count = len(dedup_tiers) - len(filtered_tiers)
-
-#         if acronyms_removed_count > 0 or tiers_removed_count > 0:
-#             logger.warning(
-#                 f"Filtered out {acronyms_removed_count} invalid acronyms and "
-#                 f"{tiers_removed_count} invalid tiers based on keyword blocklist."
-#             )
-
-#         all_definitions = filtered_acronyms + filtered_tiers
-
-#         all_definitions = dedup_acronyms + dedup_tiers
-#         if all_definitions:
-#             # This step is crucial for handling shared formulary documents (cache hits).
-#             # The 'all_definitions' list comes from the cached result, but we associate
-#             # it with the current plan's specific state, payer, and plan name.
-#             # This ensures that if Plan A and Plan B share a PDF, the definitions
-#             # are correctly mapped to *both* plans in the reference table,
-#             # mirroring how drug data is mapped in the drug_formulary_details table.
-#             insert_acronyms_to_ref_table(all_definitions, state_name, payer, plan_name, "pp_formulary_names")
-
-#         if structured_df.empty:
-#             logger.info(f"{log_prefix} Acronyms/Tiers processed, but no drug records found.")
-#             return 'SUCCESS', filename, {"processed_records": [], "db_payer_name": db_payer_name}, costs
-
-#         processed_records = []
-#         for _, row in structured_df.iterrows():
-#             try:
-#                 raw_drug_name = str(row.get('drug_name', '') or '')
-#                 requirements_text = str(row.get('drug_requirements', '') or '').strip()
-#                 cleaned_drug_name = clean_drug_name(raw_drug_name)
-#                 if not cleaned_drug_name: continue
-
-#                 raw_tier = row.get('drug_tier', None)
-#                 drug_tier_normalized = normalize_drug_tier(raw_tier) or infer_drug_tier_from_text(requirements_text) or infer_drug_tier_from_text(raw_drug_name)
-
-#                 with get_db_connection() as conn:
-#                     coverage_status = determine_coverage_status(requirements_text, drug_tier_normalized, conn, state_name, db_payer_name)
-
-#                 record = {
-#                     "id": str(uuid.uuid4()), "plan_id": plan_id, "payer_id": payer_id,
-#                     "drug_name": cleaned_drug_name, "state_name": state_name,
-#                     "coverage_status": coverage_status, "drug_tier": drug_tier_normalized,
-#                     "drug_requirements": requirements_text or None,
-#                     "is_prior_authorization_required": "Yes" if detect_prior_authorization(requirements_text) else "No",
-#                     "is_step_therapy_required": "Yes" if detect_step_therapy(requirements_text) else "No",
-#                     "is_quantity_limit_applied": "Yes" if "ql" in (requirements_text or "").lower() else "No",
-#                     "confidence_score": 0.95, "source_url": formulary_url,
-#                     "plan_name": db_plan_name, "payer_name": db_payer_name, "file_name": filename,
-#                     "ndc_code": None, "jcode": None, "coverage_details": None,
-#                 }
-#                 processed_records.append(record)
-#             except Exception as e:
-#                 logger.warning(f"{log_prefix} Error processing extracted row: {row}. Error: {e}")
-#                 continue
-#             pass
-
-#         if processed_records:
-#             return 'SUCCESS', filename, {"processed_records": processed_records, "db_payer_name": db_payer_name}, costs
-#         else:
-#             return 'SKIPPED', filename, "Data extracted, but no valid drug records could be processed.", costs
-
-#     except Exception as e:
-#         return 'ERROR', filename, f"An unexpected error occurred in worker: {e}\n{traceback.format_exc()}", zero_costs
 
 
 def process_single_pdf_url_worker(plan_info):
