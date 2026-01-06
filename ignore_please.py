@@ -25,16 +25,16 @@ from utils import is_english
 import threading
 
 from config import (
-    PDF_FOLDER, PROCESS_COUNT, MISTRAL_API_KEY,  
-    MISTRAL_OCR_COST_PER_1K_PAGES, LLM_PAGE_WORKERS,
+    PDF_FOLDER, PROCESS_COUNT, MISTRAL_API_KEY, BEDROCK_MODEL_ID, BEDROCK_COST_PER_1K_TOKENS,bedrock,
+    MISTRAL_OCR_COST_PER_1K_PAGES, BEDROCK_COST_PER_1K_TOKENS, LLM_PAGE_WORKERS,
     MAX_RETRIES, BACKOFF_MULTIPLIER, CLIENT_TIMEOUT, CONNECT_TIMEOUT, PDF_PAGE_PROCESSING_CONFIG,
     OCR_CHUNK_WORKERS, MISTRAL_OCR_RATE_LIMIT, ENABLE_PAGE_PREFILTER, MIN_PAGE_TEXT_LENGTH, SKIP_INDEX_PAGES
 )
 from database import get_db_connection, batch_determine_coverage_status, get_cached_result, cache_result, update_plan_file_hash, insert_acronyms_to_ref_table, insert_drug_formulary_data, delete_drug_formulary_records_for_plan
 from utils import (
     similarity, clean_drug_name, detect_prior_authorization,
-    detect_step_therapy, calculate_file_hash, 
-     track_mistral_cost, determine_coverage_status,
+    detect_step_therapy, calculate_file_hash, rate_limited_api_call,
+    track_bedrock_cost_precalculated, track_mistral_cost, determine_coverage_status,
     normalize_drug_tier, infer_drug_tier_from_text, calculate_bytes_hash,
     parse_complex_drug_name, similarity, normalize_requirement_code, transform_viewer_url
 )
@@ -737,6 +737,65 @@ def _extract_partial_json_arrays(json_string: str) -> dict:
 
     return extracted
 
+
+# def robust_json_repair(json_string: str):
+#     """
+#     Attempts to repair common JSON errors from LLMs, primarily focusing on trailing commas,
+#     escaping backslashes, and stripping non-JSON content before parsing.
+#     """
+#     default_output = {"drug_table": [], "acronyms": [], "tiers": []}
+
+#     if not isinstance(json_string, str) or not json_string.strip():
+#         return default_output
+
+#     # 1. Find the start and end of the main JSON object.
+#     start_index = json_string.find('{')
+#     end_index = json_string.rfind('}')
+
+#     if start_index == -1 or end_index == -1:
+#         logger.warning("Could not find a JSON object in the LLM response.")
+#         return default_output
+
+#     # Extract the JSON part of the string.
+#     json_string = json_string[start_index : end_index + 1]
+
+#     # 2. Escape every backslash by doubling it.
+#     json_string = json_string.replace("\\", "\\\\")
+
+#     # 3. Fix the most common LLM error: trailing commas before '}' or ']'.
+#     json_string = re.sub(r',\s*([}\]])', r'\1', json_string)
+
+#     # 4. Attempt to parse the cleaned JSON.
+#     try:
+#         # Use json5 for more lenient parsing if available.
+#         if JSON5_AVAILABLE:
+#             try:
+#                 parsed = json5.loads(json_string)
+#                 return _sanitize_output(parsed, default_output)
+#             except Exception as e:
+#                 logger.debug(f"json5 parsing failed, falling back to standard json: {e}")
+
+#         # Fallback to the standard json library.
+#         parsed = json.loads(json_string)
+#         return _sanitize_output(parsed, default_output)
+
+#     except json.JSONDecodeError as e:
+#         logger.error(f"JSON parsing failed definitively after repair attempts: {e}")
+#         logger.debug(f"Problematic JSON string for debugging: {json_string}")
+
+#         # Log the failed JSON to a file for analysis.
+#         try:
+#             with open("failed_llm_json.log", "a", encoding="utf-8") as f:
+#                 f.write(f"=== JSON Parse Error ===\n")
+#                 f.write(f"Original String: {json_string}\n")
+#                 f.write(f"{'='*50}\n\n")
+#         except Exception as log_error:
+#             logging.warning(f"Failed to write to debug log: {log_error}")
+
+#         return default_output
+
+
+
 def robust_json_repair(json_string: str):
     """
     Attempts to repair common JSON errors from LLMs, primarily focusing on trailing commas,
@@ -1122,8 +1181,138 @@ def _sanitize_output(parsed_data, default_output):
     }
     return sanitized
 
+def extract_printed_page_number_from_markdown(markdown: Optional[str]) -> Optional[int]:
+    """
+    Try to extract a printed page number from OCR markdown/text for a page.
+
+    Heuristics tried (in order):
+      1. A lone number on one of the last 6 non-empty lines: "1" or "12"
+      2. "Page 1", "Page 1 of 10", "Pg. 1", "p. 1", possibly with punctuation
+      3. A number appearing near the end of the page text (last 200 chars)
+      4. If nothing found -> return None
+
+    Returns int when found, else None.
+    """
+    if not markdown:
+        return None
+
+    # normalize line endings & split
+    lines = [ln.strip() for ln in markdown.splitlines() if ln.strip()]
+    # 1) Check last few lines for a single number
+    for ln in reversed(lines[-6:]):  # footers are usually within the last few lines
+        if re.fullmatch(r'\d{1,4}', ln):
+            try:
+                return int(ln)
+            except ValueError:
+                pass
+
+    # Prepare a short tail of the text (footers typically near the end)
+    tail = "\n".join(lines[-12:]) if lines else markdown
+    tail_search = tail[-400:] if len(tail) > 400 else tail  # limit search area
+
+    # 2) Common "Page X" patterns
+    page_patterns = [
+        r'page[\s:\.-]*?(\d{1,4})\b',     # "Page 1", "page-1"
+        r'pg[\s\.]*?(\d{1,4})\b',         # "Pg. 1"
+        r'\bp[\s\.]*?(\d{1,4})\b',        # "p. 1"
+        r'(\d{1,4})\s+of\s+\d{1,4}\b',    # "1 of 10"
+    ]
+    for pat in page_patterns:
+        m = re.search(pat, tail_search, flags=re.IGNORECASE)
+        if m:
+            try:
+                return int(m.group(1))
+            except (IndexError, ValueError):
+                continue
+
+    # 3) As a last resort, look for any lone number near the very end
+    m = re.search(r'(\d{1,3})\s*$', tail_search)
+    if m:
+        try:
+            return int(m.group(1))
+        except ValueError:
+            pass
+
+    return None
 
 
+def apply_effective_page_numbers(
+    ocr_pages: List[Union[str, Dict]],
+    structured_records_per_page: List[List[Dict]],
+) -> List[Dict]:
+    """
+    Given OCR pages and the structured records produced per OCR page,
+    return a single flattened list of structured records where each record will have:
+      - 'page_number'        : printed page number when found, otherwise the OCR page index (1-based)
+      - 'ocr_page_index'     : the OCR page sequence index (1-based) (for auditing)
+
+    Parameters
+    - ocr_pages: list where each item is either:
+        * a markdown string for the page, or
+        * a dict having a 'markdown' or 'text' key
+      The list order represents the OCR page sequence.
+    - structured_records_per_page: list with same length as ocr_pages; each element is a list
+      of structured records (dicts) extracted from that OCR page.
+
+    Returns:
+      - flattened list of dict records with page_number & ocr_page_index injected.
+    """
+    if len(ocr_pages) != len(structured_records_per_page):
+        logger.warning(
+            "apply_effective_page_numbers: ocr_pages length != structured_records_per_page length "
+            f"({len(ocr_pages)} vs {len(structured_records_per_page)})"
+        )
+
+    flattened: List[Dict] = []
+    n_pages = min(len(ocr_pages), len(structured_records_per_page))
+
+    for idx in range(n_pages):
+        ocr_page = ocr_pages[idx]
+        # robustly obtain page markdown text
+        if isinstance(ocr_page, str):
+            markdown = ocr_page
+        elif isinstance(ocr_page, dict):
+            markdown = (
+                ocr_page.get("markdown")
+                or ocr_page.get("text")
+                or ocr_page.get("page_text")
+                or ""
+            )
+        else:
+            markdown = ""
+
+        ocr_page_index = idx + 1  # 1-based
+        printed_page = extract_printed_page_number_from_markdown(markdown)
+        effective_page = printed_page if printed_page is not None else ocr_page_index
+
+        logger.debug(
+            "Page mapping: ocr_index=%d printed_footer=%s effective=%d",
+            ocr_page_index,
+            str(printed_page),
+            effective_page,
+        )
+
+        records = structured_records_per_page[idx] or []
+        for rec in records:
+            # preserve existing page_number if present? we overwrite intentionally
+            rec["page_number"] = effective_page
+            # add raw OCR index for auditing
+            rec["ocr_page_index"] = ocr_page_index
+            flattened.append(rec)
+
+    # If lengths differ, handle any remaining pages (defensive)
+    if len(ocr_pages) > n_pages:
+        logger.warning("apply_effective_page_numbers: extra OCR pages without structured records.")
+    if len(structured_records_per_page) > n_pages:
+        logger.warning("apply_effective_page_numbers: extra structured pages without OCR pages; "
+                       "assigning ocr_page_index=None")
+        for idx in range(n_pages, len(structured_records_per_page)):
+            for rec in structured_records_per_page[idx]:
+                rec["page_number"] = None
+                rec["ocr_page_index"] = None
+                flattened.append(rec)
+
+    return flattened
 
 
 def extract_metadata_from_filename(filename):
@@ -1162,7 +1351,7 @@ def is_index_page(markdown: str) -> bool:
         
         # If it has a tier column AND either dosage forms OR requirements OR special columns, it's a DRUG PAGE
         if has_tier_column and (has_dosage_forms or has_requirements or has_category_column or has_special_code_column):
-            logger.info(f" 'Alphabetical Index' page has actual drug data. This is a DRUG PAGE, not an index!")
+            logger.info(f"âœ… 'Alphabetical Index' page has actual drug data. This is a DRUG PAGE, not an index!")
             return False
     
     # === Check for specific payer table structures (Hennepin Health, etc.) ===
@@ -1171,7 +1360,7 @@ def is_index_page(markdown: str) -> bool:
                                 'tier' in lower_markdown and 'category' in lower_markdown and '|' in lower_markdown)
     
     if hennepin_health_pattern:
-        logger.info("Detected Hennepin Health table structure (Drug Name | Special Code | Tier | Category). This is a DRUG PAGE, not an index!")
+        logger.info("âœ… Detected Hennepin Health table structure (Drug Name | Special Code | Tier | Category). This is a DRUG PAGE, not an index!")
         return False
     
     # === Check for drug page indicators BEFORE index keywords ===
@@ -1308,7 +1497,178 @@ def is_index_page(markdown: str) -> bool:
 
     return False
 
+def is_aca_drug_list_page(markdown: str) -> bool:
+    """
+    Detects if a page is part of an 'ACA Drug List' or 'Preventative Medications' section
+    using a heuristic scoring system. This is more robust than simple keyword matching.
 
+    Returns True if the page's score exceeds a confidence threshold, False otherwise.
+    """
+    score = 0
+    # A score of 10 or more gives high confidence that this page should be skipped.
+    CONFIDENCE_THRESHOLD = 10
+
+    lower_markdown = markdown.lower()
+
+    # --- Feature 1: The Strongest Signal - The BRAND/GENERIC Table Header ---
+    # This structure is unique to these lists and absent from the main formulary.
+    # We use regex to be precise about the table format.
+    if re.search(r'\|\s*brand\s*\|\s*generic\s*\|', lower_markdown):
+        logger.debug("ACA page score +8 for BRAND/GENERIC header.")
+        score += 8
+
+    # --- Feature 2: High-Confidence Titles ---
+    # These titles are very unlikely to appear on a standard formulary page.
+    # We check if they appear as standalone lines (typical for a title).
+    high_confidence_titles = [
+        r'^\s*aca drug list\s*$',
+        r'^\s*preventative medications and preferred contraceptives\s*$',
+        r'^\s*breast cancer prevention\s*$',
+        r'^\s*tobacco cessation\s*$',
+        r'^\s*bowel preparation\s*$',
+        r'^\s*pre-exposure prophylaxis \(prep\)\*\*\s*$'
+    ]
+    for title_pattern in high_confidence_titles:
+        if re.search(title_pattern, lower_markdown, re.MULTILINE):
+            logger.debug(f"ACA page score +5 for title: {title_pattern}")
+            score += 5
+
+    # --- Feature 3: Supporting Keywords ---
+    # These words add confidence but aren't strong enough on their own.
+    supporting_keywords = [
+        'affordable care act',
+        'preventive services',
+        'contraceptives',
+        'statins*',
+        'fluoride products',
+        'iron products'
+    ]
+    for keyword in supporting_keywords:
+        if keyword in lower_markdown:
+            logger.debug(f"ACA page score +2 for keyword: {keyword}")
+            score += 2
+
+    # --- Final Decision ---
+    if score >= CONFIDENCE_THRESHOLD:
+        logger.info(f"Detected ACA/Preventative drug list page with a confidence score of {score}. Skipping.")
+        return True
+
+    return False
+
+@rate_limited_api_call
+def extract_structured_data_with_llm(page_markdown: str, mistral_client: Mistral, payer_name: str = None):
+    """
+    Uses Mistral Chat with structured output to parse markdown and extract drug data.
+    """
+    costs = {'tokens': 0, 'cost': 0.0, 'calls': 1}
+    default_output = {"drug_table": [], "acronyms": [], "tiers": []}
+
+    if not mistral_client:
+        logger.error("Mistral client is not provided. Cannot extract structured data.")
+        return default_output, costs
+
+    if is_index_page(page_markdown):
+        logger.info("Skipping LLM call for index/table of contents page.")
+        return default_output, {'tokens': 0, 'cost': 0.0, 'calls': 0}
+
+    if is_aca_drug_list_page(page_markdown):
+        logger.info("Skipping LLM call for ACA Drug List/Preventative Medications page.")
+        return default_output, {'tokens': 0, 'cost': 0.0, 'calls': 0}
+
+    user_message = f"Extract drug formulary information from the following text:\n\n{page_markdown}"
+
+
+    for attempt in range(MAX_RETRIES):
+        try:
+            response = mistral_client.chat.complete(
+                model="mistral-large-latest",
+    messages=[
+    {"role": "system", "content": (
+        "You are a professional medical data extractor. You will receive a page from a drug formulary. "
+        "IMPORTANT: Drug Tiers are often found in SECTION HEADERS above the drug list (e.g., 'Tier 1 - Generic', 'Tier 2'). "
+        "If a drug row does not have a specific tier column, you MUST use the most recent Section Header as the Tier for that drug. "
+        "CRITICAL EXCLUSION: Do NOT mistreat 'Therapeutic Categories' (e.g., 'Pain Relief', 'Cardiovascular', 'Inflammatory Disease') as the Drug Tier. "
+        "If the immediate header is a medical condition or class, LOOK HIGHER up the page for the true Tier Header (e.g. 'Tier 1', 'Generic', 'Preferred Brand'). "
+        "   - Map 'Generic' or 'Generics' -> 'Tier 1' (or T1)"
+        "   - Map 'Preferred Brand' -> 'Tier 2' (or T2)"
+        "   - Map 'Non-Preferred' -> 'Tier 3' (or T3)"
+        "   - Map 'Specialty' -> 'Tier 4' (or T4)"
+        "   - CRITICAL: Only apply these mappings if they appear in SECTION HEADERS."
+        "LAYOUT SPECIFIC: If the page has columns labeled 'Preferred' and 'Non-Preferred', treat these as TIERS. "
+        "   - Drugs under 'Preferred' -> Tier = 'Preferred' "
+        "   - Drugs under 'Non-Preferred' -> Tier = 'Non-Preferred' "
+        "If you absolutely cannot find a Tier Header (and it's not the Preferred/Non-Preferred layout), return null (empty) for the Tier field. "
+        "REQUIREMENTS extraction: "
+        "   - Check for codes in PARENTHESES (e.g. (QL), (PA)) or SQUARE BRACKETS (e.g. [NP], [SP], [DL]). "
+        "   - EXTRACT these codes into the 'Drug Edit' field. "
+        "   - Do NOT map [NP] or [SP] text to the Drug Tier field UNLESS it is clearly a column header. Keep them in Drug Edit. "
+        "   - Check for 'GEN 5' or 'Gen 5'. "
+        "Do NOT use the document title (e.g., '3-Tier Drug List') as the tier. "
+        "IMPORTANT: Some pages may have a 'Legend' or 'Introduction' at the top. Ignore the intro for drug rows, "
+        "but YOU MUST extract any 'Tier Definitions' or 'Keys' (like 'T1 = Tier 1', 'QL = Quantity Limit') "
+        "but YOU MUST extract any 'Tier Definitions' or 'Keys' (like 'T1 = Tier 1', 'QL = Quantity Limit') "
+        "and put them into the 'FormularyAbbreviations' list. "
+        "Extract every single drug listed in the tables below it. "
+        f"Output JSON matching this schema: {json.dumps(DRUG_EXTRACTION_SCHEMA)}"
+    )},
+    {"role": "user", "content": user_message}
+],
+                response_format={"type": "json_object", "schema": DRUG_EXTRACTION_SCHEMA},
+                temperature=0
+            )
+
+            response_content = response.choices[0].message.content
+
+            usage = response.usage
+            total_tokens = usage.total_tokens
+            costs['tokens'] = total_tokens
+            costs['cost'] = (total_tokens / 1000.0) * 0.002 # Placeholder cost
+
+            try:
+                structured_response = json.loads(response_content)
+            except json.JSONDecodeError:
+                logger.error("Failed to parse JSON response from Mistral.")
+                continue
+
+            # Map to internal structure
+            drug_table = []
+            for item in structured_response.get("DrugInformation", []):
+                drug_table.append({
+                    "drug_name": item.get("Drug Name"),
+                    "drug_tier": item.get("drug tier"),
+                    "drug_requirements": item.get("requirements")
+                })
+
+            acronyms = []
+            for item in structured_response.get("FormularyAbbreviations", []):
+                acronyms.append({
+                    "acronym": item.get("Acronym"),
+                    "expansion": item.get("Expansion"),
+                    "explanation": item.get("Explanation")
+                })
+            
+            structured_data = {
+                "drug_table": drug_table,
+                "acronyms": acronyms,
+                "tiers": [] 
+            }
+
+            logger.info(
+                f"Successfully processed page. Extracted: "
+                f"{len(structured_data['drug_table'])} drugs, "
+                f"{len(structured_data['acronyms'])} acronyms."
+            )
+
+            return structured_data, costs
+
+        except Exception as e:
+            logger.error(f"Error in Mistral LLM data extraction (attempt {attempt+1}/{MAX_RETRIES}): {e}")
+            if attempt < MAX_RETRIES - 1:
+                time.sleep(BACKOFF_MULTIPLIER ** attempt)
+            else:
+                return default_output, costs
+    
+    return default_output, costs
 
 
 def create_resilient_mistral_client():
@@ -1426,12 +1786,12 @@ def process_pdf_with_mistral_ocr(pdf_input, payer_name=None, filename: Optional[
             num_pages = len(reader.pages)
             if num_pages > MAX_PDF_PAGES:
                 logger.error(f"PDF has {num_pages} pages, exceeding limit of {MAX_PDF_PAGES}.")
-                return {"drug_table": [], "acronyms": [], "tiers": []}, "", {'mistral_pages': 0}
+                return {"drug_table": [], "acronyms": [], "tiers": []}, "", {'mistral_pages': 0, 'bedrock_tokens': 0, 'bedrock_cost': 0.0, 'bedrock_calls': 0}
             pdf_input.seek(0)
         except Exception as e:
             logger.warning(f"Failed to check PDF page count: {e}")
 
-    total_costs = {'mistral_pages': 0, 'mistral_cost': 0.0}
+    total_costs = {'mistral_pages': 0, 'mistral_cost': 0.0, 'bedrock_tokens': 0, 'bedrock_cost': 0.0, 'bedrock_calls': 0}
     
     mistral_client = create_resilient_mistral_client()
 
@@ -1922,8 +2282,85 @@ def process_pdf_with_mistral_ocr(pdf_input, payer_name=None, filename: Optional[
             return full_structured_data, "[NATIVE OCR EXTRACTION]", total_costs
 
         except Exception as primary_error:
-            logger.error(f"⚠️ [PRIMARY FLOW FAILED] Unified extraction failed for {filename}: {primary_error}")
-            return {"drug_table": [], "acronyms": [], "tiers": []}, "", total_costs
+            logger.warning(f"âš ï¸ [PRIMARY FLOW FAILED] Unified extraction failed for {filename}: {primary_error}")
+            logger.info("--- [BACKUP FLOW] Falling back to traditional OCR + Per-Page LLM processing ---")
+
+        # --------------------------------------------------------------------------
+        # BACKUP FLOW: Original OCR + Per-Page LLM Loop
+        # --------------------------------------------------------------------------
+        signed_url = mistral_client.files.get_signed_url(file_id=uploaded_file.id, expiry=120)
+        
+        ocr_response = mistral_client.ocr.process(
+            document=DocumentURLChunk(document_url=signed_url.url),
+            model="mistral-ocr-2512",
+            include_image_base64=False
+        )
+
+        page_count = len(ocr_response.pages)
+        total_costs['mistral_pages'] = page_count
+        total_costs['mistral_cost'] = (page_count / 1000.0) * MISTRAL_OCR_COST_PER_1K_PAGES
+
+        all_structured_data, all_acronyms, all_tiers = [], [], []
+
+        # Since we already extracted only the needed pages, process ALL pages in this (smaller) document
+        # Map extracted page index to original page number for tracking
+        original_page_numbers = pages_to_extract if 'pages_to_extract' in locals() else list(range(1, page_count + 1))
+        page_indices_to_process = list(range(page_count))  # Process all pages in the extracted doc
+
+        if not page_indices_to_process:
+            logger.warning(f"No valid pages selected for processing for file '{filename}'. Skipping LLM stage.")
+        else:
+            logger.info(f"[BACKUP FLOW] Processing {len(page_indices_to_process)} extracted pages in parallel with up to {LLM_PAGE_WORKERS} workers...")
+            logger.info(f"Original page numbers being processed: {original_page_numbers}")
+            
+            with ThreadPoolExecutor(max_workers=LLM_PAGE_WORKERS) as executor:
+                # Map extracted index to original page number
+                future_to_page = {
+                    executor.submit(extract_structured_data_with_llm, ocr_response.pages[idx].markdown, mistral_client, payer_name): (idx, original_page_numbers[idx] if idx < len(original_page_numbers) else idx + 1)
+                    for idx in page_indices_to_process
+                }
+
+                for future in as_completed(future_to_page):
+                    extracted_idx, original_page_num = future_to_page[future]
+                    try:
+                        structured_records, llm_costs = future.result()
+                        logger.info(f"--- Completed processing for Original Page {original_page_num} (Extracted index {extracted_idx}) ---")
+                        total_costs['bedrock_tokens'] += llm_costs.get('tokens', 0)
+                        total_costs['bedrock_cost'] += llm_costs.get('cost', 0)
+                        total_costs['bedrock_calls'] += llm_costs.get('calls', 0)
+                        if structured_records:
+                            extracted_count = len(structured_records.get('drug_table', []))
+                            for drug in structured_records.get('drug_table', []):
+                                if isinstance(drug, dict):
+                                    drug['page_number'] = original_page_num  # Use original page number
+                                else:
+                                    logger.warning(f"Skipping non-dict item in drug_table: {drug}")
+                                    continue
+                                all_structured_data.append(drug)
+                            if extracted_count > 0:
+                                logger.debug(f"Assigned page_number={original_page_num} to {extracted_count} drugs from this page")
+                            all_acronyms.extend(structured_records.get('acronyms', []))
+                            all_tiers.extend(structured_records.get('tiers', []))
+                    except Exception as exc:
+                        logger.error(f"Page {original_page_num} generated an exception during result processing: {exc}")
+
+        full_raw_content = "\n\n--- PAGE BREAK ---\n\n".join([p.markdown for p in ocr_response.pages])
+        
+        full_structured_data = {
+            "drug_table": all_structured_data,
+            "acronyms": all_acronyms,
+            "tiers": all_tiers
+        }
+        
+        logger.info(f"Final results: {len(all_structured_data)} structured records extracted from PDF.")
+
+        try:
+            mistral_client.files.delete(file_id=uploaded_file.id)
+            logger.info(f"Deleted uploaded file from Mistral: {uploaded_file.id}")
+        except Exception as e:
+            logger.warning(f"Failed to delete uploaded file {uploaded_file.id}: {e}")
+
+        return full_structured_data, full_raw_content, total_costs
 
     except Exception as e:
         logger.error(f"A critical error occurred in the main PDF processing pipeline for {filename}: {e}")
@@ -2378,18 +2815,18 @@ def process_pdfs_from_urls_in_parallel():
 
                                 if page_number is not None and page_number <= 2 and not drug_requirements:
                                     if len(drug_name) < 5 or not re.search(r'[a-zA-Z]{3,}', drug_name):
-                                        logger.warning(f"BLOCKED Page {page_number} record (missing requirements + suspicious name): '{drug_name}'")
+                                        logger.warning(f"ðŸš« BLOCKED Page {page_number} record (missing requirements + suspicious name): '{drug_name}'")
                                         blocked_records += 1
                                         continue
 
                                 if fragment_pattern.match(drug_name):
-                                    logger.warning(f"BLOCKED FRAGMENT before DB insertion: '{drug_name}'")
+                                    logger.warning(f"ðŸš« BLOCKED FRAGMENT before DB insertion: '{drug_name}'")
                                     blocked_records += 1
                                     continue
 
                                 name_parts = drug_name.split()
                                 if not re.search(r'[a-zA-Z]{3,}', drug_name) or (len(name_parts) == 1 and name_parts[0].lower() in junk_keywords):
-                                    logger.warning(f"BLOCKED INVALID NAME before DB insertion: '{drug_name}'")
+                                    logger.warning(f"ðŸš« BLOCKED INVALID NAME before DB insertion: '{drug_name}'")
                                     blocked_records += 1
                                     continue
 
@@ -2408,6 +2845,8 @@ def process_pdfs_from_urls_in_parallel():
                     payer_name = result_data['db_payer_name']
                     if costs['mistral_pages'] > 0:
                         track_mistral_cost(payer_name, costs['mistral_pages'])
+                    if costs['bedrock_tokens'] > 0:
+                        track_bedrock_cost_precalculated(payer_name, costs['bedrock_tokens'], costs['bedrock_cost'], costs['bedrock_calls'])
 
                 elif status == 'SKIPPED':
                     logger.warning(f"Skipped plan: {plan_name_log}. Reason: {result_data}")

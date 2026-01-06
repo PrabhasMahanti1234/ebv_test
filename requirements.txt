@@ -1,0 +1,15 @@
+mistralai
+pandas
+requests
+httpx
+PyPDF2
+pymupdf
+Pillow
+boto3
+python-dotenv
+nest_asyncio
+psycopg2-binary
+openpyxl
+langdetect
+json5
+

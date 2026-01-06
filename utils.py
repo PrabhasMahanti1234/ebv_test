@@ -13,64 +13,14 @@ import random
 import json
 from functools import wraps
 from pathlib import Path
-from config import MAX_RETRIES, BACKOFF_MULTIPLIER, RATE_LIMIT_DELAY, COST_TRACKER, BEDROCK_COST_PER_1K_TOKENS, MISTRAL_OCR_COST_PER_1K_PAGES, bedrock
+from config import MAX_RETRIES, BACKOFF_MULTIPLIER, COST_TRACKER, MISTRAL_OCR_COST_PER_1K_PAGES
 from langdetect import detect
 from langdetect.lang_detect_exception import LangDetectException
 
 logger = logging.getLogger(__name__)
 
 # --- GLOBAL RATE LIMIT VARIABLES ---
-GLOBAL_LAST_CALL = 0
-GLOBAL_LOCK = threading.Lock()
-
-RATE_LIMIT_DELAY = 1.2       # Minimum seconds between ANY Bedrock calls
-MAX_RETRIES = 5
-BACKOFF_MULTIPLIER = 2
 _URL_MAPPINGS_CACHE = None
-
-def rate_limited_api_call(func):
-    """Global rate limiter across ALL Bedrock calls + backoff + jitter"""
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        global GLOBAL_LAST_CALL
-
-        for attempt in range(MAX_RETRIES):
-            try:
-                # ---- GLOBAL LOCK: ensures only ONE API call at a time ----
-                with GLOBAL_LOCK:
-                    now = time.time()
-                    wait = GLOBAL_LAST_CALL + RATE_LIMIT_DELAY - now
-                    if wait > 0:
-                        logger.debug(f"[RATE LIMIT] Sleeping {wait:.2f}s before Bedrock call")
-                        time.sleep(wait)
-                    GLOBAL_LAST_CALL = time.time()
-
-                # ---- CALL THE REAL FUNCTION ----
-                return func(*args, **kwargs)
-
-            except Exception as e:
-                err = str(e).lower()
-
-                if "throttling" in err or "rate limit" in err or "429" in err:
-                    if attempt < MAX_RETRIES - 1:
-                        delay = (RATE_LIMIT_DELAY * (BACKOFF_MULTIPLIER ** attempt))
-                        jitter = random.uniform(0.2, 0.8)
-                        total = delay + jitter
-                        logger.warning(
-                            f"[THROTTLED] Retry {attempt+1}/{MAX_RETRIES} "
-                            f"in {total:.2f}s due to throttling"
-                        )
-                        time.sleep(total)
-                        continue
-                    else:
-                        logger.error("[FATAL] Max retries reached due to throttling")
-                        return {}
-                else:
-                    logger.error(f"[ERROR] Bedrock call failed: {e}")
-                    return {}
-
-        return {}
-    return wrapper
 
 def estimate_tokens(text):
     """Estimate token count - roughly 4 characters per token"""
@@ -78,47 +28,7 @@ def estimate_tokens(text):
         return 0
     return max(1, len(str(text)) // 4)
 
-def track_bedrock_cost(payer_name, prompt_text, response_text):
-    """Track Bedrock API costs for a specific payer"""
-    global COST_TRACKER
-    
-    # Estimate tokens
-    prompt_tokens = estimate_tokens(prompt_text)
-    response_tokens = estimate_tokens(response_text)
-    total_tokens = prompt_tokens + response_tokens
-    
-    # Calculate cost
-    cost = (total_tokens / 1000.0) * BEDROCK_COST_PER_1K_TOKENS
-    
-    # Update payer-specific tracking
-    COST_TRACKER['payer_costs'][payer_name]['bedrock_tokens'] += total_tokens
-    COST_TRACKER['payer_costs'][payer_name]['bedrock_cost'] += cost
-    COST_TRACKER['payer_costs'][payer_name]['llm_calls'] += 1
-    COST_TRACKER['payer_costs'][payer_name]['total_cost'] += cost
-    
-    # Update global tracking
-    COST_TRACKER['total_tokens'] += total_tokens
-    COST_TRACKER['total_llm_calls'] += 1
-    COST_TRACKER['total_cost'] += cost
-    
-    logger.debug(f"Bedrock cost for {payer_name}: ${cost:.8f} ({total_tokens} tokens)")
 
-def track_bedrock_cost_precalculated(payer_name, tokens, cost, calls):
-    """Tracks Bedrock API costs that have already been calculated."""
-    global COST_TRACKER
-    
-    # Update payer-specific tracking
-    COST_TRACKER['payer_costs'][payer_name]['bedrock_tokens'] += tokens
-    COST_TRACKER['payer_costs'][payer_name]['bedrock_cost'] += cost
-    COST_TRACKER['payer_costs'][payer_name]['llm_calls'] += calls
-    COST_TRACKER['payer_costs'][payer_name]['total_cost'] += cost
-    
-    # Update global tracking
-    COST_TRACKER['total_tokens'] += tokens
-    COST_TRACKER['total_llm_calls'] += calls
-    COST_TRACKER['total_cost'] += cost
-    
-    logger.debug(f"Tracked Bedrock cost for {payer_name}: ${cost:.8f} ({tokens} tokens)")
 
 def track_mistral_cost(payer_name, page_count):
     """Track Mistral OCR costs for a specific payer"""
@@ -239,14 +149,12 @@ def extract_requirements_from_drug_name(drug_name_cell):
         r'\s+(PA|ST|QL|BvD|SP|TI|NM)(?:\s|$)',
         # Capture parenthesized requirements like (QL), (PA, QL), (Gen 4), (Gen 5)
         # Matches content inside parens that looks like codes or "Gen X", separated by commas/spaces
-        r'\s*\(((?:PA|ST|QL|SP|NM|VAC|Gen\s*\d+|[A-Z]{2,}|[0-9]+|[♦†‡*•§])(?:,\s*(?:PA|ST|QL|SP|NM|VAC|Gen\s*\d+|[A-Z]{2,}|[0-9]+|[♦†‡*•§]))*)\)',
+        r'\s*\(((?:PA|ST|QL|SP|NM|VAC|Gen\s*\d+|[A-Z]{2,})(?:,\s*(?:PA|ST|QL|SP|NM|VAC|Gen\s*\d+|[A-Z]{2,}))*)\)',
         # Capture square bracket requirements like [NP], [SP]
         r'\s*\[([^\]]+)\]',
         # This regex says: match 2-3 letters, UNLESS those letters are a unit like MG or ML
         fr'\s+(?!(?:{units_not_to_ignore})\b)([A-Z]{{2,3}}(?:,[A-Z]{{2,3}})*)$',
         r'\s*\^?\s*\{([^}]+)\}\s*\$?\s*$'
-        r'([♦†‡*•§\\#@]+)$', 
-        r'(?<![a-zA-Z\d\s])(\d{1,2})$' # 1-2 digits at end, not following another digit/letter (e.g., Belbuca®2)
     ]
 
     extracted_requirements = []
@@ -299,8 +207,8 @@ def lookup_expansion(acronym, state_name, payer_name, conn):
             
             cur.execute(
                 """
-                SELECT expansion, explanation, NULL as coverage_status 
-                FROM pp_formulary_names 
+                SELECT expansion, explanation, coverage_status 
+                FROM tier_requirement_expansion 
                 WHERE acronym ILIKE %s
                   AND (%s IS NULL OR UPPER(state_name) = UPPER(%s))
                   AND (%s IS NULL OR UPPER(payer_name) = UPPER(%s))
@@ -312,8 +220,8 @@ def lookup_expansion(acronym, state_name, payer_name, conn):
             # Original exact match logic
             cur.execute(
                 """
-                SELECT expansion, explanation, NULL as coverage_status 
-                FROM pp_formulary_names 
+                SELECT expansion, explanation, coverage_status 
+                FROM tier_requirement_expansion 
                 WHERE UPPER(acronym) = %s 
                   AND (%s IS NULL OR UPPER(state_name) = UPPER(%s))
                   AND (%s IS NULL OR UPPER(payer_name) = UPPER(%s))
@@ -410,7 +318,7 @@ def determine_coverage_status(requirements_text, tier_text, conn, state_name, pa
     # Combine and split all requirements using common delimiters
     all_text = f"{requirements_text or ''} {tier_text or ''}"
     # Updated regex to better capture $0 variants
-    requirements = re.findall(r'(\$[\\\s]*0[\\\s]*\$?|\$\/\$|\$[0-9]+|[A-Za-z0-9/\-♦†‡*•§]{1,})', all_text)
+    requirements = re.findall(r'(\$[\\\s]*0[\\\s]*\$?|\$\/\$|\$[0-9]+|[A-Za-z0-9/\-]{2,})', all_text)
 
     if not requirements:
         return "Covered"
@@ -451,6 +359,44 @@ def parse_requirement(req_text):
         return code, params
     return req_text.strip().upper(), None
 
+def determine_coverage_status(requirements_text, tier_text, conn, state_name, payer_name):
+    """
+    Determine coverage status by checking requirements in expansion table.
+    - If ANY requirement is 'Covered with Conditions' -> return 'Covered with Conditions'
+    - If ALL requirements are 'Covered' -> return 'Covered'
+    - Default to 'Covered' if no requirements
+    - No hard-coding of requirement codes or statuses; all logic is table-driven.
+    """
+
+    if not requirements_text and not tier_text:
+        return "Covered"
+
+    # Combine and split all requirements using common delimiters
+    all_text = f"{requirements_text or ''} {tier_text or ''}"
+    # Updated regex to better capture $0 variants
+    requirements = re.findall(r'(\$[\\\s]*0[\\\s]*\$?|\$\/\$|\$[0-9]+|[A-Za-z0-9/\-]{2,})', all_text)
+
+    if not requirements:
+        return "Covered"
+
+    statuses = []
+    for code in requirements:
+        norm_code = normalize_requirement_code(code)
+        # print(f"Looking up normalized code: '{norm_code}' from original: '{code}'")  # Debug print
+        _, _, status = lookup_expansion(norm_code, state_name, payer_name, conn)
+        if status:
+            statuses.append(status.strip())
+
+    if not statuses:
+        return "Covered"
+
+    if "Covered with Condition" in statuses or "Covered with Conditions" in statuses:
+        return "Covered with Conditions"
+    if all(status == "Covered" for status in statuses):
+        return "Covered"
+    # If there are mixed or unknown statuses, default to "Covered with Conditions"
+    return "Covered with Conditions"
+
 def determine_final_coverage_status(coverage_statuses):
     """
     Determine final coverage status when multiple statuses are found.
@@ -467,115 +413,7 @@ def determine_final_coverage_status(coverage_statuses):
     else:
         return "Covered with Conditions"  # Safe default
 
-# Optional: Keep Claude as fallback for cases where lookup table doesn't have coverage_status
-def determine_coverage_status_with_claude_fallback(requirements_text, tier_text, conn, state_name, payer_name):
-    """
-    Determine coverage status using direct lookup first, Claude as fallback.
-    """
-    
-    # Collect raw codes from requirements and tier columns
-    raw_inputs = []
-    for raw_text in [requirements_text, tier_text]:
-        if raw_text and not pd.isna(raw_text):
-            parts = re.split(r'[;,|:]', str(raw_text))
-            raw_inputs.extend([p.strip() for p in parts if p.strip()])
 
-    # Look up from SQL table
-    coverage_statuses = []
-    expansions_without_status = []
-    
-    for code in raw_inputs:
-        expansion, explanation, coverage_status = lookup_expansion(code, state_name, payer_name, conn)
-        
-        if coverage_status:  # Direct lookup found coverage status
-            coverage_statuses.append(coverage_status)
-        elif expansion:  # Found expansion but no coverage status - use Claude
-            if explanation:
-                combined_text = f"{expansion} ({explanation})"
-            else:
-                combined_text = expansion
-            expansions_without_status.append(combined_text)
-
-    # If we have direct coverage statuses, use those
-    if coverage_statuses:
-        direct_status = determine_final_coverage_status(coverage_statuses)
-        
-        # If we also have expansions without status, check with Claude
-        if expansions_without_status:
-            claude_status = call_claude_for_coverage("; ".join(expansions_without_status))
-            
-            # Combine results - if either indicates conditions, return conditions
-            if direct_status == "Covered with Conditions" or claude_status == "Covered with Conditions":
-                return "Covered with Conditions"
-            elif direct_status == "Not Covered" or claude_status == "Not Covered":
-                return "Not Covered"
-            else:
-                return "Covered"
-        else:
-            return direct_status
-    
-    # No direct coverage statuses found
-    elif expansions_without_status:
-        return call_claude_for_coverage("; ".join(expansions_without_status))
-    
-    # Fallback logic
-    if not requirements_text or pd.isna(requirements_text):
-        return "Covered"
-    return "Covered with Conditions"
-
-
-def call_claude_for_coverage(expansion_text):
-    """
-    Use Claude 3 Haiku (AWS Bedrock) to classify coverage status.
-    (Keep this function unchanged for fallback scenarios)
-    """
-    messages = [
-        {
-            "role": "user",
-            "content": [
-                {
-                    "type": "text",
-                    "text": f"""
-You are an expert in interpreting health plan formulary rules.
-Given the following expansion text: "{expansion_text}", decide if the drug is:
-- "Covered with Conditions" (if it requires prior authorization, step therapy, quantity limits, specialty restrictions, or non-formulary)
-- "Covered" (if no restrictions are indicated)
-
-Task: Decide if the drug is:
-- "Covered with Conditions" â†’ if it requires prior authorization, step therapy, quantity limits, specialty restrictions, or is non-formulary
-- "Covered" â†’ if no restrictions are indicated
-
-âš ï¸ Important: Respond with ONLY one of these exact phrases:
-- Covered
-- Covered with Conditions
-No explanation, no extra text.
-"""
-                }
-            ],
-        }
-    ]
-
-    try:
-        response = bedrock.invoke_model(
-            modelId="anthropic.claude-3-haiku-20240307-v1:0",
-            body=json.dumps({
-                "anthropic_version": "bedrock-2023-05-31",
-                "max_tokens": 50,
-                "temperature": 0,
-                "messages": messages
-            })
-        )
-
-        result = json.loads(response["body"].read())
-
-        if "content" in result and len(result["content"]) > 0:
-            return result["content"][0]["text"].strip()
-
-        raise ValueError(f"Unexpected Claude response format: {result}")
-    
-    except Exception as e:
-        print(f"[ERROR] Claude API call failed: {e}")
-        return "Covered with Conditions"
 
 def detect_prior_authorization(requirements_text):
     """
@@ -868,51 +706,3 @@ def is_english(text: str) -> bool:
         # This can happen on very short or ambiguous text (like "PA" or "1").
         # We will assume these are valid, as they are not definitively non-English.
         return True
-
-def normalize_footnotes(text):
-    """
-    Converts superscript digits (¹, ², ³) and other artifacts 
-    into standard digits (1, 2, 3) for database lookup.
-    """
-    if not text:
-        return ""
-    # Map superscript to standard digits
-    trans = str.maketrans("⁰¹²³⁴⁵⁶⁷⁸⁹", "0123456789")
-    return text.translate(trans)
-
-
-def expand_requirement_footnotes(raw_req, state_name, payer_name, conn):
-    """
-    Normalizes superscripts, splits combined codes (like '42' or '¹³'),
-    and maps them to full descriptions.
-    """
-    if not raw_req or str(raw_req).lower() in ['null', 'nan', '[null]', '']:
-        return None
-
-    # 1. Normalize superscripts (e.g., ¹⁰ -> 10)
-    cleaned_req = normalize_footnotes(str(raw_req))
-
-    # 2. Extract digits (1-2 digits long) or known symbols
-    # This handles "42" as "4" and "2", or "13" as "13"
-    potential_codes = re.findall(r'(\d{1,2}|[♦†‡*•§])', cleaned_req)
-    
-    expanded_list = []
-    
-    for code in potential_codes:
-        # Check expansion table
-        expansion, explanation, _ = lookup_expansion(code, state_name, payer_name, conn)
-        
-        if expansion:
-            # Format: "Expansion: Explanation" or just "Expansion"
-            full_text = f"{expansion}: {explanation}" if explanation and explanation.strip() else expansion
-            # Remove any trailing dots or extra spaces
-            expanded_list.append(full_text.strip().rstrip('.'))
-        else:
-            # If not found in DB, just return the code (you should check your DB for these)
-            expanded_list.append(f"Code {code}")
-
-    # 3. Join with semicolon
-    if expanded_list:
-        return " ; ".join(expanded_list)
-    
-    return raw_req
