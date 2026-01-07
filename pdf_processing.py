@@ -1647,7 +1647,7 @@ def process_pdf_with_mistral_ocr(pdf_input, payer_name=None, filename: Optional[
                             }
                         }
                     }
-                }
+                
                 
                 # Prepare PDF bytes for parallel processing
                 if isinstance(pdf_input, BytesIO):
