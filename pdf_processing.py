@@ -1639,8 +1639,8 @@ def process_pdf_with_mistral_ocr(pdf_input, payer_name=None, filename: Optional[
                                         "type": "object",
                                         "properties": {
                                             "Acronym": {"type": "string", "description": "The abbreviation code (B, G, O, P, N, R, NR, PA, QL, ST, or Comment numbers like 6, 11, 12, etc.)"},
-                                            "Expansion": {"type": "string", "description": "What it stands for (Brand, Generic, Preferred, or for comment numbers: the full comment text)"},
-                                            "Explanation": {"type": ["string", "null"], "description": "Additional explanation if any"}
+                                            "Expansion": {"type": "string", "description": "What it stands for (Brand, Generic, Preferred, or for comment numbers: the full comment text. Please Extract only english language Explansions.)"},
+                                            "Explanation": {"type": ["string", "null"], "description": "Additional explanation if any. Please Extract only english language Explanation. Don't include spanish language explanations."}}
                                         }
                                     }
                                 }
