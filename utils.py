@@ -283,7 +283,7 @@ def parse_requirements(text):
     return parsed
 
 def normalize_requirement_code(code: str) -> str:
-    """
+    r"""
     Normalize a requirement code for lookup.
     - Cleans LaTeX, stray $, spaces, and artifacts so that "$\$ 0$" becomes "$0"
     - Keeps $ if present at start, removes spaces and artifacts

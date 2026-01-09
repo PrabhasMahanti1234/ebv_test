@@ -455,7 +455,24 @@ def insert_drug_formulary_data(processed_data):
         logger.warning("No processed data provided to insert.")
         return
 
-    logger.info(f"Preparing to insert {len(processed_data)} records into the database.")
+    # DEDUPLICATION: Remove duplicates based on conflict key (plan_id, drug_name, drug_tier, drug_requirements)
+    # Keep the last occurrence (which may have more complete data)
+    seen_keys = {}
+    for record in processed_data:
+        key = (
+            record.get("plan_id"),
+            record.get("drug_name", "").strip().lower() if record.get("drug_name") else "",
+            record.get("drug_tier", "").strip() if record.get("drug_tier") else None,
+            record.get("drug_requirements", "").strip() if record.get("drug_requirements") else None
+        )
+        seen_keys[key] = record  # Later records overwrite earlier ones
+    
+    deduplicated_data = list(seen_keys.values())
+    
+    if len(deduplicated_data) < len(processed_data):
+        logger.info(f"🔄 Deduplicated: {len(processed_data)} → {len(deduplicated_data)} records (removed {len(processed_data) - len(deduplicated_data)} duplicates)")
+    
+    logger.info(f"Preparing to insert {len(deduplicated_data)} records into the database.")
 
     with get_db_connection() as conn:
         cursor = conn.cursor()
@@ -469,7 +486,7 @@ def insert_drug_formulary_data(processed_data):
         ]
 
         data_tuples = []
-        for record in processed_data:
+        for record in deduplicated_data:  # Use deduplicated data
             # Defensive: skip records with missing essential info
             if not record.get("plan_name") or not record.get("payer_name"):
                 logger.warning(f"Skipping record with missing plan_name or payer_name: {record}")

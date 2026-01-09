@@ -55,9 +55,11 @@ BACKOFF_MULTIPLIER = 2
 # -----------------------------
 # Parallel OCR chunk processing (Optimization 1)
 OCR_CHUNK_WORKERS = 10  # Number of OCR chunks to process in parallel
+MAX_PAGES_PER_OCR_REQUEST = 4 # Mistral's HARD LIMIT for structured output (document_annotations)
+MAX_OCR_WORKERS = 6  # Increased from 4 to 6 for faster parallel processing
 
 # Mistral-specific rate limiting (Optimization 7) - Mistral has higher limits than Bedrock
-MISTRAL_OCR_RATE_LIMIT = 0.1  # 100ms between Mistral OCR calls (much faster than Bedrock)
+MISTRAL_OCR_RATE_LIMIT = 0.05  # 50ms between Mistral OCR calls (faster)
 
 # Smart page pre-filtering (Optimization 5)
 ENABLE_PAGE_PREFILTER = True  # Enable/disable page pre-filtering before OCR
@@ -67,8 +69,8 @@ SKIP_INDEX_PAGES = True  # Skip pages that look like index/TOC pages
 # Add these constants after your existing configuration
 MISTRAL_OCR_COST_PER_1K_PAGES = 2.0   # $2.00 per 1000 pages
 
-CLIENT_TIMEOUT = 300.0  # 5 minutes for general read/write timeouts
-CONNECT_TIMEOUT = 15.0  # 15 seconds for establishing a connection
+CLIENT_TIMEOUT = 60.0  # 60 seconds for general read/write timeouts (was 300s, reduced for faster failure detection)
+CONNECT_TIMEOUT = 10.0  # 10 seconds for establishing a connection (was 15s)
 
 # Global cost tracking dictionary
 COST_TRACKER = {
@@ -101,8 +103,8 @@ COST_TRACKER = {
 #
 PDF_PAGE_PROCESSING_CONFIG = {
     # Example: Process pages 1-10, 20-30, and 90-100 for all files.
-    "default": "all"
-
+    # "default": "all"
+    "default": ["395-444"]
     # Example: Process all pages for Cigna, but only a few for others.
     # "Cigna": "all",
     # "default": [1, 2, 3, "10-15"]
