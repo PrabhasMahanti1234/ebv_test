@@ -140,20 +140,21 @@ def extract_requirements_from_drug_name(drug_name_cell):
     if not drug_text:
         return "", ""
 
-    # Units we strictly want to keep in the drug name
-    units_not_to_ignore = "MG|ML|MCG|GM|G|UNIT|UNITS|%|HR"
+    # Units and words we strictly want to keep in the drug name
+    # These should NOT be stripped as requirement codes
+    units_not_to_ignore = "MG|ML|MCG|GM|G|UNIT|UNITS|%|HR|KIT|HCL|TAB|CAP|SOL|INJ|ORAL|NASAL|CREAM|GEL|PATCH|HUMAN|EMERGENCY|SYRINGE|SOLUTION|TABLET|CAPSULE|SPRAY|OINTMENT|SUSPENSION"
 
-    # Updated patterns
+    # Updated patterns - be more specific to avoid stripping drug name parts
     requirement_patterns = [
         r'\s+(DL,LA|LA,DL|DL|LA|AV,DL|DL,AV|MO|AV|CI|PDS|CI,DL$)',
         r'\s+(PA|ST|QL|BvD|SP|TI|NM)(?:\s|$)',
-        # Capture parenthesized requirements like (QL), (PA, QL), (Gen 4), (Gen 5)
-        # Matches content inside parens that looks like codes or "Gen X", separated by commas/spaces
-        r'\s*\(((?:PA|ST|QL|SP|NM|VAC|Gen\s*\d+|[A-Z]{2,})(?:,\s*(?:PA|ST|QL|SP|NM|VAC|Gen\s*\d+|[A-Z]{2,}))*)\)',
+        # Capture parenthesized requirements ONLY if they contain known codes
+        # Do NOT match drug formulation info like (HCL) or (HUMAN)
+        r'\s*\(((?:PA|ST|QL|SP|NM|VAC|Gen\s*\d+)(?:,\s*(?:PA|ST|QL|SP|NM|VAC|Gen\s*\d+))*)\)',
         # Capture square bracket requirements like [NP], [SP]
         r'\s*\[([^\]]+)\]',
-        # This regex says: match 2-3 letters, UNLESS those letters are a unit like MG or ML
-        fr'\s+(?!(?:{units_not_to_ignore})\b)([A-Z]{{2,3}}(?:,[A-Z]{{2,3}})*)$',
+        # DISABLED: This was removing valid drug name parts like "KIT"
+        # fr'\s+(?!(?:{units_not_to_ignore})\b)([A-Z]{{2,3}}(?:,[A-Z]{{2,3}})*)$',
         r'\s*\^?\s*\{([^}]+)\}\s*\$?\s*$'
     ]
 
@@ -521,12 +522,42 @@ def clean_special_chars(cleaned_text):
     return cleaned_text
 
 def normalize_drug_tier(raw_tier):
-    """Clean raw tier text and return the cleaned value or None"""
+    """
+    Clean raw tier text and normalize to standard tier names.
+    Handles both 'Tier X' format and 'Generic/Brand' format.
+    """
     if not raw_tier:
         return None
     
     cleaned = clean_special_chars(raw_tier)
-    return cleaned if cleaned else None
+    if not cleaned:
+        return None
+    
+    cleaned_lower = cleaned.lower().strip()
+    
+    # Map Generic/Brand format to tier equivalents
+    tier_mapping = {
+        'generic': 'Generic',
+        'brand': 'Brand', 
+        'specialty': 'Specialty',
+        'preferred generic': 'Tier 1',
+        'preferred brand': 'Tier 2',
+        'non-preferred': 'Tier 3',
+        'non preferred': 'Tier 3',
+        'nonpreferred': 'Tier 3',
+    }
+    
+    # Check if it matches a known mapping
+    if cleaned_lower in tier_mapping:
+        return tier_mapping[cleaned_lower]
+    
+    # Check for Tier X pattern
+    tier_match = re.search(r'tier\s*(\d+)', cleaned_lower, re.IGNORECASE)
+    if tier_match:
+        return f"Tier {tier_match.group(1)}"
+    
+    # Return the cleaned value as-is if it looks valid
+    return cleaned
 
 def infer_drug_tier_from_text(text: Optional[str]) -> Optional[str]:
     """

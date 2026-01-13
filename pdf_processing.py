@@ -171,14 +171,31 @@ def process_single_chunk_parallel(chunk_info: dict) -> dict:
             if isinstance(chunk_json, str):
                 try:
                     chunk_json = json.loads(chunk_json)
-                except json.JSONDecodeError:
-                    chunk_json = {"DrugInformation": [], "FormularyAbbreviations": []}
+                except json.JSONDecodeError as e:
+                    logger.debug(f"Chunk {chunk_idx + 1}: JSON decode error, attempting repair...")
+                    # Use robust_json_repair to fix malformed JSON
+                    repaired = robust_json_repair(chunk_json)
+                    if repaired.get("drug_table") or repaired.get("acronyms"):
+                        chunk_json = {
+                            "DrugInformation": repaired.get("drug_table", []),
+                            "FormularyAbbreviations": repaired.get("acronyms", [])
+                        }
+                        logger.debug(f"Chunk {chunk_idx + 1}: JSON repaired")
+                    else:
+                        logger.error(f"Chunk {chunk_idx + 1}: JSON repair failed")
+                        chunk_json = {"DrugInformation": [], "FormularyAbbreviations": []}
 
             drug_info_list = chunk_json.get("DrugInformation", [])
 
             for drug_idx, item in enumerate(drug_info_list):
                 if isinstance(item, dict):
                     drug_name = item.get("Drug Name", "")
+                    dosage_form = item.get("Dosage Form/Strength", "")
+                    
+                    # Combine drug name and dosage form/strength
+                    if drug_name and dosage_form:
+                        drug_name = f"{drug_name.strip()} {dosage_form.strip()}"
+                    
                     if not drug_name or len(drug_name) < 2:
                         continue
 
@@ -210,18 +227,22 @@ def process_single_chunk_parallel(chunk_info: dict) -> dict:
             for item in chunk_json.get("FormularyAbbreviations", []):
                 if isinstance(item, dict):
                     result['acronyms'].append(_extract_acronym_from_item(item))
+        else:
+            logger.warning(f"Chunk {chunk_idx + 1}: No document_annotation found")
 
         try:
             mistral_client.files.delete(file_id=chunk_uploaded.id)
         except:
             pass
 
-        # Check if this chunk's data looks like it came from an index page
-        if result['drugs'] and _is_extracted_data_from_index_page(result['drugs']):
-            logger.warning(f"⚠️ Chunk {chunk_idx + 1}: Detected INDEX PAGE data, discarding {len(result['drugs'])} entries")
-            result['drugs'] = []
-            result['acronyms'] = []
-        elif result['drugs']:
+        # NOTE: Chunk-level index detection DISABLED - causes valid drugs to be lost
+        # when chunks contain mixed index + drug pages. Individual index entries
+        # are filtered out later in _consolidate_and_clean_drug_table() instead.
+        # if result['drugs'] and _is_extracted_data_from_index_page(result['drugs']):
+        #     logger.warning(f"⚠️ Chunk {chunk_idx + 1}: Detected INDEX PAGE data, discarding {len(result['drugs'])} entries")
+        #     result['drugs'] = []
+        #     result['acronyms'] = []
+        if result['drugs']:
             logger.info(f"Chunk {chunk_idx + 1} complete: {len(result['drugs'])} drugs")
 
     except Exception as e:
@@ -518,11 +539,49 @@ def process_single_pdf_url_worker(plan_info):
 
     try:
         pdf_url = transform_viewer_url(formulary_url)
+        log_prefix = f"Plan {plan_id}:"
 
-        response = requests.get(pdf_url, timeout=120, stream=True)
-        response.raise_for_status()
+        # Use browser-like headers to avoid 406 errors from websites blocking bots
+        download_headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'application/pdf,*/*',
+            'Accept-Language': 'en-US,en;q=0.9',
+        }
 
-        pdf_bytes = BytesIO(response.content)
+        # Proxy configuration (uncomment if needed)
+        # proxy_user = os.getenv("PROXY_USER")
+        # proxy_pass = os.getenv("PROXY_PASS")
+        # proxy_host = os.getenv("PROXY_HOST")
+        # proxy_port = os.getenv("PROXY_PORT")
+
+        # proxies = None
+        # if all([proxy_user, proxy_pass, proxy_host, proxy_port]):
+        #     proxy_url = f"http://{proxy_user}:{proxy_pass}@{proxy_host}:{proxy_port}"
+        #     proxies = {
+        #         "http": proxy_url,
+        #         "https": proxy_url,
+        #     }
+        #     logger.info(f"{log_prefix} Using authenticated proxy.")
+        # else:
+        #     logger.info(f"{log_prefix} Proxy environment variables not set. Attempting direct connection.")
+
+        try:
+            with requests.get(pdf_url, timeout=120, headers=download_headers, stream=True, verify=True) as resp:
+                resp.raise_for_status()
+                content_type = resp.headers.get('Content-Type', '')
+                if 'application/pdf' not in content_type and 'application/octet-stream' not in content_type:
+                    logger.warning(f"{log_prefix} Unexpected content type: {content_type}. Proceeding anyway.")
+                pdf_content_bytes = resp.content
+        except requests.exceptions.SSLError as e:
+            logger.warning(f"{log_prefix} SSL verification failed: {e}. Retrying with SSL verification DISABLED.")
+            with requests.get(pdf_url, timeout=120, headers=download_headers, stream=True, verify=False) as resp:
+                resp.raise_for_status()
+                content_type = resp.headers.get('Content-Type', '')
+                if 'application/pdf' not in content_type and 'application/octet-stream' not in content_type:
+                    logger.warning(f"{log_prefix} Unexpected content type on retry: {content_type}. Proceeding anyway.")
+                pdf_content_bytes = resp.content
+
+        pdf_bytes = BytesIO(pdf_content_bytes)
         file_hash = calculate_bytes_hash(pdf_bytes.getvalue())
 
         cached_data, cached_content = get_cached_result(file_hash)
@@ -539,9 +598,11 @@ def process_single_pdf_url_worker(plan_info):
         drug_table = structured_data.get("drug_table", [])
         acronyms = structured_data.get("acronyms", [])
 
-        if _is_extracted_data_from_index_page(drug_table):
-            logger.warning(f"Plan {plan_id}: Detected index page, skipping")
-            return plan_id, {"drug_table": [], "acronyms": [], "status": "index_page"}
+        # NOTE: Plan-level index detection DISABLED - individual index entries 
+        # are filtered in _consolidate_and_clean_drug_table() instead.
+        # if _is_extracted_data_from_index_page(drug_table):
+        #     logger.warning(f"Plan {plan_id}: Detected index page, skipping")
+        #     return plan_id, {"drug_table": [], "acronyms": [], "status": "index_page"}
 
         if LANGDETECT_AVAILABLE:
             def is_fully_english(item: dict) -> bool:
@@ -605,6 +666,11 @@ def process_single_pdf_url_worker(plan_info):
         if enriched_drug_records:
             insert_drug_formulary_data(enriched_drug_records)
             logger.info(f"Inserted {len(enriched_drug_records)} drug records for plan {plan_id}")
+        
+        # Insert acronyms into pp_formulary_names table
+        if acronyms:
+            insert_acronyms_to_ref_table(acronyms, state_name, payer_name, plan_name, "pp_formulary_names")
+            logger.info(f"Inserted {len(acronyms)} acronyms into pp_formulary_names for plan {plan_id}")
 
         result = {
             "drug_table": drug_table,

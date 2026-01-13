@@ -55,9 +55,14 @@ ENHANCED_PDF_DPI = 200
 USE_ENHANCED_PDF = False
 
 # Pre-compiled regex patterns for index page detection (PERFORMANCE OPTIMIZATION)
-RE_DOT_LEADER = re.compile(r'\.{3,}')
-RE_PAGE_NUMBER_AT_END = re.compile(r'[\s,\.]+\d{1,3}\s*$')
-RE_INDEX_PATTERN = re.compile(r'^[A-Z][A-Z\s\-/,]+[\.\s]+\d{1,3}\s*$')
+# Pattern for dot leaders: matches ". . . ." or "......" or ". ." patterns
+RE_DOT_LEADER = re.compile(r'(?:\.[\s\.]*){4,}')  # Requires 4+ dots to avoid false positives
+# Pattern for page numbers at end of line
+RE_PAGE_NUMBER_AT_END = re.compile(r'\s{3,}\d{1,3}\s*$')  # Requires 3+ spaces before page number
+# Pattern for index entries: DRUG NAME followed by dots/spaces and page number
+RE_INDEX_PATTERN = re.compile(r'^[A-Z][A-Za-z\s\-/,\(\)]+\.{3,}\s*\d{1,3}\s*$')  # Must have 3+ dots
+# Pattern to detect if line has dosage info (real drugs have this, index entries don't)
+RE_HAS_DOSAGE = re.compile(r'\d+\s*(mg|ml|mcg|g|%|unit|tablet|capsule|cap|tab|sol|cream)', re.IGNORECASE)
 
 # Optional imports
 try:
@@ -309,22 +314,41 @@ def prefilter_pages_with_pymupdf(pdf_input: BytesIO, page_indices: List[int]) ->
                 index_reason = ""
                 
                 # Check 1: Explicit index indicators in header
-                header_text = text_lower[:500]
+                header_text = text_lower[:800]  # Check more of the header
+                footer_text = text_lower[-300:] if len(text_lower) > 300 else text_lower
+                
                 index_indicators = [
                     "table of contents", "alphabetical index", "drug index",
-                    "index of drugs", "formulary index", "index to drugs"
+                    "index of drugs", "formulary index", "index to drugs",
+                    "medication index", "generic index", "brand index",
+                    "attention fhk providers",
+                    "alphabetical listing of drugs",  # NEW: From uploaded image
+                    "listing of drugs", "drug listing",
+                    "formulary listing", "medication listing"
                 ]
+                
+                # Also check footer for "last updated date" pattern (common in index pages)
+                footer_indicators = ["last updated date", "last updated:", "you can find information"]
                 for indicator in index_indicators:
                     if indicator in header_text:
                         is_index = True
-                        index_reason = f"contains '{indicator}'"
+                        index_reason = f"header contains '{indicator}'"
                         break
+                
+                # Check footer for index page indicators
+                if not is_index:
+                    for indicator in footer_indicators:
+                        if indicator in footer_text:
+                            is_index = True
+                            index_reason = f"footer contains '{indicator}'"
+                            break
                 
                 if not is_index:
                     lines = text.split('\n')
                     total_content_lines = 0
                     dot_leader_lines = 0
                     page_number_at_end_lines = 0
+                    no_dosage_lines = 0
                     
                     for line in lines:
                         stripped = line.strip()
@@ -333,32 +357,44 @@ def prefilter_pages_with_pymupdf(pdf_input: BytesIO, page_indices: List[int]) ->
                         
                         total_content_lines += 1
                         
-                        # Check 2: Dot leaders (........) pattern - USE COMPILED REGEX
+                        # Check 2: Dot leaders (. . . . or ......) pattern
                         if RE_DOT_LEADER.search(stripped):
                             dot_leader_lines += 1
                         
-                        # Check 3: Page number at end pattern - USE COMPILED REGEX
+                        # Check 3: Page number at end pattern
                         if RE_PAGE_NUMBER_AT_END.search(stripped):
                             page_number_at_end_lines += 1
+                        
+                        # Check 4: No dosage info (index entries are just drug names)
+                        if not RE_HAS_DOSAGE.search(stripped) and len(stripped) > 10:
+                            no_dosage_lines += 1
                     
-                    # If >15% of lines have dot leaders, it's an index
                     if total_content_lines > 10:
-                        if dot_leader_lines / total_content_lines >= 0.15:
+                        # Rule 1: If >30% of lines have dot leaders, it's definitely an index
+                        # (increased from 20% to reduce false positives)
+                        if dot_leader_lines / total_content_lines >= 0.30:
                             is_index = True
                             index_reason = f"{dot_leader_lines}/{total_content_lines} lines have dot leaders"
                         
-                        # If >30% of lines end with page numbers, it's an index
-                        elif page_number_at_end_lines / total_content_lines >= 0.30:
+                        # Rule 2: If >50% of lines end with page numbers, likely index
+                        # (increased from 40% to reduce false positives)
+                        elif page_number_at_end_lines / total_content_lines >= 0.50:
                             is_index = True
                             index_reason = f"{page_number_at_end_lines}/{total_content_lines} lines end with page numbers"
                         
-                        # Check for index pattern: DRUGNAME...## - USE COMPILED REGEX
+                        # Rule 3: If >98% have no dosage info AND >40% end with page numbers
+                        # (made stricter to avoid false positives on drug pages)
+                        elif no_dosage_lines / total_content_lines >= 0.98 and page_number_at_end_lines / total_content_lines >= 0.40:
+                            is_index = True
+                            index_reason = f"No dosage info ({no_dosage_lines}/{total_content_lines}) + page numbers ({page_number_at_end_lines})"
+                        
+                        # Rule 4: Check for index pattern directly (stricter threshold)
                         elif not is_index:
                             toc_pattern_count = sum(
                                 1 for line in lines
                                 if RE_INDEX_PATTERN.match(line.strip())
                             )
-                            if toc_pattern_count / total_content_lines >= 0.25:
+                            if toc_pattern_count / total_content_lines >= 0.35:
                                 is_index = True
                                 index_reason = f"{toc_pattern_count}/{total_content_lines} lines match index pattern"
 

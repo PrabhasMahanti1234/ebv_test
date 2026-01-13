@@ -102,10 +102,11 @@ COST_TRACKER = {
 # - The special key "default" applies to any file NOT matched by other keys.
 #
 PDF_PAGE_PROCESSING_CONFIG = {
-    # Example: Process pages 1-10, 20-30, and 90-100 for all files.
-    # "default": "all"
-    "default": ["395-444"]
-    # Example: Process all pages for Cigna, but only a few for others.
+    # Process pages to find the drug table
+    # Increased range to capture full drug lists (some PDFs have 60+ pages of drugs)
+    # Use "all" to process everything, or specific ranges like ["1-100"]
+    "default": ["1-50"]
+    # Override for specific payers if needed:
     # "Cigna": "all",
-    # "default": [1, 2, 3, "10-15"]
+    # "Select": ["1-80"],
 }

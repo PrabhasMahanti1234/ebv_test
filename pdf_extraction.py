@@ -48,10 +48,10 @@ except ImportError:
 # =============================================================================
 # OCR ANNOTATION SCHEMA - Supports Multiple PDF Formats
 # =============================================================================
-# FORMAT 1 (Traditional): Drug Name | Drug Tier | Requirements columns
-# FORMAT 2 (PDL): B,G,O | Comment | P,N,R,NR | Therapeutic Category
-# FORMAT 3 (Tier Designation): Drug Name | Tier Designation | dot-marked columns
-# FORMAT 4 (Hennepin/Product): PRODUCT DESCRIPTION | TIER | LIMITS & RESTRICTIONS
+# FORMAT 1 (CareSource/Standard): Drug Name | Tier | Restrictions/Limits
+# FORMAT 2 (Traditional): Drug Name | Drug Tier | Requirements
+# FORMAT 3 (PDL): B,G,O | Comment | P,N,R,NR | Therapeutic Category
+# FORMAT 4 (Tier Designation): Drug Name | Tier Designation | dot-marked columns
 # =============================================================================
 OCR_ANNOTATION_SCHEMA = {
     "type": "json_schema",
@@ -63,38 +63,85 @@ OCR_ANNOTATION_SCHEMA = {
             "properties": {
                 "DrugInformation": {
                     "type": "array",
-                    "description": "Extract drugs from formulary tables. Supports multiple formats: 1) Traditional: Drug Name|Drug Tier|Requirements. 2) PDL: B,G,O|P,N,R,NR. 3) Tier Designation with dots. 4) Product format: PRODUCT DESCRIPTION|TIER|LIMITS & RESTRICTIONS where TIER can be 'Generics', 'Preferred Generics', 'Non-Preferred', etc. SKIP index pages and TOC.",
+                    "description": """Extract ALL drugs from the formulary drug table. 
+
+CRITICAL: Look for tables with these column headers:
+- "Drug Name" | "Tier" | "Restrictions/Limits"
+- OR "Drug Name" | "Drug Tier" | "Requirements"
+
+TABLE STRUCTURE RECOGNITION:
+- The table has 3 columns: Drug Name (left), Tier (middle), Restrictions/Limits (right)
+- CATEGORY HEADERS appear as gray/shaded rows spanning all columns (e.g., "FIRST GENERATION ANTIHISTAMINES", "PHENOTHIAZINE DERIVATIVES")
+- Drug rows contain: full drug name with dosage in column 1, tier value in column 2, restrictions in column 3
+
+EXTRACTION RULES:
+1. Extract EVERY drug row - do NOT skip any, even if dosage form is in the drug name
+2. Category headers go in the 'category' field, NOT 'Drug Name'
+3. Tier values are exactly: "Tier 1", "Tier 2", "Tier 3", "Tier 4", "Tier 5" OR "Generic", "Brand" (copy exact text)
+4. Restrictions column may contain: "ST", "PA", "QL", "QL (60 ML per 30 days)", etc.
+5. If Restrictions/Limits cell is empty, set requirements to null
+6. SKIP index/table of contents pages (pages with just drug names and page numbers)
+7. For drugs with inline dosage (e.g., 'carbinoxamine maleate oral tablet 4 mg'), extract the COMPLETE text into 'Drug Name' and leave 'Dosage Form/Strength' as null
+8. Set 'page_number' to the actual PDF page number where this drug appears""",
                     "items": {
                         "type": "object",
                         "properties": {
-                            "Drug Name": {"type": "string", "description": "Complete drug name with form/dosage. Map from PRODUCT DESCRIPTION column if present."},
-                            "drug tier": {"type": ["string", "null"], "description": "From Drug Tier, TIER column (Generics, Preferred Generics, Non-Preferred, Preferred Brand), or Tier Designation (NP, P, NC)."},
-                            "requirements": {"type": ["string", "null"], "description": "From Requirements, LIMITS & RESTRICTIONS (e.g. 'QPD 6.0 per day', 'PA', 'ST', 'QL'), or combined dot-marked columns."},
-                            "BGO": {"type": ["string", "null"], "description": "PDL format: B=Brand, G=Generic, O=OTC."},
-                            "PNRNR": {"type": ["string", "null"], "description": "PDL format: P=Preferred, N=Non-Preferred, R/NR."},
-                            "Specialty": {"type": ["boolean", "null"], "description": "True if Specialty column has dot."},
-                            "PriorAuthorization": {"type": ["boolean", "null"], "description": "True if Prior Authorization column has dot or PA in limits."},
-                            "StepTherapy": {"type": ["boolean", "null"], "description": "True if Step Therapy column has dot or ST in limits."},
-                            "DispensingLimits": {"type": ["boolean", "null"], "description": "True if Dispensing Limits column has dot or QL/QPD in limits."},
-                            "category": {"type": ["string", "null"], "description": "Therapeutic category, section header, or drug class (e.g. SALICYLATES)."},
-                            "page_number": {"type": ["integer", "null"], "description": "Page number where drug is found."},
-                            "pa_form_link": {"type": ["string", "null"], "description": "PA Form Link URL if present."}
-                        }
+                            "Drug Name": {
+                                "type": "string", 
+                                "description": """The complete drug name from the first/left-most column. This column may contain EITHER:
+1. Just the drug name (e.g., 'AMOXICILLIN', 'AMPICILLIN')
+2. Drug name WITH dosage form inline (e.g., 'carbinoxamine maleate oral liquid', 'carbinoxamine maleate oral tablet 4 mg', 'azelastine nasal spray non-aerosol 137 mcg (0.1 %)')
+
+EXTRACT THE FULL TEXT from the first column, including any dosage information. Copy EXACTLY as shown."""
+                            },
+                            "Dosage Form/Strength": {
+                                "type": ["string", "null"],
+                                "description": "The dosage form and strength IF it appears in a SEPARATE second column (between Drug Name and Tier). Examples: 'TAB 250MG', 'CAP 500MG', 'SUS 200/5ML'. In many PDFs, this information is ALREADY included in the Drug Name column, so this field will be null. Only fill this if there's a distinct second column."
+                            },
+                            "drug tier": {
+                                "type": ["string", "null"], 
+                                "description": "The tier/drug type value. Copy exactly as shown. Can be: 'Tier 1', 'Tier 2', 'Tier 3', 'Tier 4', 'Tier 5', OR 'Generic', 'Brand', 'Specialty'. Leave null ONLY for category header rows."
+                            },
+                            "requirements": {
+                                "type": ["string", "null"], 
+                                "description": "The restrictions from the Restrictions/Limits column (right column). Copy EXACTLY as shown. Examples: 'ST' (Step Therapy), 'PA' (Prior Authorization), 'QL (60 ML per 30 days)' (Quantity Limit with details), 'PA, QL', empty cells should be null."
+                            },
+                            "BGO": {"type": ["string", "null"], "description": "PDL format only: B=Brand, G=Generic, O=OTC. Leave null for standard formulary tables."},
+                            "PNRNR": {"type": ["string", "null"], "description": "PDL format only: P=Preferred, N=Non-Preferred, R/NR. Leave null for standard formulary tables."},
+                            "Specialty": {"type": ["boolean", "null"], "description": "True if marked as Specialty drug. Leave null if not indicated."},
+                            "PriorAuthorization": {"type": ["boolean", "null"], "description": "True if 'PA' appears in requirements column."},
+                            "StepTherapy": {"type": ["boolean", "null"], "description": "True if 'ST' appears in requirements column."},
+                            "DispensingLimits": {"type": ["boolean", "null"], "description": "True if 'QL' appears in requirements column."},
+                            "category": {
+                                "type": ["string", "null"], 
+                                "description": "Category header text from gray/shaded rows that span all columns. Examples: 'FIRST GEN. ANTIHIST. DERIVATIVES, MISC.', 'FIRST GENERATION ANTIHISTAMINES', 'OTHER ANTIHISTAMINES', 'PHENOTHIAZINE DERIVATIVES', 'PIPERAZINE DERIVATIVES', 'PROPYLAMINE DERIVATIVES', 'SECOND GENERATION ANTIHISTAMINES'. These are NOT drug names."
+                            },
+                            "page_number": {"type": ["integer", "null"], "description": "Page number in the PDF where this drug is found."},
+                            "pa_form_link": {"type": ["string", "null"], "description": "PA Form Link URL if present in the table."}
+                        },
+                        "required": ["Drug Name"]
                     }
                 },
                 "FormularyAbbreviations": {
                     "type": "array",
-                    "description": "Extract abbreviation/legend definitions. Include QPD, QL, PA, ST definitions.",
+                    "description": """Extract ALL abbreviation/legend definitions from ANYWHERE in the document.
+                    
+Look for legends in: page headers, footers, sidebar text, or dedicated sections.
+Common patterns: 'ST = Step Therapy', 'PA = Prior Authorization', 'QL = Quantity Limit'
+                    
+Extract EVERY abbreviation definition found.""",
                     "items": {
                         "type": "object",
                         "properties": {
-                            "Acronym": {"type": "string", "description": "The abbreviation code (e.g., QPD, QL, PA, ST)."},
-                            "Expansion": {"type": "string", "description": "What it stands for (e.g., Quantity Per Day, Quantity Limit)."},
-                            "Explanation": {"type": ["string", "null"], "description": "Additional explanation if available."}
-                        }
+                            "Acronym": {"type": "string", "description": "The abbreviation code. Examples: 'ST', 'PA', 'QL', 'SP', 'Tier 1', 'Generic'."},
+                            "Expansion": {"type": "string", "description": "What the abbreviation stands for. Examples: 'Step Therapy', 'Prior Authorization', 'Quantity Limit'."},
+                            "Explanation": {"type": ["string", "null"], "description": "Additional explanation if provided in the legend."}
+                        },
+                        "required": ["Acronym", "Expansion"]
                     }
                 }
-            }
+            },
+            "required": ["DrugInformation"]
         }
     }
 }
@@ -103,48 +150,63 @@ OCR_ANNOTATION_SCHEMA = {
 def _build_requirements_from_item(item):
     """
     Build drug_requirements from multiple format types:
-    - Tier Designation format (boolean dot columns)
+    - Traditional requirements text (PRIORITY - exact values like "QL (2 EA per 30 days)")
+    - Tier Designation format (boolean dot columns - fallback)
     - PDL format (BGO + PNRNR)
-    - Traditional requirements text
     """
-    # Check for Tier Designation format (dot-marked columns)
+    # PRIORITY 1: Traditional requirements text (contains exact QL/PA/ST values)
+    requirements_text = item.get("requirements")
+    if requirements_text and requirements_text.strip():
+        return requirements_text.strip()
+    
+    # PRIORITY 2: Check for Tier Designation format (dot-marked columns) as FALLBACK
     specialty = item.get("Specialty")
     prior_auth = item.get("PriorAuthorization")
     step_therapy = item.get("StepTherapy")
     dispensing_limits = item.get("DispensingLimits")
 
-    # Priority 1: Tier Designation format
     tier_parts = []
     if specialty is True:
         tier_parts.append("Specialty")
     if prior_auth is True:
-        tier_parts.append("Prior Authorization")
+        tier_parts.append("PA")  # Shortened for consistency
     if step_therapy is True:
-        tier_parts.append("Step Therapy")
+        tier_parts.append("ST")  # Shortened for consistency
     if dispensing_limits is True:
-        tier_parts.append("Dispensing Limits")
+        tier_parts.append("QL")  # Shortened - actual value should be in requirements text
 
     if tier_parts:
         return ", ".join(tier_parts)
 
-    # Priority 2: PDL format (BGO + PNRNR)
+    # PRIORITY 3: PDL format (BGO + PNRNR)
     bgo = item.get("BGO", "").strip() if item.get("BGO") else ""
     pnrnr = item.get("PNRNR", "").strip() if item.get("PNRNR") else ""
     if bgo or pnrnr:
         parts = [p for p in [bgo, pnrnr] if p]
         return "; ".join(parts) if parts else None
 
-    # Priority 3: Traditional requirements text
-    return item.get("requirements") or None
+    return None
 
 
 def _extract_drug_from_item(item: dict, page_number: int) -> dict:
     """
     Extract drug data from an OCR item into a standardized dictionary format.
     Centralizes the drug extraction logic used in multiple places.
+    
+    Combines Drug Name + Dosage Form/Strength into a single drug_name field.
+    Example: "AMOXICILLIN" + "TAB 875MG" → "AMOXICILLIN TAB 875MG"
     """
+    drug_name = item.get("Drug Name") or ""
+    dosage_form = item.get("Dosage Form/Strength") or ""
+    
+    # Combine drug name and dosage form/strength if both present
+    if drug_name and dosage_form:
+        combined_name = f"{drug_name.strip()} {dosage_form.strip()}"
+    else:
+        combined_name = drug_name.strip() if drug_name else ""
+    
     return {
-        "drug_name": item.get("Drug Name"),
+        "drug_name": combined_name if combined_name else None,
         "drug_tier": item.get("drug tier"),
         "drug_requirements": _build_requirements_from_item(item),
         "category": item.get("category"),
@@ -195,8 +257,12 @@ def _sanitize_output(parsed_data, default_output):
 
 def robust_json_repair(json_string: str):
     """
-    Parse and repair malformed JSON from LLM outputs.
+    Parse and repair malformed JSON from LLM/OCR outputs.
     Uses json_repair library if available, with fallback to basic cleanup.
+    Handles common issues like:
+    - Unquoted values with special characters ($$$, etc.)
+    - Truncated JSON arrays
+    - Missing closing brackets
     """
     default_output = {"drug_table": [], "acronyms": [], "tiers": []}
 
@@ -206,6 +272,11 @@ def robust_json_repair(json_string: str):
     # Remove markdown code fences
     json_string = re.sub(r'^```(?:json)?\s*', '', json_string.strip())
     json_string = re.sub(r'\s*```$', '', json_string.strip())
+
+    # Pre-process: Fix common malformed JSON patterns
+    # Fix unquoted values starting with $ (like $$$ Non-preferred)
+    json_string = re.sub(r':\s*(\$+[^"}\],]+)"', r': "\1"', json_string)
+    json_string = re.sub(r':\s*(\$+[^"}\],\n]+)\s*([,}\]])', r': "\1"\2', json_string)
 
     # Try json_repair library first (most robust)
     if JSON_REPAIR_AVAILABLE:
@@ -219,7 +290,44 @@ def robust_json_repair(json_string: str):
         except Exception as e:
             logger.debug(f"json_repair failed: {e}, trying fallback...")
 
-    # Fallback: Basic JSON parsing with cleanup
+    # Fallback 1: Try to extract DrugInformation array directly
+    drug_table = []
+    try:
+        # Find DrugInformation array and extract individual objects
+        drug_info_match = re.search(r'"DrugInformation"\s*:\s*\[', json_string)
+        if drug_info_match:
+            start = drug_info_match.end()
+            # Extract all complete JSON objects from the array
+            obj_pattern = re.compile(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}')
+            for match in obj_pattern.finditer(json_string[start:]):
+                try:
+                    obj = json.loads(match.group())
+                    if obj.get("Drug Name"):
+                        # Combine Drug Name + Dosage Form/Strength
+                        drug_name = obj.get("Drug Name", "")
+                        dosage_form = obj.get("Dosage Form/Strength", "")
+                        if drug_name and dosage_form:
+                            combined_name = f"{drug_name.strip()} {dosage_form.strip()}"
+                        else:
+                            combined_name = drug_name.strip() if drug_name else ""
+                        
+                        drug_table.append({
+                            "drug_name": combined_name,
+                            "drug_tier": obj.get("drug tier"),
+                            "drug_requirements": obj.get("requirements"),
+                            "category": obj.get("category"),
+                            "page_number": obj.get("page_number")
+                        })
+                except json.JSONDecodeError:
+                    continue
+            
+            if drug_table:
+                logger.info(f"✅ Fallback extraction recovered {len(drug_table)} drugs from truncated JSON")
+                return {"drug_table": drug_table, "acronyms": [], "tiers": []}
+    except Exception as e:
+        logger.debug(f"Fallback drug extraction failed: {e}")
+
+    # Fallback 2: Basic JSON parsing with cleanup
     try:
         start_idx = json_string.find('{')
         if start_idx == -1:
@@ -237,9 +345,16 @@ def robust_json_repair(json_string: str):
                     break
 
         if end_idx == -1:
-            return default_output
-
-        json_str = json_string[start_idx:end_idx + 1]
+            # JSON is truncated - try to close it
+            json_str = json_string[start_idx:]
+            # Close any open arrays and objects
+            open_brackets = json_str.count('[') - json_str.count(']')
+            open_braces = json_str.count('{') - json_str.count('}')
+            json_str = json_str + (']' * open_brackets) + ('}' * open_braces)
+        else:
+            json_str = json_string[start_idx:end_idx + 1]
+        
+        # Remove trailing commas before ] or }
         json_str = re.sub(r',\s*([}\]])', r'\1', json_str)
 
         result = json.loads(json_str)
@@ -250,80 +365,80 @@ def robust_json_repair(json_string: str):
         return default_output
 
 
+def _is_index_entry(item: dict) -> bool:
+    """
+    Check if a single drug entry looks like it came from an index page.
+    Returns True if the entry looks like an index entry, False otherwise.
+    """
+    drug_name = item.get("drug_name", "") or ""
+    
+    # Index entry indicators:
+    # 1. Drug name ends with page number (e.g., "BACITRACIN...13")
+    if RE_PAGE_NUMBER_END.search(drug_name):
+        return True
+    
+    # 2. Drug name contains dot leaders (.......)
+    if RE_DOT_LEADERS.search(drug_name):
+        return True
+    
+    return False
+
+
 def _is_extracted_data_from_index_page(drug_table: List[dict]) -> bool:
     """
     Detect if extracted drug data appears to come from an index/table of contents page.
-    Returns True if the data looks like an index, False otherwise.
-
-    Index page indicators:
-    - Drug names contain page numbers (e.g., "BACITRACIN...13" or "BACLOFEN 260")
-    - Drug names contain dot leaders (........)
-    - High percentage have same tier (hallucinated uniformly)
-    - No requirements but uniform tier
-    - Drug names are just drug names without form/dosage info
+    Returns True ONLY if the MAJORITY of data looks like an index, False otherwise.
+    
+    NOTE: This function now uses higher thresholds to avoid discarding valid drug data
+    when a chunk contains a mix of index and drug pages.
     """
-    if not drug_table or len(drug_table) < 5:
+    if not drug_table or len(drug_table) < 10:  # Increased minimum from 5 to 10
         return False
 
     total = len(drug_table)
     
     # Count various index indicators
-    page_number_at_end = 0
-    dot_leader_pattern = 0
-    no_dosage_form = 0
+    index_entries = 0
     tier_counts = {}
     no_requirements = 0
+    no_dosage_form = 0
     
     for item in drug_table:
         drug_name = item.get("drug_name", "") or ""
         tier = item.get("drug_tier", "") or ""
         req = item.get("drug_requirements")
         
-        # Pattern 1: Drug name ends with page number - USE COMPILED REGEX
-        if RE_PAGE_NUMBER_END.search(drug_name):
-            page_number_at_end += 1
+        # Check if this specific entry looks like an index entry
+        if _is_index_entry(item):
+            index_entries += 1
         
-        # Pattern 2: Dot leaders in name - USE COMPILED REGEX
-        if RE_DOT_LEADERS.search(drug_name):
-            dot_leader_pattern += 1
-        
-        # Pattern 3: No dosage/form info - USE COMPILED REGEX
+        # Pattern: No dosage/form info
         if not RE_DOSAGE_FORM.search(drug_name):
             no_dosage_form += 1
         
-        # Pattern 4: Count tier values to detect uniform hallucination
+        # Count tier values
         if tier:
             tier_counts[tier] = tier_counts.get(tier, 0) + 1
         
-        # Pattern 5: No requirements
+        # No requirements
         if not req:
             no_requirements += 1
 
-    # Detection Rule 1: High percentage of page numbers at end
-    if page_number_at_end / total >= 0.2:
-        logger.info(f"🚫 INDEX PAGE DETECTED: {page_number_at_end}/{total} names have page numbers at end")
+    # Detection Rule 1: Very high percentage of obvious index entries (>50% instead of 20%)
+    if total > 0 and index_entries / total >= 0.50:
+        logger.info(f"🚫 INDEX PAGE DETECTED: {index_entries}/{total} entries are obvious index entries")
         return True
     
-    # Detection Rule 2: Dot leaders present
-    if dot_leader_pattern / total >= 0.1:
-        logger.info(f"🚫 INDEX PAGE DETECTED: {dot_leader_pattern}/{total} names have dot leaders")
-        return True
-    
-    # Detection Rule 3: Very uniform tier (likely hallucinated) + no requirements + no dosage info
-    if tier_counts:
+    # Detection Rule 2: Very uniform tier + no requirements + no dosage (stricter thresholds)
+    if tier_counts and total > 20:  # Only check for larger datasets
         most_common_tier = max(tier_counts.values())
         tier_uniformity = most_common_tier / total
         
-        # If >80% have same tier, no requirements, and no dosage info → likely index page
-        if tier_uniformity >= 0.8 and no_requirements / total >= 0.9 and no_dosage_form / total >= 0.7:
+        # If >95% have same tier AND >98% no requirements AND >95% no dosage info
+        if tier_uniformity >= 0.95 and no_requirements / total >= 0.98 and no_dosage_form / total >= 0.95:
             logger.info(f"🚫 INDEX PAGE DETECTED: {tier_uniformity*100:.0f}% uniform tier, "
                        f"{no_requirements}/{total} no requirements, {no_dosage_form}/{total} no dosage info")
             return True
-    
-    # Detection Rule 4: Almost all entries have no dosage/form info
-    if no_dosage_form / total >= 0.85:
-        logger.info(f"🚫 INDEX PAGE DETECTED: {no_dosage_form}/{total} entries have no dosage/form info")
-        return True
 
     return False
 
@@ -386,19 +501,26 @@ def _consolidate_and_clean_drug_table(drug_table: List[dict]) -> List[dict]:
     # Stage 2: Propagate tier/requirements
     result = _clean_and_propagate_drug_groups(consolidated)
 
-    # Stage 3: Filter invalid entries
+    # Stage 3: Filter invalid entries AND individual index entries
     filtered = []
     filtered_out = []
+    index_entries_removed = 0
     for item in result:
         name = item.get("drug_name", "") or ""
-        # Keep if name is substantial
-        if len(name) >= 3 and not name.isdigit():
-            filtered.append(item)
-        else:
+        # Skip if name is too short or just a number
+        if len(name) < 3 or name.isdigit():
             filtered_out.append(name)
+            continue
+        # Skip individual index entries (page numbers, dot leaders)
+        if _is_index_entry(item):
+            index_entries_removed += 1
+            continue
+        filtered.append(item)
 
     if filtered_out:
         logger.debug(f"🧹 Filtered out {len(filtered_out)} invalid entries: {filtered_out[:5]}")
+    if index_entries_removed > 0:
+        logger.info(f"🧹 Removed {index_entries_removed} individual index entries from drug table")
 
     logger.info(f"🧹 Final drug count: {len(filtered)} (filtered {len(result) - len(filtered)} invalid entries)")
 
