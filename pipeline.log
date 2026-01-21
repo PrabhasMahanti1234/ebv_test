@@ -1,0 +1,1197 @@
+2025-12-23 17:48:16 [INFO] Starting pipeline
+2025-12-23 17:48:16 [INFO] Ensuring database schema exists...
+2025-12-23 17:48:16 [INFO] Created/ensured processed_file_cache table
+2025-12-23 17:48:16 [INFO] Created partitioned drug_formulary_details table
+2025-12-23 17:48:16 [INFO] Created/ensured pp_formulary_names table
+2025-12-23 17:48:16 [INFO] Ensured product mapping columns exist in drug_formulary_details.
+2025-12-23 17:48:16 [INFO] Database schema ensured successfully with partitioning and comprehensive indexing
+2025-12-23 17:48:16 [INFO] STEP 1: Populating Payer and Plan Tables from Excel
+2025-12-23 17:48:16 [INFO] Loaded 1 records from Excel
+2025-12-23 17:48:16 [INFO] Cleaned DataFrame column names.
+2025-12-23 17:48:16 [WARNING] Found misspelled column 'Formulory date'. Renaming to 'Formulary Date'.
+2025-12-23 17:48:16 [INFO] Column 'Formulary Date' was already a datetime type. No conversion needed.
+2025-12-23 17:48:16 [INFO] Column 'Captured Date' was already a datetime type. No conversion needed.
+2025-12-23 17:48:17 [INFO] Step 1 Complete! Processed 1 plans
+2025-12-23 17:48:17 [INFO] Database now contains 1 payers and 1 plans
+2025-12-23 17:48:17 [INFO] STEP 2: Processing PDF Files from URLs in plan_details
+2025-12-23 17:48:17 [INFO] Found 1 plans with URLs to process.
+2025-12-23 17:48:19 [INFO] url_mappings.json not found. No URL transformations will be applied.
+2025-12-23 17:48:19 [INFO] [URL Worker for Common Ground Healthcare Cooperative-Prescription drug list] Using authenticated proxy.
+2025-12-23 17:48:24 [INFO] Updated file_hash for plan_id: c4c1fb80-b40f-41df-8bf9-48c41cdea900
+2025-12-23 17:48:24 [INFO] Cache MISS for hash: 68ad9759d24c552f7cb8aefaebd159434d556b0f1f26da9f1f5541635219b570
+2025-12-23 17:48:24 [INFO] [URL Worker for Common Ground Healthcare Cooperative-Prescription drug list] Cache MISS for new hash. Starting full processing...
+2025-12-23 17:48:24 [INFO] Analyzing PDF with parallel LLM pipeline: Wisconsin_Common Ground Healthcare Cooperative_Common Ground Healthcare Cooperative-Prescription drug list.pdf
+2025-12-23 17:48:25 [WARNING] PyMuPDF (fitz) not available. Cannot enhance PDF.
+2025-12-23 17:48:25 [WARNING] PDF enhancement failed. Falling back to original PDF.
+2025-12-23 17:48:25 [INFO] Attempt 1/5 to upload 'temp_in_memory.pdf' to Mistral...
+2025-12-23 17:48:29 [INFO] HTTP Request: POST https://api.mistral.ai/v1/files "HTTP/1.1 200 OK"
+2025-12-23 17:48:29 [INFO] File uploaded successfully to Mistral.
+2025-12-23 17:48:29 [INFO] HTTP Request: GET https://api.mistral.ai/v1/files/945f6aa5-26a1-4468-8425-dcc53fcdfe36/url?expiry=120 "HTTP/1.1 200 OK"
+2025-12-23 17:48:42 [INFO] HTTP Request: POST https://api.mistral.ai/v1/ocr "HTTP/1.1 200 OK"
+2025-12-23 17:48:42 [INFO] Applying page processing rule for 'Wisconsin_Common Ground Healthcare Cooperative_Common Ground Healthcare Cooperative-Prescription drug list.pdf' from configuration default: ['20-25']
+2025-12-23 17:48:42 [INFO] Final list of pages to process for 'Wisconsin_Common Ground Healthcare Cooperative_Common Ground Healthcare Cooperative-Prescription drug list.pdf': [20, 21, 22, 23, 24, 25]
+2025-12-23 17:48:42 [INFO] Processing 6 pages in parallel with up to 8 workers...
+2025-12-23 17:48:42 [INFO] Page indices to process (1-based): [20, 21, 22, 23, 24, 25]
+2025-12-23 17:48:42 [INFO] Detected index page: Found 44 page-like numbers with limited variety.
+2025-12-23 17:48:42 [INFO] Skipping LLM call for index/table of contents page.
+2025-12-23 17:48:42 [INFO] --- Completed processing for PDF Page 20/147 (OCR index 19) ---
+2025-12-23 17:48:45 [INFO] Detected index page: Found 39 page-like numbers with limited variety.
+2025-12-23 17:48:45 [INFO] Skipping LLM call for index/table of contents page.
+2025-12-23 17:48:45 [INFO] --- Completed processing for PDF Page 23/147 (OCR index 22) ---
+2025-12-23 17:48:47 [INFO] Detected index page: Found 61 page-like numbers with limited variety.
+2025-12-23 17:48:47 [INFO] Skipping LLM call for index/table of contents page.
+2025-12-23 17:48:47 [INFO] --- Completed processing for PDF Page 24/147 (OCR index 23) ---
+2025-12-23 17:49:01 [INFO] HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-23 17:49:01 [INFO] Successfully processed page. Extracted: 32 drugs, 3 acronyms.
+2025-12-23 17:49:01 [INFO] --- Completed processing for PDF Page 22/147 (OCR index 21) ---
+2025-12-23 17:49:04 [INFO] HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-23 17:49:04 [INFO] Successfully processed page. Extracted: 31 drugs, 5 acronyms.
+2025-12-23 17:49:04 [INFO] --- Completed processing for PDF Page 21/147 (OCR index 20) ---
+2025-12-23 17:49:09 [INFO] HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+{'dbname': 'ebv', 'user': 'postgres', 'password': '1234', 'host': 'localhost', 'port': '5432'}
+DEBUG INPUT MARKDOWN (first 500): |  Drug Name | Tier | Restrictions/Limits  |
+| --- | --- | --- |
+|  DESCOVY | Tier 1 | QL (1 EA per 1 day)  |
+|  emtricitabine-tenofovir (tdf) oral tablet
+100-150 mg, 133-200 mg, 167-250 mg | Tier 1 | QL (1 EA per 1 day)  |
+|  emtricitabine-tenofovir (tdf) oral tablet
+200-300 mg | Tier 0 - Preventive | QL (1 EA per 1 day)  |
+|  emtricita-rilpivirine-tenof df | Tier 1 |   |
+|  entecavir | Tier 1 | PA  |
+|  famciclovir oral tablet 125 mg, 500 mg | Tier 1 | QL (21 EA per 30 days)  |
+|  famciclovir 
+DEBUG INPUT MARKDOWN (first 500): |  Drug Name | Tier | Restrictions/Limits  |
+| --- | --- | --- |
+|  **QUINOLONE ANTIBIOTICS**  |   |   |
+|  CIPRO HC | Tier 3 |   |
+|  ciprofloxacin | Tier 1 |   |
+|  ciprofloxacin hcl | Tier 1 |   |
+|  ciprofloxacin-dexamethasone | Tier 1 | ST  |
+|  ciprofloxacin-fluocinolone | Tier 2 |   |
+|  levofloxacin ophthalmic (eye) | Tier 1 |   |
+|  levofloxacin oral | Tier 1 |   |
+|  moxifloxacin ophthalmic (eye) | Tier 1 |   |
+|  ofloxacin ophthalmic (eye) | Tier 1 | QL (10 ML per 30 days)  |
+|  oflox
+DEBUG INPUT MARKDOWN (first 500): |  Drug Name | Tier | Restrictions/Limits  |
+| --- | --- | --- |
+|  TAFINLAR ORAL CAPSULE | Tier 4 | PA; CM; QL (120 EA per 30 days)  |
+|  tamoxifen | Tier 0 - Preventive | CM  |
+|  temozolomide | Tier 4 | PA; CM  |
+|  THALOMID | Tier 4 | PA; QL (30 EA per 30 days)  |
+|  toremifene | Tier 1 | PA; CM  |
+|  tretinoin | Tier 1 | QL (45 GM per 30 days)  |
+|  tretinoin (antineoplastic) | Tier 1 | CM  |
+|  tretinoin (emollient) | Tier 1 |   |
+|  valrubicin | Tier 4 | PA  |
+|  VERZENIO | Tier 4 | PA; C
+DEBUG MISTRAL RESPONSE: {
+  "DrugInformation": [
+    {
+      "Drug Pub Name": "CIPRO HC",
+      "Pub Tier": "Tier 3"
+    },
+    {
+      "Drug Pub Name": "ciprofloxacin",
+      "Pub Tier": "Tier 1"
+    },
+    {
+      "Drug Pub Name": "ciprofloxacin hcl",
+      "Pub Tier": "Tier 1"
+    },
+    {
+      "Drug Pub Name": "ciprofloxacin-dexamethasone",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": "ST"
+    },
+    {
+      "Drug Pub Name": "ciprofloxacin-fluocinolone",
+      "Pub Tier": "Tier 2"
+    },
+    {
+      "Drug Pub Name": "levofloxacin ophthalmic (eye)",
+      "Pub Tier": "Tier 1"
+    },
+    {
+      "Drug Pub Name": "levofloxacin oral",
+      "Pub Tier": "Tier 1"
+    },
+    {
+      "Drug Pub Name": "moxifloxacin ophthalmic (eye)",
+      "Pub Tier": "Tier 1"
+    },
+    {
+      "Drug Pub Name": "ofloxacin ophthalmic (eye)",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": "QL (10 ML per 30 days)"
+    },
+    {
+      "Drug Pub Name": "ofloxacin oral",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": "QL (2 EA per 1 day)"
+    },
+    {
+      "Drug Pub Name": "ofloxacin otic (ear)",
+      "Pub Tier": "Tier 1"
+    },
+    {
+      "Drug Pub Name": "PRIFTIN",
+      "Pub Tier": "Tier 3"
+    },
+    {
+      "Drug Pub Name": "rifabutin",
+      "Pub Tier": "Tier 1"
+    },
+    {
+      "Drug Pub Name": "rifampin oral",
+      "Pub Tier": "Tier 1"
+    },
+    {
+      "Drug Pub Name": "XIFAXAN ORAL TABLET 200 MG",
+      "Pub Tier": "Tier 2",
+      "Drug Edit": "PA; QL (9 EA per 30 days)"
+    },
+    {
+      "Drug Pub Name": "XIFAXAN ORAL TABLET 550 MG",
+      "Pub Tier": "Tier 2",
+      "Drug Edit": "PA; QL (60 EA per 30 days)"
+    },
+    {
+      "Drug Pub Name": "sulfadiazine",
+      "Pub Tier": "Tier 1"
+    },
+    {
+      "Drug Pub Name": "sulfamethoxazole-trimethoprim oral",
+      "Pub Tier": "Tier 1"
+    },
+    {
+      "Drug Pub Name": "sulfasalazine",
+      "Pub Tier": "Tier 1"
+    },
+    {
+      "Drug Pub Name": "SULFATRIM",
+      "Pub Tier": "Tier 1"
+    },
+    {
+      "Drug Pub Name": "demeclocycline",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": "PA"
+    },
+    {
+      "Drug Pub Name": "doxycycline hyclate oral capsule",
+      "Pub Tier": "Tier 1"
+    },
+    {
+      "Drug Pub Name": "doxycycline hyclate oral tablet 100 mg, 150 mg, 50 mg, 75 mg",
+      "Pub Tier": "Tier 1"
+    },
+    {
+      "Drug Pub Name": "doxycycline monohydrate oral capsule 100 mg, 50 mg, 75 mg",
+      "Pub Tier": "Tier 1"
+    },
+    {
+      "Drug Pub Name": "doxycycline monohydrate oral capsule 150 mg",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": "ST"
+    },
+    {
+      "Drug Pub Name": "doxycycline monohydrate oral suspension for reconstitution",
+      "Pub Tier": "Tier 1"
+    },
+    {
+      "Drug Pub Name": "doxycycline monohydrate oral tablet",
+      "Pub Tier": "Tier 1"
+    },
+    {
+      "Drug Pub Name": "minocycline oral capsule",
+      "Pub Tier": "Tier 1"
+    },
+    {
+      "Drug Pub Name": "minocycline oral tablet",
+      "Pub Tier": "Tier 1"
+    },
+    {
+      "Drug Pub Name": "tetracycline",
+      "Pub Tier": "Tier 1"
+    },
+    {
+      "Drug Pub Name": "fosfomycin tromethamine",
+      "Pub Tier": "Tier 1"
+    },
+    {
+      "Drug Pub Name": "methenamine hippurate",
+      "Pub Tier": "Tier 1"
+    }
+  ],
+  "FormularyAbbreviations": [
+    {
+      "Acronym": "ST",
+      "Expansion": "Step Therapy",
+      "Explanation": "Requires trying an alternative medication before this drug is approved."
+    },
+    {
+      "Acronym": "QL",
+      "Expansion": "Quantity Limit",
+      "Explanation": "Limits the amount of the drug that can be dispensed in a given time period."
+    },
+    {
+      "Acronym": "PA",
+      "Expansion": "Prior Authorization",
+      "Explanation": "Requires approval from the insurance provider before the drug is covered."
+    }
+  ]
+}
+2025-12-23 17:49:09 [INFO] Successfully processed page. Extracted: 35 drugs, 3 acronyms.
+2025-12-23 17:49:09 [INFO] --- Completed processing for PDF Page 25/147 (OCR index 24) ---
+2025-12-23 17:49:09 [INFO] Final results: 98 structured records extracted from PDF.
+2025-12-23 17:49:10 [INFO] HTTP Request: DELETE https://api.mistral.ai/v1/files/945f6aa5-26a1-4468-8425-dcc53fcdfe36 "HTTP/1.1 200 OK"
+2025-12-23 17:49:10 [INFO] Deleted uploaded file from Mistral: 945f6aa5-26a1-4468-8425-dcc53fcdfe36
+2025-12-23 17:49:10 [INFO] Successfully cached result for hash: 68ad9759d24c552f7cb8aefaebd159434d556b0f1f26da9f1f5541635219b570
+2025-12-23 17:49:10 [INFO] [URL Worker for Common Ground Healthcare Cooperative-Prescription drug list] Initial extraction: 98 records from pages 21-25
+2025-12-23 17:49:10 [INFO] [URL Worker for Common Ground Healthcare Cooperative-Prescription drug list] Step 1: Running group propagation on 98 raw records.
+2025-12-23 17:49:10 [INFO] [URL Worker for Common Ground Healthcare Cooperative-Prescription drug list] After group propagation: 98 records.
+2025-12-23 17:49:10 [INFO] [URL Worker for Common Ground Healthcare Cooperative-Prescription drug list] Step 2: Consolidating fragments for 98 records.
+2025-12-23 17:49:10 [INFO] [URL Worker for Common Ground Healthcare Cooperative-Prescription drug list] After consolidation: 98 records.
+2025-12-23 17:49:10 [INFO] [URL Worker for Common Ground Healthcare Cooperative-Prescription drug list] After complex parsing, DataFrame has 106 rows.
+2025-12-23 17:49:10 [WARNING] Filtered out 7 non-English or mixed-language acronyms.
+2025-12-23 17:49:11 [INFO] Successfully inserted or updated 7 records into pp_formulary_names.
+DEBUG MISTRAL RESPONSE: {
+  "DrugInformation": [
+    {
+      "Drug Pub Name": "DESCOVY",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": "QL (1 EA per 1 day)"
+    },
+    {
+      "Drug Pub Name": "emtricitabine-tenofovir (tdf) oral tablet 100-150 mg, 133-200 mg, 167-250 mg",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": "QL (1 EA per 1 day)"
+    },
+    {
+      "Drug Pub Name": "emtricitabine-tenofovir (tdf) oral tablet 200-300 mg",
+      "Pub Tier": "Tier 0 - Preventive",
+      "Drug Edit": "QL (1 EA per 1 day)"
+    },
+    {
+      "Drug Pub Name": "emtricita-rilpivirine-tenof df",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": ""
+    },
+    {
+      "Drug Pub Name": "entecavir",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": "PA"
+    },
+    {
+      "Drug Pub Name": "famciclovir oral tablet 125 mg, 500 mg",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": "QL (21 EA per 30 days)"
+    },
+    {
+      "Drug Pub Name": "famciclovir oral tablet 250 mg",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": "QL (60 EA per 30 days)"
+    },
+    {
+      "Drug Pub Name": "LAGEVRIO (EUA)",
+      "Pub Tier": "Tier 2",
+      "Drug Edit": "QL (40 EA per 180 days)"
+    },
+    {
+      "Drug Pub Name": "ODEFSEY",
+      "Pub Tier": "Tier 2",
+      "Drug Edit": "QL (1 EA per 1 day)"
+    },
+    {
+      "Drug Pub Name": "ribavirin oral",
+      "Pub Tier": "Tier 4",
+      "Drug Edit": ""
+    },
+    {
+      "Drug Pub Name": "valacyclovir",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": "QL (30 EA per 30 days)"
+    },
+    {
+      "Drug Pub Name": "valganciclovir oral tablet",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": ""
+    },
+    {
+      "Drug Pub Name": "amoxicil-clarithromy-lansopraz",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": "QL (112 EA per 30 days)"
+    },
+    {
+      "Drug Pub Name": "azithromycin oral",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": ""
+    },
+    {
+      "Drug Pub Name": "clarithromycin",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": ""
+    },
+    {
+      "Drug Pub Name": "DIFICID ORAL SUSPENSION FOR RECONSTITUTION",
+      "Pub Tier": "Tier 2",
+      "Drug Edit": "PA; QL (136 ML per 10 days)"
+    },
+    {
+      "Drug Pub Name": "DIFICID ORAL TABLET",
+      "Pub Tier": "Tier 2",
+      "Drug Edit": "PA; QL (20 EA per 10 days)"
+    },
+    {
+      "Drug Pub Name": "fidaxomicin",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": "PA"
+    },
+    {
+      "Drug Pub Name": "linezolid",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": "PA"
+    },
+    {
+      "Drug Pub Name": "dicloxacillin",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": ""
+    },
+    {
+      "Drug Pub Name": "KLAYESTA",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": "QL (180 GM per 1 FILL)"
+    },
+    {
+      "Drug Pub Name": "NYAMYC",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": "QL (180 GM per 30 days)"
+    },
+    {
+      "Drug Pub Name": "nystatin oral",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": ""
+    },
+    {
+      "Drug Pub Name": "nystatin topical cream",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": "QL (30 GM per 30 days)"
+    },
+    {
+      "Drug Pub Name": "nystatin topical ointment",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": "QL (30 GM per 30 days)"
+    },
+    {
+      "Drug Pub Name": "nystatin topical powder",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": "QL (180 GM per 30 days)"
+    },
+    {
+      "Drug Pub Name": "NYSTOP",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": "QL (180 GM per 30 days)"
+    },
+    {
+      "Drug Pub Name": "neomycin-polymyxin b-dexameth",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": ""
+    },
+    {
+      "Drug Pub Name": "neomycin-polymyxin-hc otic (ear)",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": ""
+    },
+    {
+      "Drug Pub Name": "polymyxin b sulf-trimethoprim",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": ""
+    },
+    {
+      "Drug Pub Name": "flucytosine",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": ""
+    }
+  ],
+  "FormularyAbbreviations": [
+    {
+      "Acronym": "QL",
+      "Expansion": "Quantity Limit",
+      "Explanation": "Limits the amount of the drug that can be dispensed for a specific time period."
+    },
+    {
+      "Acronym": "PA",
+      "Expansion": "Prior Authorization",
+      "Explanation": "Requires approval from the insurance provider before the drug can be dispensed."
+    },
+    {
+      "Acronym": "EA",
+      "Expansion": "Each",
+      "Explanation": "Refers to the number of units (e.g., tablets, capsules) of the drug."
+    },
+    {
+      "Acronym": "GM",
+      "Expansion": "Grams",
+      "Explanation": "Unit of weight for the drug quantity."
+    },
+    {
+      "Acronym": "ML",
+      "Expansion": "Milliliters",
+      "Explanation": "Unit of volume for liquid medications."
+    }
+  ]
+}
+DEBUG MISTRAL RESPONSE: {
+  "DrugInformation": [
+    {
+      "Drug Pub Name": "TAFINLAR ORAL CAPSULE",
+      "Pub Tier": "Tier 4",
+      "Drug Edit": "PA; CM; QL (120 EA per 30 days)"
+    },
+    {
+      "Drug Pub Name": "tamoxifen",
+      "Pub Tier": "Tier 0 - Preventive",
+      "Drug Edit": "CM"
+    },
+    {
+      "Drug Pub Name": "temozolomide",
+      "Pub Tier": "Tier 4",
+      "Drug Edit": "PA; CM"
+    },
+    {
+      "Drug Pub Name": "THALOMID",
+      "Pub Tier": "Tier 4",
+      "Drug Edit": "PA; QL (30 EA per 30 days)"
+    },
+    {
+      "Drug Pub Name": "toremifene",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": "PA; CM"
+    },
+    {
+      "Drug Pub Name": "tretinoin",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": "QL (45 GM per 30 days)"
+    },
+    {
+      "Drug Pub Name": "tretinoin (antineoplastic)",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": "CM"
+    },
+    {
+      "Drug Pub Name": "tretinoin (emollient)",
+      "Pub Tier": "Tier 1",
+      "Drug Edit": ""
+    },
+    {
+      "Drug Pub Name": "valrubicin",
+      "Pub Tier": "Tier 4",
+      "Drug Edit": "PA"
+    },
+    {
+      "Drug Pub Name": "VERZENIO",
+      "Pub Tier": "Tier 4",
+      "Drug Edit": "PA; CM; QL (60 EA per 30 days)"
+    },
+    {
+      "Drug Pub Name": "VOTRIENT",
+      "Pub Tier": "Tier 4",
+      "Drug Edit": "PA; CM; QL (120 EA per 30 days)"
+    },
+    {
+      "Drug Pub Name": "XTANDI ORAL CAPSULE",
+      "Pub Tier": "Tier 4",
+      "Drug Edit": "PA; CM; QL (120 EA per 30 days)"
+    },
+    {
+      "Drug Pub Name": "XTANDI ORAL TABLET 40 MG",
+      "Pub Tier": "Tier 4",
+      "Drug Edit": "PA; CM; QL (120 EA per 30 days)"
+    },
+    {
+      "Drug Pub Name": "XTANDI ORAL TABLET 80 MG",
+      "Pub Tier": "Tier 4",
+      "Drug Edit": "PA; CM; QL (60 EA per 30 days)"
+    },
+    {
+      "Drug Pub Name": "ZELBORAF",
+      "Pub Tier": "Tier 4",
+      "Drug Edit": "PA; CM; QL (240 EA per 30 days)"
+    },
+    {
+      "Drug Pub Name": "ZOLINZA",
+      "Pub Tier": "Tier 4",
+      "Drug Edit": "PA; CM"
+    },
+    {
+      "Drug Pub Name": "RHOGAM ULTRA-FILTERED PLUS",
+      "Pub Tier": "Tier 2",
+      "Drug Edit": ""
+    },
+    {
+      "Drug Pub Name": "ADACEL(TDAP ADOLESN/ADULT) (PF)",
+      "Pub Tier": "Tier 0 - Preventive",
+      "Drug Edit": ""
+    },
+    {
+      "Drug Pub Name": "BOOSTRIX TDAP",
+      "Pub Tier": "Tier 0 - Preventive",
+      "Drug Edit": ""
+    },
+    {
+      "Drug Pub Name": "DAPTACEL (DTAP PEDIATRIC) (PF)",
+      "Pub Tier": "Tier 0 - Preventive",
+      "Drug Edit": ""
+    },
+    {
+      "Drug Pub Name": "INFANRIX (DTAP) (PF)",
+      "Pub Tier": "Tier 0 - Preventive",
+      "Drug Edit": ""
+    },
+    {
+      "Drug Pub Name": "PEDIARIX (PF)",
+      "Pub Tier": "Tier 0 - Preventive",
+      "Drug Edit": ""
+    },
+    {
+      "Drug Pub Name": "TENIVAC (PF)",
+      "Pub Tier": "Tier 0 - Preventive",
+      "Drug Edit": ""
+    },
+    {
+      "Drug Pub Name": "VAXELIS (PF)",
+      "Pub Tier": "Tier 0 - Preventive",
+      "Drug Edit": ""
+    },
+    {
+      "Drug Pub Name": "ABRYSVO (PF)",
+      "Pub Tier": "Tier 0 - Preventive",
+      "Drug Edit": ""
+    },
+    {
+      "Drug Pub Name": "ACTHIB (PF)",
+      "Pub Tier": "Tier 0 - Preventive",
+      "Drug Edit": ""
+    },
+    {
+      "Drug Pub Name": "AREXVY (PF)",
+      "Pub Tier": "Tier 0 - Preventive",
+      "Drug Edit": ""
+    },
+    {
+      "Drug Pub Name": "AREXVY ADJUVANT COMPONENT (PF)",
+      "Pub Tier": "Tier 2",
+      "Drug Edit": ""
+    },
+    {
+      "Drug Pub Name": "AREXVY ANTIGEN COMPONENT",
+      "Pub Tier": "Tier 2",
+      "Drug Edit": ""
+    },
+    {
+      "Drug Pub Name": "bcg vaccine, live (pf)",
+      "Pub Tier": "Tier 0 - Preventive",
+      "Drug Edit": ""
+    },
+    {
+      "Drug Pub Name": "BEXSERO",
+      "Pub Tier": "Tier 0 - Preventive",
+      "Drug Edit": ""
+    },
+    {
+      "Drug Pub Name": "BIOTHRAX",
+      "Pub Tier": "Tier 0 - Preventive",
+      "Drug Edit": ""
+    },
+    {
+      "Drug Pub Name": "CAPVAXIVE",
+      "Pub Tier": "Tier 2",
+      "Drug Edit": ""
+    },
+    {
+      "Drug Pub Name": "DENGVAXIA (PF)",
+      "Pub Tier": "Tier 0 - Preventive",
+      "Drug Edit": ""
+    },
+    {
+      "Drug Pub Name": "ENGERIX-B (PF)",
+      "Pub Tier": "Tier 0 - Preventive",
+      "Drug Edit": ""
+    }
+  ],
+  "FormularyAbbreviations": [
+    {
+      "Acronym": "PA",
+      "Expansion": "Prior Authorization",
+      "Explanation": "Requires prior approval from the insurance provider before the drug is covered."
+    },
+    {
+      "Acronym": "CM",
+      "Expansion": "Clinical Management",
+      "Explanation": "Requires ongoing monitoring or management by a healthcare provider."
+    },
+    {
+      "Acronym": "QL",
+      "Expansion": "Quantity Limit",
+      "Explanation": "Limits the amount of the drug that can be dispensed within a specific time period."
+    }
+  ]
+}
+Looking up normalized code: 'PA' from original: 'PA'
+Searching for acronym: 'PA', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'CM' from original: 'CM'
+Searching for acronym: 'CM', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'QL' from original: 'QL'
+Searching for acronym: 'QL', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '60' from original: '60'
+Searching for acronym: '60', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'EA' from original: 'EA'
+Searching for acronym: 'EA', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PER' from original: 'PER'
+Searching for acronym: 'PER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '30' from original: '30'
+Searching for acronym: '30', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'DAYS' from original: 'DAYS'
+Searching for acronym: 'DAYS', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'QL' from original: 'QL'
+Searching for acronym: 'QL', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '180' from original: '180'
+Searching for acronym: '180', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'GM' from original: 'GM'
+Searching for acronym: 'GM', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PER' from original: 'PER'
+Searching for acronym: 'PER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '30' from original: '30'
+Searching for acronym: '30', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'DAYS' from original: 'DAYS'
+Searching for acronym: 'DAYS', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PA' from original: 'PA'
+Searching for acronym: 'PA', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'CM' from original: 'CM'
+Searching for acronym: 'CM', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'QL' from original: 'QL'
+Searching for acronym: 'QL', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '120' from original: '120'
+Searching for acronym: '120', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'EA' from original: 'EA'
+Searching for acronym: 'EA', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PER' from original: 'PER'
+Searching for acronym: 'PER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '30' from original: '30'
+Searching for acronym: '30', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'DAYS' from original: 'DAYS'
+Searching for acronym: 'DAYS', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'CM' from original: 'CM'
+Searching for acronym: 'CM', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PREVENTIVE' from original: 'Preventive'
+Searching for acronym: 'PREVENTIVE', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'QL' from original: 'QL'
+Searching for acronym: 'QL', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '21' from original: '21'
+Searching for acronym: '21', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'EA' from original: 'EA'
+Searching for acronym: 'EA', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PER' from original: 'PER'
+Searching for acronym: 'PER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '30' from original: '30'
+Searching for acronym: '30', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'DAYS' from original: 'DAYS'
+Searching for acronym: 'DAYS', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PA' from original: 'PA'
+Searching for acronym: 'PA', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'CM' from original: 'CM'
+Searching for acronym: 'CM', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'QL' from original: 'QL'
+Searching for acronym: 'QL', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '240' from original: '240'
+Searching for acronym: '240', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'EA' from original: 'EA'
+Searching for acronym: 'EA', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PER' from original: 'PER'
+Searching for acronym: 'PER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '30' from original: '30'
+Searching for acronym: '30', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'DAYS' from original: 'DAYS'
+Searching for acronym: 'DAYS', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'CM' from original: 'CM'
+Searching for acronym: 'CM', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PA' from original: 'PA'
+Searching for acronym: 'PA', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PA' from original: 'PA'
+Searching for acronym: 'PA', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'QL' from original: 'QL'
+Searching for acronym: 'QL', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'EA' from original: 'EA'
+Searching for acronym: 'EA', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PER' from original: 'PER'
+Searching for acronym: 'PER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '30' from original: '30'
+Searching for acronym: '30', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'DAYS' from original: 'DAYS'
+Searching for acronym: 'DAYS', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'QL' from original: 'QL'
+Searching for acronym: 'QL', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '30' from original: '30'
+Searching for acronym: '30', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'EA' from original: 'EA'
+Searching for acronym: 'EA', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PER' from original: 'PER'
+Searching for acronym: 'PER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '30' from original: '30'
+Searching for acronym: '30', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'DAYS' from original: 'DAYS'
+Searching for acronym: 'DAYS', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PA' from original: 'PA'
+Searching for acronym: 'PA', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'QL' from original: 'QL'
+Searching for acronym: 'QL', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '10' from original: '10'
+Searching for acronym: '10', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'ML' from original: 'ML'
+Searching for acronym: 'ML', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PER' from original: 'PER'
+Searching for acronym: 'PER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '30' from original: '30'
+Searching for acronym: '30', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'DAYS' from original: 'DAYS'
+Searching for acronym: 'DAYS', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PA' from original: 'PA'
+Searching for acronym: 'PA', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'QL' from original: 'QL'
+Searching for acronym: 'QL', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '60' from original: '60'
+Searching for acronym: '60', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'EA' from original: 'EA'
+Searching for acronym: 'EA', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PER' from original: 'PER'
+Searching for acronym: 'PER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '30' from original: '30'
+Searching for acronym: '30', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'DAYS' from original: 'DAYS'
+Searching for acronym: 'DAYS', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PA' from original: 'PA'
+Searching for acronym: 'PA', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'QL' from original: 'QL'
+Searching for acronym: 'QL', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '20' from original: '20'
+Searching for acronym: '20', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'EA' from original: 'EA'
+Searching for acronym: 'EA', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PER' from original: 'PER'
+Searching for acronym: 'PER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '10' from original: '10'
+Searching for acronym: '10', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'DAYS' from original: 'DAYS'
+Searching for acronym: 'DAYS', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PREVENTIVE' from original: 'Preventive'
+Searching for acronym: 'PREVENTIVE', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'QL' from original: 'QL'
+Searching for acronym: 'QL', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '45' from original: '45'
+Searching for acronym: '45', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'GM' from original: 'GM'
+Searching for acronym: 'GM', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PER' from original: 'PER'
+Searching for acronym: 'PER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '30' from original: '30'
+Searching for acronym: '30', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'DAYS' from original: 'DAYS'
+Searching for acronym: 'DAYS', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'ST' from original: 'ST'
+Searching for acronym: 'ST', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PA' from original: 'PA'
+Searching for acronym: 'PA', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'QL' from original: 'QL'
+Searching for acronym: 'QL', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '30' from original: '30'
+Searching for acronym: '30', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'EA' from original: 'EA'
+Searching for acronym: 'EA', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PER' from original: 'PER'
+Searching for acronym: 'PER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '30' from original: '30'
+Searching for acronym: '30', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'DAYS' from original: 'DAYS'
+Searching for acronym: 'DAYS', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'QL' from original: 'QL'
+Searching for acronym: 'QL', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'EA' from original: 'EA'
+Searching for acronym: 'EA', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PER' from original: 'PER'
+Searching for acronym: 'PER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'DAY' from original: 'DAY'
+Searching for acronym: 'DAY', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PREVENTIVE' from original: 'Preventive'
+Searching for acronym: 'PREVENTIVE', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+2025-12-23 17:49:12 [INFO] [URL Worker for Common Ground Healthcare Cooperative-Prescription drug list] Final records by page (will be saved to DB): {21: 34, 22: 37, 25: 35}
+2025-12-23 17:49:12 [INFO] [URL Worker for Common Ground Healthcare Cooperative-Prescription drug list] Total processing time (worker start to DB push): 52.16 seconds.
+2025-12-23 17:49:12 [INFO] Aggregating results for SUCCESSFUL plan: Common Ground Healthcare Cooperative-Prescription drug list
+2025-12-23 17:49:12 [INFO] Deduplicating 106 records before insertion for plan 'Common Ground Healthcare Cooperative-Prescription drug list'.
+2025-12-23 17:49:12 [WARNING] Removed 1 duplicate records from the batch for 'Common Ground Healthcare Cooperative-Prescription drug list'.
+2025-12-23 17:49:12 [INFO] Inserting 105 validated records for plan 'Common Ground Healthcare Cooperative-Prescription drug list' into the database.
+2025-12-23 17:49:12 [INFO] Preparing to insert 105 records into the database.
+2025-12-23 17:49:12 [INFO] Successfully inserted or updated 105 records.
+2025-12-23 17:49:12 [INFO] Mistral OCR cost for Common Ground Healthcare Cooperative: $0.1470 (147 pages)
+Looking up normalized code: 'PA' from original: 'PA'
+Searching for acronym: 'PA', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'CM' from original: 'CM'
+Searching for acronym: 'CM', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'QL' from original: 'QL'
+Searching for acronym: 'QL', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '60' from original: '60'
+Searching for acronym: '60', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'EA' from original: 'EA'
+Searching for acronym: 'EA', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PER' from original: 'PER'
+Searching for acronym: 'PER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '30' from original: '30'
+Searching for acronym: '30', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'DAYS' from original: 'DAYS'
+Searching for acronym: 'DAYS', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'QL' from original: 'QL'
+Searching for acronym: 'QL', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'EA' from original: 'EA'
+Searching for acronym: 'EA', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PER' from original: 'PER'
+Searching for acronym: 'PER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'DAY' from original: 'DAY'
+Searching for acronym: 'DAY', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'QL' from original: 'QL'
+Searching for acronym: 'QL', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '180' from original: '180'
+Searching for acronym: '180', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'GM' from original: 'GM'
+Searching for acronym: 'GM', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PER' from original: 'PER'
+Searching for acronym: 'PER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'FILL' from original: 'FILL'
+Searching for acronym: 'FILL', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'QL' from original: 'QL'
+Searching for acronym: 'QL', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '112' from original: '112'
+Searching for acronym: '112', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'EA' from original: 'EA'
+Searching for acronym: 'EA', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PER' from original: 'PER'
+Searching for acronym: 'PER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '30' from original: '30'
+Searching for acronym: '30', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'DAYS' from original: 'DAYS'
+Searching for acronym: 'DAYS', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'QL' from original: 'QL'
+Searching for acronym: 'QL', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'EA' from original: 'EA'
+Searching for acronym: 'EA', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PER' from original: 'PER'
+Searching for acronym: 'PER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'DAY' from original: 'DAY'
+Searching for acronym: 'DAY', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PA' from original: 'PA'
+Searching for acronym: 'PA', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'QL' from original: 'QL'
+Searching for acronym: 'QL', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '136' from original: '136'
+Searching for acronym: '136', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'ML' from original: 'ML'
+Searching for acronym: 'ML', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PER' from original: 'PER'
+Searching for acronym: 'PER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '10' from original: '10'
+Searching for acronym: '10', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'DAYS' from original: 'DAYS'
+Searching for acronym: 'DAYS', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'QL' from original: 'QL'
+Searching for acronym: 'QL', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '40' from original: '40'
+Searching for acronym: '40', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'EA' from original: 'EA'
+Searching for acronym: 'EA', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PER' from original: 'PER'
+Searching for acronym: 'PER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '180' from original: '180'
+Searching for acronym: '180', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'DAYS' from original: 'DAYS'
+Searching for acronym: 'DAYS', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'QL' from original: 'QL'
+Searching for acronym: 'QL', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'EA' from original: 'EA'
+Searching for acronym: 'EA', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PER' from original: 'PER'
+Searching for acronym: 'PER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'DAY' from original: 'DAY'
+Searching for acronym: 'DAY', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PA' from original: 'PA'
+Searching for acronym: 'PA', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'CM' from original: 'CM'
+Searching for acronym: 'CM', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'QL' from original: 'QL'
+Searching for acronym: 'QL', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '30' from original: '30'
+Searching for acronym: '30', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'GM' from original: 'GM'
+Searching for acronym: 'GM', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'PER' from original: 'PER'
+Searching for acronym: 'PER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: '30' from original: '30'
+Searching for acronym: '30', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'DAYS' from original: 'DAYS'
+Searching for acronym: 'DAYS', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+Looking up normalized code: 'TIER' from original: 'Tier'
+Searching for acronym: 'TIER', state: 'Wisconsin', payer: 'Common Ground Healthcare Cooperative'
+result:  None
+2025-12-23 17:49:12 [INFO] --- URL PDF Processing Complete ---
+2025-12-23 17:49:12 [INFO] Summary: 1 successful, 0 failed, 0 skipped
+2025-12-23 17:49:12 [INFO] Updating status to 'completed' for drugs in 1 plans.
+2025-12-23 17:49:12 [INFO] Successfully updated status for 105 drug formulary records.
+2025-12-23 17:49:12 [INFO] Updating final status for all payers and plans...
+2025-12-23 17:49:13 [INFO] Set 1 plans to 'active'.
+2025-12-23 17:49:13 [INFO] Set 0 failed or unprocessed plans to 'inactive'.
+2025-12-23 17:49:13 [INFO] Set 1 payers to 'active'.
+2025-12-23 17:49:13 [INFO] Set 0 payers to 'inactive'.
+2025-12-23 17:49:13 [INFO] Successfully updated all plan and payer statuses.
+2025-12-23 17:49:13 [INFO] Pipeline finished
+{'dbname': 'ebv', 'user': 'postgres', 'password': '1234', 'host': 'localhost', 'port': '5432'}
