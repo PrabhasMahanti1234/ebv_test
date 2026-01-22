@@ -105,7 +105,7 @@ PDF_PAGE_PROCESSING_CONFIG = {
     # Process pages to find the drug table
     # Increased range to capture full drug lists (some PDFs have 60+ pages of drugs)
     # Use "all" to process everything, or specific ranges like ["1-100"]
-    "default": ["1-50"]
+    "default": ["8-10"]
     # Override for specific payers if needed:
     # "Cigna": "all",
     # "Select": ["1-80"],

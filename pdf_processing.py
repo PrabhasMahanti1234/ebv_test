@@ -9,6 +9,7 @@ import re
 import json
 import logging
 import time
+import math
 import traceback
 import requests
 import httpx
@@ -92,6 +93,20 @@ except ImportError:
 # LANGDETECT_AVAILABLE = False
 
 
+def sanitize_agent_value(value):
+    """Sanitize preferred_agent/non_preferred_agent - ONLY allow 'yes' or 'no', convert others to None."""
+    if value is None:
+        return None
+    value_str = str(value).strip().lower()
+    if value_str == "yes":
+        return "yes"
+    elif value_str == "no":
+        return "no"
+    else:
+        # Any other value (including "[default]", "default", etc.) becomes None
+        return None
+
+
 def process_single_chunk_parallel(chunk_info: dict) -> dict:
     """
     OPTIMIZATION 1: Process a single chunk of pages for parallel execution.
@@ -165,6 +180,15 @@ def process_single_chunk_parallel(chunk_info: dict) -> dict:
             return result
 
         result['pages_processed'] = len(ocr_response.pages)
+        
+        # Debug: Log raw markdown content from pages to understand table structure
+        if ocr_response.pages:
+            logger.info(f"📋 OCR returned {len(ocr_response.pages)} pages. Checking raw markdown...")
+            for page_idx, page in enumerate(ocr_response.pages[:2]):  # First 2 pages only
+                if hasattr(page, 'markdown') and page.markdown:
+                    # Log first 2000 chars of markdown to see table structure
+                    md_preview = page.markdown[:2000]
+                    logger.info(f"   Page {page_idx + 1} markdown preview:\n{md_preview}")
 
         if hasattr(ocr_response, 'document_annotation') and ocr_response.document_annotation:
             chunk_json = ocr_response.document_annotation
@@ -186,6 +210,12 @@ def process_single_chunk_parallel(chunk_info: dict) -> dict:
                         chunk_json = {"DrugInformation": [], "FormularyAbbreviations": []}
 
             drug_info_list = chunk_json.get("DrugInformation", [])
+            
+            # Debug: Log first few raw drug items to see what OCR returns
+            if drug_info_list:
+                logger.info(f"📋 OCR returned {len(drug_info_list)} drugs. Sample of first 3 raw items:")
+                for sample_idx, sample_item in enumerate(drug_info_list[:3]):
+                    logger.info(f"   Drug {sample_idx + 1}: {sample_item}")
 
             for drug_idx, item in enumerate(drug_info_list):
                 if isinstance(item, dict):
@@ -196,32 +226,38 @@ def process_single_chunk_parallel(chunk_info: dict) -> dict:
                     if drug_name and dosage_form:
                         drug_name = f"{drug_name.strip()} {dosage_form.strip()}"
                     
+                    # Remove trailing asterisks from drug names (common in PREFERRED/NON-PREFERRED format)
+                    if drug_name:
+                        drug_name = drug_name.strip().rstrip('*').strip()
+                    
                     if not drug_name or len(drug_name) < 2:
                         continue
 
                     drug_requirements = _build_requirements_from_item(item)
 
+                    # Map to actual PDF page index using original_pages array
+                    # original_pages contains the actual PDF page numbers (e.g., [11, 12, 13, 14])
+                    # OCR returns page_number relative to chunk (1, 2, 3, 4)
                     ocr_page_num = item.get("page_number")
-                    # Map OCR page number (1,2,3,4 in chunk) to original PDF page (270,271,272,273)
+                    
                     if ocr_page_num and isinstance(ocr_page_num, int) and 1 <= ocr_page_num <= len(original_pages):
+                        # OCR gave us a page number within the chunk - map to actual PDF page
                         actual_pdf_page = original_pages[ocr_page_num - 1]
-                    elif ocr_page_num and isinstance(ocr_page_num, int) and ocr_page_num in original_pages:
-                        actual_pdf_page = ocr_page_num
                     else:
-                        # Estimate page based on position in drug list
-                        if len(drug_info_list) > 0 and len(original_pages) > 0:
-                            position_ratio = drug_idx / len(drug_info_list)
-                            page_index = min(int(position_ratio * len(original_pages)), len(original_pages) - 1)
-                            actual_pdf_page = original_pages[page_index]
-                        else:
-                            actual_pdf_page = original_pages[0] if original_pages else 1
+                        # OCR didn't provide page_number or it's invalid - use first page in chunk
+                        actual_pdf_page = original_pages[0] if original_pages else None
+                    
+                    # Debug logging for page mapping
+                    logger.debug(f"Page mapping: Drug '{drug_name[:30]}...' - OCR page {ocr_page_num} -> Actual page {actual_pdf_page} (original_pages: {original_pages})")
 
                     result['drugs'].append({
                         "drug_name": drug_name,
                         "drug_tier": item.get("drug tier"),
                         "drug_requirements": drug_requirements,
                         "category": item.get("category"),
-                        "page_number": actual_pdf_page
+                        "page_number": actual_pdf_page,
+                        "preferred_agent": sanitize_agent_value(item.get("preferred_agent")),
+                        "non_preferred_agent": sanitize_agent_value(item.get("non_preferred_agent"))
                     })
 
             for item in chunk_json.get("FormularyAbbreviations", []):
@@ -658,7 +694,9 @@ def process_single_pdf_url_worker(plan_info):
                 "coverage_details": None,
                 "confidence_score": None,
                 "source_url": formulary_url,
-                "file_name": f"{plan_name}.pdf"
+                "file_name": f"{plan_name}.pdf",
+                "preferred_agent": sanitize_agent_value(drug.get("preferred_agent")),
+                "non_preferred_agent": sanitize_agent_value(drug.get("non_preferred_agent"))
             }
             enriched_drug_records.append(enriched_record)
         

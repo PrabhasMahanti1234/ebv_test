@@ -66,33 +66,49 @@ OCR_ANNOTATION_SCHEMA = {
                     "description": """Extract ALL drugs from the formulary drug table. 
 
 CRITICAL: Look for tables with these column headers:
-- "Drug Name" | "Tier" | "Restrictions/Limits"
+- "Drug Name" | "Tier" | "Drug Requirements/Limits"
 - OR "Drug Name" | "Drug Tier" | "Requirements"
+- OR "PREFERRED" | "NON-PREFERRED" (two-column format)
+- OR "Preferred Agents" | "Non-preferred Agents" with sub-headers "No PA Required" | "PA Required"
+- OR similar layouts
 
-TABLE STRUCTURE RECOGNITION:
-- The table has 3 columns: Drug Name (left), Tier (middle), Restrictions/Limits (right)
-- CATEGORY HEADERS appear as gray/shaded rows spanning all columns (e.g., "FIRST GENERATION ANTIHISTAMINES", "PHENOTHIAZINE DERIVATIVES")
-- Drug rows contain: full drug name with dosage in column 1, tier value in column 2, restrictions in column 3
+FORMAT 1 - THREE-COLUMN TABLE:
+- Drug Name (left), Tier (middle - often just numbers like 2, 3, 4, 5), Drug Requirements/Limits (right)
+- CATEGORY HEADERS appear as shaded/bold rows (e.g., "ANTIFUNGALS", "ANTIMALARIALS")
+
+FORMAT 2 - TWO-COLUMN PREFERRED/NON-PREFERRED TABLE:
+- Left column: "PREFERRED" or "Preferred Agents" (may have sub-header "No PA Required")
+- Right column: "NON-PREFERRED" or "Non-preferred Agents" (may have sub-header "PA Required")
+- For drugs in PREFERRED column: set preferred_agent="yes", non_preferred_agent="no"
+- For drugs in NON-PREFERRED column: set preferred_agent="no", non_preferred_agent="yes"
+- IMPORTANT for requirements field:
+  * If the column header explicitly says "PA Required": set requirements="PA" for those drugs
+  * If the column header does NOT mention PA: leave requirements=null
+  * Only set requirements based on what is EXPLICITLY shown in the PDF headers
+- Remove asterisks (*) from drug names if present
+- IGNORE the 3rd column (Prior Authorization Criteria) - do NOT extract text from it
 
 EXTRACTION RULES:
-1. Extract EVERY drug row - do NOT skip any, even if dosage form is in the drug name
+1. Extract EVERY drug row - do NOT skip any
 2. Category headers go in the 'category' field, NOT 'Drug Name'
-3. Tier values are exactly: "Tier 1", "Tier 2", "Tier 3", "Tier 4", "Tier 5" OR "Generic", "Brand" (copy exact text)
-4. Restrictions column may contain: "ST", "PA", "QL", "QL (60 ML per 30 days)", etc.
-5. If Restrictions/Limits cell is empty, set requirements to null
-6. SKIP index/table of contents pages (pages with just drug names and page numbers)
-7. For drugs with inline dosage (e.g., 'carbinoxamine maleate oral tablet 4 mg'), extract the COMPLETE text into 'Drug Name' and leave 'Dosage Form/Strength' as null
-8. Set 'page_number' to the actual PDF page number where this drug appears""",
+3. Set 'page_number' to the actual PDF page number where this drug appears""",
                     "items": {
                         "type": "object",
                         "properties": {
                             "Drug Name": {
                                 "type": "string", 
-                                "description": """The complete drug name from the first/left-most column. This column may contain EITHER:
+                                "description": """The COMPLETE drug name from the drug column - extract every single word. This column may contain EITHER:
 1. Just the drug name (e.g., 'AMOXICILLIN', 'AMPICILLIN')
-2. Drug name WITH dosage form inline (e.g., 'carbinoxamine maleate oral liquid', 'carbinoxamine maleate oral tablet 4 mg', 'azelastine nasal spray non-aerosol 137 mcg (0.1 %)')
+2. Drug name WITH chemical salt/form information (e.g., 'fentanyl citrate', 'carbinoxamine maleate', 'tramadol tartrate')
+3. Drug name WITH brand name in parentheses (e.g., 'ACTIQ (fentanyl citrate) lozenge', 'FENTORA (fentanyl citrate) buccal tablet')
 
-EXTRACT THE FULL TEXT from the first column, including any dosage information. Copy EXACTLY as shown."""
+CRITICAL: Extract the FULL TEXT exactly as shown. DO NOT truncate or omit ANY part of the drug name:
+- Include salt forms: citrate, maleate, tartrate, sulfate, hydrochloride, etc.
+- Include brand/generic info in parentheses
+- Include dosage form words: lozenge, tablet, capsule, solution, etc.
+- REMOVE only trailing asterisks (*)
+
+Example: 'ACTIQ (fentanyl citrate) lozenge' should be extracted as 'ACTIQ (fentanyl citrate) lozenge' - NOT truncated to 'ACTIQ (fentanyl' or 'ACTIQ'."""
                             },
                             "Dosage Form/Strength": {
                                 "type": ["string", "null"],
@@ -100,11 +116,21 @@ EXTRACT THE FULL TEXT from the first column, including any dosage information. C
                             },
                             "drug tier": {
                                 "type": ["string", "null"], 
-                                "description": "The tier/drug type value. Copy exactly as shown. Can be: 'Tier 1', 'Tier 2', 'Tier 3', 'Tier 4', 'Tier 5', OR 'Generic', 'Brand', 'Specialty'. Leave null ONLY for category header rows."
+                                "description": "The tier value from the 'Tier' column. Can be a plain number ('1', '2', '3', '4', '5') OR text ('Tier 1', 'Tier 2', 'Generic', 'Brand', 'Specialty'). Copy EXACTLY as shown in the PDF - if it shows just '2', extract '2'. If it shows 'Tier 2', extract 'Tier 2'. Leave null ONLY for category header rows OR for PREFERRED/NON-PREFERRED format tables."
                             },
                             "requirements": {
                                 "type": ["string", "null"], 
-                                "description": "The restrictions from the Restrictions/Limits column (right column). Copy EXACTLY as shown. Examples: 'ST' (Step Therapy), 'PA' (Prior Authorization), 'QL (60 ML per 30 days)' (Quantity Limit with details), 'PA, QL', empty cells should be null."
+                                "description": "The restrictions/requirements. For standard tables: extract from 'Drug Requirements/Limits' column. For PREFERRED/NON-PREFERRED tables: set to 'PA' if the drug is in the 'PA Required' or 'Non-preferred Agents' column, set to null if the drug is in the 'No PA Required' or 'Preferred Agents' column."
+                            },
+                            "preferred_agent": {
+                                "type": ["string", "null"],
+                                "enum": ["yes", "no", None],
+                                "description": "ONLY USE VALUES: 'yes', 'no', or null. NO OTHER VALUES ALLOWED. For PREFERRED/NON-PREFERRED format tables: Set to 'yes' if the drug is in the PREFERRED or 'No PA Required' column. Set to 'no' if the drug is in the NON-PREFERRED or 'PA Required' column. Leave null for standard tier-based tables. NEVER use '[default]' or any other placeholder text."
+                            },
+                            "non_preferred_agent": {
+                                "type": ["string", "null"],
+                                "enum": ["yes", "no", None],
+                                "description": "ONLY USE VALUES: 'yes', 'no', or null. NO OTHER VALUES ALLOWED. For PREFERRED/NON-PREFERRED format tables: Set to 'yes' if the drug is in the NON-PREFERRED or 'PA Required' column. Set to 'no' if the drug is in the PREFERRED or 'No PA Required' column. Leave null for standard tier-based tables. NEVER use '[default]' or any other placeholder text."
                             },
                             "BGO": {"type": ["string", "null"], "description": "PDL format only: B=Brand, G=Generic, O=OTC. Leave null for standard formulary tables."},
                             "PNRNR": {"type": ["string", "null"], "description": "PDL format only: P=Preferred, N=Non-Preferred, R/NR. Leave null for standard formulary tables."},
@@ -114,12 +140,20 @@ EXTRACT THE FULL TEXT from the first column, including any dosage information. C
                             "DispensingLimits": {"type": ["boolean", "null"], "description": "True if 'QL' appears in requirements column."},
                             "category": {
                                 "type": ["string", "null"], 
-                                "description": "Category header text from gray/shaded rows that span all columns. Examples: 'FIRST GEN. ANTIHIST. DERIVATIVES, MISC.', 'FIRST GENERATION ANTIHISTAMINES', 'OTHER ANTIHISTAMINES', 'PHENOTHIAZINE DERIVATIVES', 'PIPERAZINE DERIVATIVES', 'PROPYLAMINE DERIVATIVES', 'SECOND GENERATION ANTIHISTAMINES'. These are NOT drug names."
+                                "description": "Category header text from shaded/bold rows that span all columns. Examples: 'ANTICONVULSANTS – CARBAMAZEPINE DERIVATIVES', 'ANTICONVULSANTS – FIRST GENERATION', 'ANTIFUNGALS'. These are NOT drug names."
                             },
-                            "page_number": {"type": ["integer", "null"], "description": "Page number in the PDF where this drug is found."},
+                            "page_number": {
+                                "type": "integer", 
+                                "description": """CRITICAL: Carefully determine which page each drug appears on within this document. 
+Pages are numbered 1, 2, 3, 4 based on their position in this document chunk.
+- Look for visual page breaks, page footers, or page headers to identify where pages end
+- If a table continues across pages, drugs AFTER a page break should have the NEXT page number
+- Count pages from the start of this document (first page = 1, second page = 2, etc.)
+- Do NOT default all drugs to page 1 - carefully identify the actual page for each drug"""
+                            },
                             "pa_form_link": {"type": ["string", "null"], "description": "PA Form Link URL if present in the table."}
                         },
-                        "required": ["Drug Name"]
+                        "required": ["Drug Name", "page_number"]
                     }
                 },
                 "FormularyAbbreviations": {
@@ -205,12 +239,32 @@ def _extract_drug_from_item(item: dict, page_number: int) -> dict:
     else:
         combined_name = drug_name.strip() if drug_name else ""
     
+    # Remove trailing asterisks from drug names (common in PREFERRED/NON-PREFERRED format)
+    if combined_name:
+        combined_name = combined_name.rstrip('*').strip()
+    
+    # Sanitize preferred_agent and non_preferred_agent - ONLY allow "yes" or "no"
+    # Convert any other values (like "[default]", "default", etc.) to None
+    def sanitize_agent_value(value):
+        if value is None:
+            return None
+        value_str = str(value).strip().lower()
+        if value_str == "yes":
+            return "yes"
+        elif value_str == "no":
+            return "no"
+        else:
+            # Any other value (including "[default]", "default", etc.) becomes None
+            return None
+    
     return {
         "drug_name": combined_name if combined_name else None,
         "drug_tier": item.get("drug tier"),
         "drug_requirements": _build_requirements_from_item(item),
         "category": item.get("category"),
-        "page_number": page_number
+        "page_number": page_number,
+        "preferred_agent": sanitize_agent_value(item.get("preferred_agent")),
+        "non_preferred_agent": sanitize_agent_value(item.get("non_preferred_agent"))
     }
 
 
@@ -474,15 +528,26 @@ def _consolidate_and_clean_drug_table(drug_table: List[dict]) -> List[dict]:
 
             # A fragment is an entry that:
             # - Has NO tier AND NO requirements (clearly part of previous line)
-            # - Is short (like "aspirin" continuation)
-            # - Doesn't look like a real drug name (no dosage info, no form)
+            # - Has NO preferred_agent/non_preferred_agent (not from PREFERRED/NON-PREFERRED format)
+            # - Is VERY short and looks like a simple continuation (not a new drug)
+            # - Doesn't contain common drug identifiers
+            has_preference_info = next_item.get("preferred_agent") or next_item.get("non_preferred_agent")
+            
+            # More conservative checks - only merge if it's truly a fragment
+            looks_like_complete_drug = (
+                re.search(r'\d+\s*(mg|ml|mcg|unit|%)', next_name, re.IGNORECASE) or  # Has dosage
+                re.search(r'\b(tablet|capsule|solution|suspension|patch|cream|gel|spray|injection|syrup|liquid|powder|ER|XR|SR|CR|IR)\b', next_name, re.IGNORECASE) or  # Has dosage form
+                re.search(r'\([^)]+\)', next_name) or  # Has parentheses (likely brand/generic info)
+                re.match(r'^[A-Z]', next_name) or  # Starts with capital letter (new drug name)
+                len(next_name) > 15  # Too long to be a fragment
+            )
+            
             is_fragment = (
                 not next_item.get("drug_tier") and
                 not next_item.get("drug_requirements") and
-                len(next_name) < 30 and  # Reduced from 50
+                not has_preference_info and  # Don't merge if it has preferred/non-preferred info
                 next_name and
-                not re.search(r'\d+\s*(mg|ml|mcg|unit|%)', next_name, re.IGNORECASE) and  # No dosage
-                not re.match(r'^[a-z]+\s+\d', next_name)  # Not "drug 100mg" pattern
+                not looks_like_complete_drug  # Only merge if it doesn't look like a complete drug
             )
 
             if is_fragment and next_name:

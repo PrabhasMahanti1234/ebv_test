@@ -282,6 +282,27 @@ def ensure_database_schema():
             logger.debug(f"page_number column may already exist in drug_formulary_details: {e}")
             conn.rollback()
 
+        # Add preferred_agent and non_preferred_agent columns for new PDF template format
+        try:
+            cursor.execute("""
+                ALTER TABLE drug_formulary_details
+                ADD COLUMN IF NOT EXISTS preferred_agent VARCHAR(10) DEFAULT NULL
+            """)
+            conn.commit()
+        except Exception as e:
+            logger.debug(f"preferred_agent column may already exist in drug_formulary_details: {e}")
+            conn.rollback()
+
+        try:
+            cursor.execute("""
+                ALTER TABLE drug_formulary_details
+                ADD COLUMN IF NOT EXISTS non_preferred_agent VARCHAR(10) DEFAULT NULL
+            """)
+            conn.commit()
+        except Exception as e:
+            logger.debug(f"non_preferred_agent column may already exist in drug_formulary_details: {e}")
+            conn.rollback()
+
         # Add indexes for the new columns for better query performance
         _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_product_labeler_code ON drug_formulary_details(product_labeler_code)", "idx_product_labeler_code")
         _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_product_proprietaryname ON drug_formulary_details(product_proprietaryname)", "idx_product_proprietaryname")
@@ -445,6 +466,23 @@ def cache_result(file_hash, structured_data_dict, raw_content):
 
 # In database.py
 
+def _sanitize_agent_value(value):
+    """
+    Sanitize preferred_agent/non_preferred_agent values.
+    ONLY allow 'yes' or 'no', convert any other value (like '[default]') to None.
+    This is the final safety net before database insertion.
+    """
+    if value is None:
+        return None
+    value_str = str(value).strip().lower()
+    if value_str == "yes":
+        return "yes"
+    elif value_str == "no":
+        return "no"
+    else:
+        # Any other value (including "[default]", "default", etc.) becomes None
+        return None
+
 def insert_drug_formulary_data(processed_data):
     """
     Inserts a batch of processed drug formulary data into the database
@@ -482,7 +520,8 @@ def insert_drug_formulary_data(processed_data):
             "id", "plan_id", "payer_id", "drug_name", "ndc_code", "jcode",
             "state_name", "coverage_status", "drug_tier", "drug_requirements", "page_number",
             "is_prior_authorization_required", "is_step_therapy_required", "is_quantity_limit_applied",
-            "coverage_details", "confidence_score", "source_url", "plan_name", "payer_name", "file_name", "status"
+            "coverage_details", "confidence_score", "source_url", "plan_name", "payer_name", "file_name", "status",
+            "preferred_agent", "non_preferred_agent"
         ]
 
         data_tuples = []
@@ -508,6 +547,18 @@ def insert_drug_formulary_data(processed_data):
 
 
             # Prepare tuple for insertion, ensuring the order matches `cols`
+            # IMPORTANT: Sanitize preferred_agent and non_preferred_agent here as final safety net
+            pref_agent_raw = record.get("preferred_agent")
+            non_pref_agent_raw = record.get("non_preferred_agent")
+            pref_agent_sanitized = _sanitize_agent_value(pref_agent_raw)
+            non_pref_agent_sanitized = _sanitize_agent_value(non_pref_agent_raw)
+            
+            # Debug logging for first 5 records to verify sanitization
+            if len(data_tuples) < 5:
+                logger.info(f"🔍 Sanitization check - Drug: {record.get('drug_name')[:30]}...")
+                logger.info(f"   preferred_agent: '{pref_agent_raw}' → '{pref_agent_sanitized}'")
+                logger.info(f"   non_preferred_agent: '{non_pref_agent_raw}' → '{non_pref_agent_sanitized}'")
+            
             data_tuples.append((
                 record.get("id"),
                 record.get("plan_id"),
@@ -529,7 +580,9 @@ def insert_drug_formulary_data(processed_data):
                 record.get("plan_name"),
                 record.get("payer_name"),
                 record.get("file_name"),
-                'processing'  # Set initial status for new records
+                'processing',  # Set initial status for new records
+                pref_agent_sanitized,
+                non_pref_agent_sanitized
             ))
 
         # Using ON CONFLICT to prevent duplicates and update existing records
@@ -545,6 +598,8 @@ def insert_drug_formulary_data(processed_data):
                 is_quantity_limit_applied = EXCLUDED.is_quantity_limit_applied,
                 source_url = EXCLUDED.source_url,
                 file_name = EXCLUDED.file_name,
+                preferred_agent = EXCLUDED.preferred_agent,
+                non_preferred_agent = EXCLUDED.non_preferred_agent,
                 status = 'completed',
                 last_updated_date = CURRENT_TIMESTAMP;
         """
