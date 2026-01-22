@@ -124,18 +124,36 @@ EXTRACT THE FULL TEXT from the first column, including any dosage information. C
                 },
                 "FormularyAbbreviations": {
                     "type": "array",
-                    "description": """Extract ALL abbreviation/legend definitions from ANYWHERE in the document.
-                    
+                    "description": """Extract ALL abbreviation/legend definitions AND tier definitions from ANYWHERE in the document.
+
+EXTRACT TWO TYPES OF DEFINITIONS:
+
+TYPE 1 - ABBREVIATION CODES:
 Look for legends in: page headers, footers, sidebar text, or dedicated sections.
-Common patterns: 'ST = Step Therapy', 'PA = Prior Authorization', 'QL = Quantity Limit'
-                    
-Extract EVERY abbreviation definition found.""",
+Common patterns: 'ST = Step Therapy', 'PA = Prior Authorization', 'QL = Quantity Limit', 'B/D = Brand/Drug'
+Examples: 'NDS' = 'Non-Dispensing Supply', 'LA' = 'Limitation on Age', 'EX' = 'Excluded Drug'
+
+TYPE 2 - TIER DEFINITIONS (CRITICAL - EXTRACT THESE):
+Look for tier explanation sections with text like:
+- 'Tier 1 - Preferred Generic Drugs: This tier includes commonly prescribed generic drugs...'
+- 'Tier 2 - Generic Drugs: This tier includes generic drugs...'
+- 'Tier 3 - Preferred Brand Drugs: This tier includes preferred brand-name drugs...'
+- 'Tier 4 - Non-Preferred Drugs: This tier includes higher-priced brand name drugs...'
+- 'Tier 5 - Specialty Tier drugs: This tier includes high-cost drugs...'
+- 'Tier 6 - Select Care Diabetic Drugs: This tier includes...'
+
+For TIER DEFINITIONS:
+- Acronym = 'Tier 1', 'Tier 2', 'Tier 3', etc.
+- Expansion = The tier name like 'Preferred Generic Drugs', 'Generic Drugs', etc. 
+- Explanation = The full description text 'This tier includes commonly prescribed generic drugs...'
+
+Extract EVERY abbreviation definition AND tier definition found.""",
                     "items": {
                         "type": "object",
                         "properties": {
-                            "Acronym": {"type": "string", "description": "The abbreviation code. Examples: 'ST', 'PA', 'QL', 'SP', 'Tier 1', 'Generic'."},
-                            "Expansion": {"type": "string", "description": "What the abbreviation stands for. Examples: 'Step Therapy', 'Prior Authorization', 'Quantity Limit'."},
-                            "Explanation": {"type": ["string", "null"], "description": "Additional explanation if provided in the legend."}
+                            "Acronym": {"type": "string", "description": "The abbreviation code OR tier identifier. Examples: 'ST', 'PA', 'QL', 'SP', 'Tier 1', 'Tier 2', 'Tier 3', 'Tier 4', 'Tier 5', 'Tier 6'."},
+                            "Expansion": {"type": "string", "description": "What the abbreviation stands for OR the tier name. Examples: 'Step Therapy', 'Prior Authorization', 'Preferred Generic Drugs', 'Non-Preferred Drugs'."},
+                            "Explanation": {"type": ["string", "null"], "description": "Additional explanation if provided. For tier definitions, this is the full description like 'This tier includes commonly prescribed generic drugs. Drugs in Tier 1 will typically be your most affordable option.'"}
                         },
                         "required": ["Acronym", "Expansion"]
                     }

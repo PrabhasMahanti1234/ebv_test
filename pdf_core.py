@@ -317,6 +317,22 @@ def prefilter_pages_with_pymupdf(pdf_input: BytesIO, page_indices: List[int]) ->
                 header_text = text_lower[:800]  # Check more of the header
                 footer_text = text_lower[-300:] if len(text_lower) > 300 else text_lower
                 
+                # NEW: Skip index detection if page contains tier definitions
+                # These pages have valuable content that should be processed
+                tier_definition_indicators = [
+                    "tier 1", "tier 2", "tier 3", "tier 4", "tier 5", "tier 6",
+                    "preferred generic", "preferred brand", "non-preferred",
+                    "generic drugs", "brand drugs", "specialty tier",
+                    "this tier includes", "drugs in tier", "cost-sharing"
+                ]
+                has_tier_definitions = any(ind in text_lower for ind in tier_definition_indicators)
+                
+                if has_tier_definitions:
+                    # This page has tier definitions - DO NOT skip it
+                    logger.info(f"   ✅ Page {page_num}: Contains tier definitions - keeping for OCR")
+                    filtered_pages.append(page_num)
+                    continue
+                
                 index_indicators = [
                     "table of contents", "alphabetical index", "drug index",
                     "index of drugs", "formulary index", "index to drugs",

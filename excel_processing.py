@@ -274,16 +274,6 @@ def populate_payer_and_plan_tables():
             for _, row in df.iterrows():
                 # Extract payer data
                 payer_data = {
-                    'payer_name': str(row['Company Name']).strip() if pd.notna(row['Company Name']) else '',
-                    'contact_phone': str(row['Contact Phone']).strip() if pd.notna(row['Contact Phone']) else None,
-                    'address_line_1': str(row['Communication Address Line 1']).strip() if pd.notna(row['Communication Address Line 1']) else None,
-                    'address_line_2': str(row['Communication Address Line 2']).strip() if pd.notna(row['Communication Address Line 2']) else None,
-                    'city': str(row['City']).strip() if pd.notna(row['City']) else None,
-                    'state': str(row['States Covered']).strip() if pd.notna(row['States Covered']) else None,
-                    'zip_code': str(row['Zip']).strip() if pd.notna(row['Zip']) else None,
-                    # This now works because the column is a proper Timestamp
-                    'created_at': str(row.get('Captured Date', '')).strip() or None,
-                
                     'payer_name': str(row.get('Company Name', '')).strip() or None,
                     'contact_phone': str(row.get('Contact Phone', '')).strip() or None,
                     'address_line_1': str(row.get('Communication Address Line 1', '')).strip() or None,
@@ -291,7 +281,7 @@ def populate_payer_and_plan_tables():
                     'city': str(row.get('City', '')).strip() or None,
                     'state': str(row.get('States Covered', '')).strip() or None,
                     'zip_code': str(row.get('Zip', '')).strip() or None,
-                    'created_at': get_date_for_db(row.get('Captured Date')), # CORRECTED
+                    'created_at': get_date_for_db(row.get('Captured Date')),
                 }
                 
                 # Skip if essential data is missing
@@ -307,20 +297,13 @@ def populate_payer_and_plan_tables():
 
                 # Extract plan data
                 plan_data = {
-                    'plan_name': str(row['Plan Name']).strip() if pd.notna(row['Plan Name']) else '',
-                    'state_name': str(row['States Covered']).strip() if pd.notna(row['States Covered']) else '',
-                    'payer_name': payer_data['payer_name'],  # <-- Add this line
-                    'formulary_url': str(row['Formulary URL']).strip() if pd.notna(row['Formulary URL']) else None,
-                    'source_link': str(row['Source Link']).strip() if pd.notna(row['Source Link']) else None,
-                    'formulary_date': str(row.get('Formulary Date', '')).strip() or None,
-                    'created_at': str(row.get('Captured Date', '')).strip() or None,
                     'plan_name': str(row.get('Plan Name', '')).strip() or None,
                     'state_name': str(row.get('States Covered', '')).strip() or None,
                     'payer_name': payer_data['payer_name'],
-                    'formulary_url': str(row.get('Formulary URL', '')).strip() or None,
+                    'formulary_url': clean_excel_string(row.get('Formulary URL')),
                     'source_link': str(row.get('Source Link', '')).strip() or None,
-                    'formulary_date': get_date_for_db(row.get('Formulary Date')), # CORRECTED
-                    'created_at': get_date_for_db(row.get('Captured Date')), # CORRECTED
+                    'formulary_date': get_date_for_db(row.get('Formulary Date')),
+                    'created_at': get_date_for_db(row.get('Captured Date')),
                 }
                 
                 # Skip if essential plan data is missing
