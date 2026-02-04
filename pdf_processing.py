@@ -30,6 +30,7 @@ from pdf_extraction import (
     _build_requirements_from_item,
     _extract_drug_from_item,
     _extract_acronym_from_item,
+    filter_index_entries_from_mistral_response,
     is_index_content,
     robust_json_repair,
     _is_extracted_data_from_index_page,
@@ -186,6 +187,9 @@ def process_single_chunk_parallel(chunk_info: dict) -> dict:
                         chunk_json = {"DrugInformation": [], "FormularyAbbreviations": []}
 
             drug_info_list = chunk_json.get("DrugInformation", [])
+            
+            # FILTER OUT INDEX ENTRIES (entries with page_number but no tier/requirements)
+            drug_info_list = filter_index_entries_from_mistral_response(drug_info_list)
 
             for drug_idx, item in enumerate(drug_info_list):
                 if isinstance(item, dict):
@@ -199,7 +203,17 @@ def process_single_chunk_parallel(chunk_info: dict) -> dict:
                     if not drug_name or len(drug_name) < 2:
                         continue
 
-                    drug_requirements = _build_requirements_from_item(item)
+                    # Extract tier - check multiple possible field names
+                    drug_tier = (item.get("Tier") or 
+                                item.get("drug tier") or 
+                                item.get("drug_tier") or 
+                                item.get("Tier Designation"))
+                    
+                    # Extract requirements - check multiple possible field names
+                    drug_requirements = (item.get("Requirements") or 
+                                        item.get("requirements") or 
+                                        item.get("drug_requirements") or
+                                        _build_requirements_from_item(item))
 
                     ocr_page_num = item.get("page_number")
                     # Map OCR page number (1,2,3,4 in chunk) to original PDF page (270,271,272,273)
@@ -218,7 +232,7 @@ def process_single_chunk_parallel(chunk_info: dict) -> dict:
 
                     result['drugs'].append({
                         "drug_name": drug_name,
-                        "drug_tier": item.get("drug tier"),
+                        "drug_tier": drug_tier,
                         "drug_requirements": drug_requirements,
                         "category": item.get("category"),
                         "page_number": actual_pdf_page
@@ -280,6 +294,15 @@ def process_pdf_with_mistral_ocr(pdf_input, payer_name=None, filename: Optional[
         if ENABLE_PAGE_PREFILTER:
             pages_to_process = prefilter_pages_with_pymupdf(BytesIO(pdf_bytes), pages_to_process)
             original_page_numbers = pages_to_process.copy()
+            
+            # CRITICAL FIX: If pre-filter removed ALL pages, stop processing
+            if not pages_to_process:
+                logger.warning(f"⚠️ All pages were filtered out during pre-processing. Returning empty results.")
+                return {
+                    "drug_table": [],
+                    "acronyms": [],
+                    "tiers": []
+                }, "[PRE-FILTER: ALL PAGES SKIPPED]", {}
 
         # Store original PDF bytes for chunk processing
         original_pdf_bytes = pdf_bytes
@@ -429,6 +452,13 @@ def process_pdf_with_mistral_ocr(pdf_input, payer_name=None, filename: Optional[
             )
 
             # CRITICAL: Pass original_page_numbers for correct page mapping
+            if hasattr(ocr_response, 'document_annotation'):
+                try:
+                    with open("debug_response.json", "w", encoding="utf-8") as f:
+                        f.write(str(ocr_response.document_annotation))
+                except Exception as e:
+                    logger.error(f"Failed to write debug response: {e}")
+            
             all_structured_data, all_acronyms, pages_processed = _process_ocr_response(ocr_response, original_page_numbers)
             all_structured_data = _consolidate_and_clean_drug_table(all_structured_data)
 
@@ -548,7 +578,6 @@ def process_single_pdf_url_worker(plan_info):
             'Accept-Language': 'en-US,en;q=0.9',
         }
 
-        # Proxy configuration (uncomment if needed)
         # proxy_user = os.getenv("PROXY_USER")
         # proxy_pass = os.getenv("PROXY_PASS")
         # proxy_host = os.getenv("PROXY_HOST")
@@ -598,6 +627,13 @@ def process_single_pdf_url_worker(plan_info):
         drug_table = structured_data.get("drug_table", [])
         acronyms = structured_data.get("acronyms", [])
 
+        # FINAL VALIDATION: Check if the entire drug_table looks like index page data
+        # This is a last line of defense before database insertion
+        if drug_table and _is_extracted_data_from_index_page(drug_table):
+            logger.warning(f"🚫 Plan {plan_id}: Detected INDEX PAGE data after extraction. Discarding {len(drug_table)} entries.")
+            drug_table = []
+            acronyms = []
+
         # NOTE: Plan-level index detection DISABLED - individual index entries 
         # are filtered in _consolidate_and_clean_drug_table() instead.
         # if _is_extracted_data_from_index_page(drug_table):
@@ -626,7 +662,16 @@ def process_single_pdf_url_worker(plan_info):
         # Clean and normalize drug data
         for drug in drug_table:
             if drug.get("drug_name"):
-                drug["drug_name"] = clean_drug_name(drug["drug_name"])
+                cleaned_name, extracted_reqs = clean_drug_name(drug["drug_name"])
+                drug["drug_name"] = cleaned_name
+                
+                # Merge extracted requirements
+                if extracted_reqs:
+                    existing_reqs = drug.get("drug_requirements")
+                    if existing_reqs:
+                        drug["drug_requirements"] = f"{existing_reqs}, {extracted_reqs}"
+                    else:
+                        drug["drug_requirements"] = extracted_reqs
             if drug.get("drug_tier"):
                 drug["drug_tier"] = normalize_drug_tier(drug["drug_tier"])
 
@@ -699,6 +744,9 @@ def process_single_pdf_url_worker(plan_info):
                 "drug_tier": drug_tier_normalized,
                 "drug_requirements": requirements_text or None,
                 "page_number": drug.get("page_number"),
+                "badge_colors": drug.get("badge_colors"),
+                "preferred_agent": drug.get("preferred_agent"),
+                "non_preferred_agent": drug.get("non_preferred_agent"),
                 "state_name": state_name,
                 "coverage_status": coverage_status,
                 "ndc_code": None,

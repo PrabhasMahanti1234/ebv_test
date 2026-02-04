@@ -44,7 +44,7 @@ from config import (
 # Import extraction functions
 from pdf_extraction import (
     OCR_ANNOTATION_SCHEMA, _extract_drug_from_item, _extract_acronym_from_item,
-    _build_requirements_from_item
+    _build_requirements_from_item, filter_index_entries_from_mistral_response
 )
 
 logger = logging.getLogger(__name__)
@@ -229,7 +229,11 @@ def _process_ocr_response(ocr_response, original_pages: list) -> tuple:
                 doc_json = json.loads(doc_json)
 
             if isinstance(doc_json, dict):
-                for item in doc_json.get("DrugInformation", []):
+                # FILTER OUT INDEX ENTRIES before processing
+                drug_info_list = doc_json.get("DrugInformation", [])
+                drug_info_list = filter_index_entries_from_mistral_response(drug_info_list)
+                
+                for item in drug_info_list:
                     if isinstance(item, dict):
                         ocr_page = item.get("page_number")
                         if ocr_page and original_pages and 1 <= ocr_page <= len(original_pages):
@@ -257,7 +261,11 @@ def _process_ocr_response(ocr_response, original_pages: list) -> tuple:
                     page_json = json.loads(page_json)
 
                 if isinstance(page_json, dict):
-                    for item in page_json.get("DrugInformation", []):
+                    # FILTER OUT INDEX ENTRIES before processing
+                    drug_info_list = page_json.get("DrugInformation", [])
+                    drug_info_list = filter_index_entries_from_mistral_response(drug_info_list)
+                    
+                    for item in drug_info_list:
                         if isinstance(item, dict):
                             all_structured_data.append(_extract_drug_from_item(item, page_num))
 
@@ -344,7 +352,7 @@ def prefilter_pages_with_pymupdf(pdf_input: BytesIO, page_indices: List[int]) ->
                 ]
                 
                 # Also check footer for "last updated date" pattern (common in index pages)
-                footer_indicators = ["last updated date", "last updated:", "you can find information"]
+                footer_indicators = []
                 for indicator in index_indicators:
                     if indicator in header_text:
                         is_index = True

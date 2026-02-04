@@ -61,11 +61,14 @@ def similarity(a, b):
     """Calculate similarity between two strings"""
     return SequenceMatcher(None, normalize_text(a), normalize_text(b)).ratio()
 
-def clean_drug_name(text: str) -> str:
-    """Cleans drug names, removing LaTeX, HTML, markdown, and extra spaces/punctuation."""
+def clean_drug_name(text: str) -> tuple[str, str]:
+    """
+    Cleans drug names, removing LaTeX, HTML, markdown, and extra spaces/punctuation.
+    Returns a tuple: (cleaned_drug_name, extracted_requirements)
+    """
     
     if text is None or pd.isna(text):
-        return "" 
+        return "", "" 
     
     
     if not isinstance(text, str):
@@ -108,7 +111,7 @@ def clean_drug_name(text: str) -> str:
     cleaned_text = re.sub(r'^[,\s\$\{\}\\]+|[,\s\$\{\}\\]+$', '', cleaned_text)
     cleaned_text = re.sub(r'\s+', ' ', cleaned_text)
     
-    return cleaned_text.strip()
+    return cleaned_text.strip(), requirements
 
 def generate_filename(state_name, payer_name, plan_name):
     """Generate filename based on naming convention"""
@@ -155,7 +158,9 @@ def extract_requirements_from_drug_name(drug_name_cell):
         r'\s*\[([^\]]+)\]',
         # DISABLED: This was removing valid drug name parts like "KIT"
         # fr'\s+(?!(?:{units_not_to_ignore})\b)([A-Z]{{2,3}}(?:,[A-Z]{{2,3}})*)$',
-        r'\s*\^?\s*\{([^}]+)\}\s*\$?\s*$'
+        r'\s*\^?\s*\{([^}]+)\}\s*\$?\s*$',
+        # Capture standalone ^ (caret) which indicates 30 day supply requirement
+        r'\s*(\^)\s*$'
     ]
 
     extracted_requirements = []
@@ -501,6 +506,7 @@ def clean_special_chars(cleaned_text):
     cleaned_text = re.sub(r'\{\s*\}', '', cleaned_text)  # Remove empty {}
     cleaned_text = re.sub(r'\^\{[^}]*\}', '', cleaned_text)  # Remove ^{DL}
     cleaned_text = re.sub(r'\^.', '', cleaned_text)  # Remove ^D style
+    # cleaned_text = re.sub(r'\^.', '', cleaned_text)  # Remove ^D style - DISABLED to preserve ^ requirement
     cleaned_text = re.sub(r'\\', ' ', cleaned_text)  # Remove stray backslashes
     
     # Step 5: Scientific notation normalization
@@ -535,6 +541,10 @@ def normalize_drug_tier(raw_tier):
     
     cleaned_lower = cleaned.lower().strip()
     
+    # Remove costs (e.g., $0/$1.60/$5.10)
+    # Matches $ followed by digits/dots, optionally separated by /
+    cleaned_lower = re.sub(r'\$[\d\./]+', '', cleaned_lower).strip()
+    
     # Map Generic/Brand format to tier equivalents
     tier_mapping = {
         'generic': 'Generic',
@@ -545,11 +555,21 @@ def normalize_drug_tier(raw_tier):
         'non-preferred': 'Tier 3',
         'non preferred': 'Tier 3',
         'nonpreferred': 'Tier 3',
+        'tier 1 - generic': 'Tier 1 - Generic',
+        'tier 1 - brand': 'Tier 1 - Brand',
     }
     
     # Check if it matches a known mapping
     if cleaned_lower in tier_mapping:
         return tier_mapping[cleaned_lower]
+    
+    # Check for "Tier X - Y" pattern (preserve full tier name)
+    tier_full_match = re.search(r'(tier\s*\d+\s*-\s*[a-z]+)', cleaned_lower, re.IGNORECASE)
+    if tier_full_match:
+        # Capitalize properly: "Tier 1 - Generic"
+        val = tier_full_match.group(1)
+        # Simple title case might be enough, or specific formatting
+        return val.title().replace(' - ', ' - ')
     
     # Check for Tier X pattern
     tier_match = re.search(r'tier\s*(\d+)', cleaned_lower, re.IGNORECASE)

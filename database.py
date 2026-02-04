@@ -282,6 +282,38 @@ def ensure_database_schema():
             logger.debug(f"page_number column may already exist in drug_formulary_details: {e}")
             conn.rollback()
 
+        try:
+            cursor.execute("""
+                ALTER TABLE drug_formulary_details
+                ADD COLUMN IF NOT EXISTS badge_colors JSONB
+            """)
+            conn.commit()
+        except Exception as e:
+            logger.debug(f"badge_colors column may already exist in drug_formulary_details: {e}")
+            conn.rollback()
+
+        try:
+            cursor.execute("""
+                ALTER TABLE drug_formulary_details
+                ADD COLUMN IF NOT EXISTS preferred_agent VARCHAR(10)
+            """)
+            conn.commit()
+            logger.info("Added preferred_agent column to drug_formulary_details.")
+        except Exception as e:
+            logger.debug(f"preferred_agent column may already exist: {e}")
+            conn.rollback()
+
+        try:
+            cursor.execute("""
+                ALTER TABLE drug_formulary_details
+                ADD COLUMN IF NOT EXISTS non_preferred_agent VARCHAR(10)
+            """)
+            conn.commit()
+            logger.info("Added non_preferred_agent column to drug_formulary_details.")
+        except Exception as e:
+            logger.debug(f"non_preferred_agent column may already exist: {e}")
+            conn.rollback()
+
         # Add indexes for the new columns for better query performance
         _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_product_labeler_code ON drug_formulary_details(product_labeler_code)", "idx_product_labeler_code")
         _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_product_proprietaryname ON drug_formulary_details(product_proprietaryname)", "idx_product_proprietaryname")
@@ -480,7 +512,8 @@ def insert_drug_formulary_data(processed_data):
         # The columns must match the order of values in the data tuples
         cols = [
             "id", "plan_id", "payer_id", "drug_name", "ndc_code", "jcode",
-            "state_name", "coverage_status", "drug_tier", "drug_requirements", "page_number",
+            "state_name", "coverage_status", "drug_tier", "drug_requirements", "page_number", "badge_colors",
+            "preferred_agent", "non_preferred_agent",
             "is_prior_authorization_required", "is_step_therapy_required", "is_quantity_limit_applied",
             "coverage_details", "confidence_score", "source_url", "plan_name", "payer_name", "file_name", "status"
         ]
@@ -506,6 +539,12 @@ def insert_drug_formulary_data(processed_data):
                 )
                 page_number = None
 
+            # Extract and serialize badge_colors if present
+            badge_colors = record.get("badge_colors")
+            if badge_colors and isinstance(badge_colors, dict):
+                badge_colors_json = json.dumps(badge_colors)
+            else:
+                badge_colors_json = None
 
             # Prepare tuple for insertion, ensuring the order matches `cols`
             data_tuples.append((
@@ -520,6 +559,9 @@ def insert_drug_formulary_data(processed_data):
                 record.get("drug_tier"),
                 record.get("drug_requirements"),
                 page_number,  # Use the sanitized page number
+                badge_colors_json,  # Serialized badge colors
+                record.get("preferred_agent"),  # Add preferred_agent
+                record.get("non_preferred_agent"),  # Add non_preferred_agent
                 record.get("is_prior_authorization_required"),
                 record.get("is_step_therapy_required"),
                 record.get("is_quantity_limit_applied"),
@@ -540,6 +582,9 @@ def insert_drug_formulary_data(processed_data):
             DO UPDATE SET
                 coverage_status = EXCLUDED.coverage_status,
                 page_number = EXCLUDED.page_number,
+                badge_colors = EXCLUDED.badge_colors,
+                preferred_agent = EXCLUDED.preferred_agent,
+                non_preferred_agent = EXCLUDED.non_preferred_agent,
                 is_prior_authorization_required = EXCLUDED.is_prior_authorization_required,
                 is_step_therapy_required = EXCLUDED.is_step_therapy_required,
                 is_quantity_limit_applied = EXCLUDED.is_quantity_limit_applied,
