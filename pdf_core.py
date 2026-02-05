@@ -229,8 +229,34 @@ def _process_ocr_response(ocr_response, original_pages: list) -> tuple:
                 doc_json = json.loads(doc_json)
 
             if isinstance(doc_json, dict):
+                # Extract PageHeaders to check if this is a valid drug page
+                # If headers exist, we assume it's a valid page and bypass index filtering
+                # Extract PageHeaders to check if this is a valid drug page
+                # If headers exist, we check their content to distinguish valid drug lists from index pages
+                page_headers = doc_json.get("PageHeaders", [])
+                
+                # Check Header Content
+                header_str = " ".join([str(h).lower() for h in page_headers])
+                is_index_header = "page" in header_str or "index" in header_str
+                is_drug_list_header = "limit" in header_str or "requir" in header_str or "tier" in header_str or "note" in header_str or "drug" in header_str
+                
+                # Bypass ONLY if it looks like a drug list AND NOT an index page
+                # This ensures we blindly add valid 2-column formats (Drug Name + Requirements)
+                # But still filter index pages (Drug Name + Page Number)
+                bypass_index_check = (is_drug_list_header and not is_index_header) or (page_headers and not is_index_header)
+                
+                if bypass_index_check:
+                    logger.info(f"✅ Valid headers detected: {page_headers}. Bypassing index check for this page.")
+                
                 # FILTER OUT INDEX ENTRIES before processing
                 drug_info_list = doc_json.get("DrugInformation", [])
+                
+                # Inject bypass flag if applicable
+                if bypass_index_check:
+                    for item in drug_info_list:
+                        item["_bypass_index_check"] = True
+                
+                # Still call filter (it will respect the flag if set, or proceed normally if not)
                 drug_info_list = filter_index_entries_from_mistral_response(drug_info_list)
                 
                 for item in drug_info_list:
@@ -261,8 +287,27 @@ def _process_ocr_response(ocr_response, original_pages: list) -> tuple:
                     page_json = json.loads(page_json)
 
                 if isinstance(page_json, dict):
+                    # Extract PageHeaders to check if this is a valid drug page
+                    page_headers = page_json.get("PageHeaders", [])
+                    
+                    # Check Header Content
+                    header_str = " ".join([str(h).lower() for h in page_headers])
+                    is_index_header = "page" in header_str or "index" in header_str
+                    is_drug_list_header = "limit" in header_str or "requir" in header_str or "tier" in header_str or "note" in header_str or "drug" in header_str
+                    
+                    # Bypass ONLY if it looks like a drug list AND NOT an index page
+                    bypass_index_check = (is_drug_list_header and not is_index_header) or (page_headers and not is_index_header)
+                    
+                    if bypass_index_check:
+                        logger.info(f"✅ Valid page headers detected: {page_headers}. Bypassing index check.")
+
                     # FILTER OUT INDEX ENTRIES before processing
                     drug_info_list = page_json.get("DrugInformation", [])
+
+                    # Inject bypass flag if applicable
+                    if bypass_index_check:
+                        for item in drug_info_list:
+                            item["_bypass_index_check"] = True
                     drug_info_list = filter_index_entries_from_mistral_response(drug_info_list)
                     
                     for item in drug_info_list:

@@ -578,24 +578,24 @@ def process_single_pdf_url_worker(plan_info):
             'Accept-Language': 'en-US,en;q=0.9',
         }
 
-        # proxy_user = os.getenv("PROXY_USER")
-        # proxy_pass = os.getenv("PROXY_PASS")
-        # proxy_host = os.getenv("PROXY_HOST")
-        # proxy_port = os.getenv("PROXY_PORT")
+        proxy_user = os.getenv("PROXY_USER")
+        proxy_pass = os.getenv("PROXY_PASS")
+        proxy_host = os.getenv("PROXY_HOST")
+        proxy_port = os.getenv("PROXY_PORT")
 
-        # proxies = None
-        # if all([proxy_user, proxy_pass, proxy_host, proxy_port]):
-        #     proxy_url = f"http://{proxy_user}:{proxy_pass}@{proxy_host}:{proxy_port}"
-        #     proxies = {
-        #         "http": proxy_url,
-        #         "https": proxy_url,
-        #     }
-        #     logger.info(f"{log_prefix} Using authenticated proxy.")
-        # else:
-        #     logger.info(f"{log_prefix} Proxy environment variables not set. Attempting direct connection.")
+        proxies = None
+        if all([proxy_user, proxy_pass, proxy_host, proxy_port]):
+            proxy_url = f"http://{proxy_user}:{proxy_pass}@{proxy_host}:{proxy_port}"
+            proxies = {
+                "http": proxy_url,
+                "https": proxy_url,
+            }
+            logger.info(f"{log_prefix} Using authenticated proxy.")
+        else:
+            logger.info(f"{log_prefix} Proxy environment variables not set. Attempting direct connection.")
 
         try:
-            with requests.get(pdf_url, timeout=120, headers=download_headers, stream=True, verify=True) as resp:
+            with requests.get(pdf_url, timeout=120, headers=download_headers, stream=True, verify=True,proxies=proxies) as resp:
                 resp.raise_for_status()
                 content_type = resp.headers.get('Content-Type', '')
                 if 'application/pdf' not in content_type and 'application/octet-stream' not in content_type:
@@ -603,7 +603,7 @@ def process_single_pdf_url_worker(plan_info):
                 pdf_content_bytes = resp.content
         except requests.exceptions.SSLError as e:
             logger.warning(f"{log_prefix} SSL verification failed: {e}. Retrying with SSL verification DISABLED.")
-            with requests.get(pdf_url, timeout=120, headers=download_headers, stream=True, verify=False) as resp:
+            with requests.get(pdf_url, timeout=120, headers=download_headers, stream=True, verify=False,proxies=proxies) as resp:
                 resp.raise_for_status()
                 content_type = resp.headers.get('Content-Type', '')
                 if 'application/pdf' not in content_type and 'application/octet-stream' not in content_type:

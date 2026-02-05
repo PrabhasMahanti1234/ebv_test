@@ -62,6 +62,13 @@ OCR_ANNOTATION_SCHEMA = {
             "type": "object",
             "title": "StructuredData",
             "properties": {
+                "PageHeaders": {
+                    "type": ["array", "null"],
+                    "description": "🔍 CRITICAL - Extract ALL column headers from the table on this page. Examples: ['Drug Name', 'Limits/Required'], ['Drug Name', 'Tier', 'Requirements'], ['PRODUCT DESCRIPTION', 'TIER', 'LIMITS'], etc. If NO headers visible, return null or empty array. This helps distinguish drug data pages from index pages.",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "DrugInformation": {
                     "type": "array",
                     "description": """Extract ALL drugs from the page.
@@ -319,7 +326,8 @@ def _extract_drug_from_item(item: dict, page_number: int) -> dict:
         "page_number": page_number,
         "badge_colors": item.get("badge_colors"),
         "preferred_agent": sanitize_agent_value(item.get("preferred_agent")),
-        "non_preferred_agent": sanitize_agent_value(item.get("non_preferred_agent"))
+        "non_preferred_agent": sanitize_agent_value(item.get("non_preferred_agent")),
+        "_bypass_index_check": item.get("_bypass_index_check")
     }
 
 
@@ -590,6 +598,12 @@ def _is_index_entry(item: dict) -> bool:
     Check if a single drug entry looks like it came from an index page.
     Uses multiple heuristics to catch various OCR parsing patterns.
     """
+    # ✅ HEADER-BASED BYPASS
+    # If this flag is set, it means the page had valid headers indicating it's a Drug Data page.
+    # Therefore, we bypass all heuristic checks and assume it's valid.
+    if item.get("_bypass_index_check"):
+        return False
+
     drug_name = item.get("drug_name", "") or ""
     tier = item.get("drug_tier", "") or ""
     reqs = item.get("drug_requirements", "") or ""
@@ -635,7 +649,7 @@ def _is_index_entry(item: dict) -> bool:
     return False
 
 
-def _is_extracted_data_from_index_page(drug_table: List[dict]) -> bool:
+def _is_extracted_data_from_index_page(drug_table: List[dict], page_headers: List[str] = None) -> bool:
     """
     Detect if extracted drug data appears to come from an index/table of contents page.
     Uses STATISTICAL VARIANCE ANALYSIS instead of simple thresholds.
@@ -645,6 +659,28 @@ def _is_extracted_data_from_index_page(drug_table: List[dict]) -> bool:
     
     Returns True if the page looks like an index, False otherwise.
     """
+    # ✅ 1. BLIND BYPASS FOR 2-COLUMN FORMATS
+    # User requested strict trust in headers for 2-column formats (Drug Name + Requirements).
+    # If headers explicitly match a drug list pattern, we SKIP all statistical checks.
+    # ✅ 1. BLIND BYPASS FOR 2-COLUMN FORMATS
+    # User requested strict trust in headers for 2-column formats (Drug Name + Requirements).
+    # If the _bypass_index_check flag is set on the first item (set by OCR processor based on headers),
+    # we SKIP all statistical checks and trust the page.
+    if drug_table and drug_table[0].get("_bypass_index_check"):
+        logger.info(f"✅ BLIND BYPASS FLAG DETECTED on {len(drug_table)} items. Treating as valid drug page regardless of statistics.")
+        return False
+
+    if page_headers:
+        # Fallback if flag logic fails but headers are passed explicitly
+        header_str = " ".join([str(h).lower() for h in page_headers])
+        is_index_header = "page" in header_str or "index" in header_str
+        is_drug_list_header = "limit" in header_str or "requir" in header_str or "tier" in header_str or "note" in header_str or "drug" in header_str
+        
+        # BLINDLY TRUST HEADERS if they look like a drug list and NOT an index
+        if is_drug_list_header and not is_index_header:
+            logger.info(f"✅ BLIND BYPASS: Valid headers detected {page_headers}. Treating as valid drug page regardless of statistics.")
+            return False
+
     if not drug_table or len(drug_table) < 3:  # Lowered from 5 to catch smaller index pages
         return False
 

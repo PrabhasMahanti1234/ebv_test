@@ -1,0 +1,554 @@
+{
+  "PageHeaders": null,
+  "DrugInformation": [
+    {
+      "Drug Name": "felbamate TABS 400 MG",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "floxuridine",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "fluocinolone acetonide OIL",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "felbamate TABS 600 MG",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "FLUAD",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "fluocinolone acetonide OINT",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "felodipine",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "FLUAD QUADRIVALENT",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "fluocinolone acetonide SOLN",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "FEMARA (letrozole)",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "FLUARIX QUADRIVALENT SUSY",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "fluocinonide CREA 0.05 %",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "FEMCAP DEVI",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "FLUARIX SUSY",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "fluocinonide CREA 0.1 %",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "FEMLYV TBDP",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "FLUBLOK QUADRIVALENT",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "fluocinonide emulsified base",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "FEMRING",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "FLUBLOK SOSY",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "fluocinonide GEL",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "fenofibrate micronized 43 MG, 67 MG, 130 MG, 134 MG, 200 MG",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "SUSP",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "fluocinonide OINT",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "fenofibrate TABS 48 MG, 54 MG, 145 MG, 160 MG",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "FLUCELVAX QUADRIVALENT SUSY",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "fluocinonide SOLN",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "fenoprofen calcium TABS",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "FLUCELVAX SUSP",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "flucorouracil (topical) CREA 5 %",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "FENSOLVI (6 MONTH) SC",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "FLUCELVAX SUSY",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "fentanyl citrate LPOP",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "flucorouracil (topical) SOLN 2 %",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "fentanyl PT72 12 MCG/HR, 25 MCG/HR, 50 MCG/HR, 75 MCG/HR, 100 MCG/HR",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "fluconazole SUSR",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "flucorouracil (topical) SOLN 5 %",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "ferrous sulfate SOLN 15 MG/ML, 15 MG/ML",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "flucytosine",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "fluconazole 500 MG/10ML",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "ferrous sulfate TABS 325 MG, 65 MG, 325 MG",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "fludarabine phosphate SOLR",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "ferrous sulfate TBEC 325 MG",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "fluconazole TABS",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "fesoterodine fumarate",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "FLULAVAL QUADRIVALENT SUSY",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "flucorouracil (ophth) SUSP",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "FLULAVAL SUSY",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "fluphenazine hcl SOLN",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "fidaxomicin TABS 200 MG",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "fluphenazine hcl TABS 1 MG",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "FETZIMA CP24",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "FLUMIST",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "FETZIMA TITRATION C4PK",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "FLUMIST QUADRIVALENT",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "fluphenazine hcl THBSS 2.5 MG, 5 MG",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "finasteride",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "flunisolide (nasal)",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "fingolimod hcl",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "fluocinolone acetonide CREA 0.01 %",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "fluordinonolide CREA 0.025 %",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "floocinolone acetonide CREA 0.025 %",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "flumonolide acetone",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "flumonolide acetone 0.01 %",
+      "page_number": 13
+    },
+    {
+      "Drug Name": "fluticasone furoate (inhalation) 50 MCG/ACT, 100 MCG/ACT, 200 MCG/ACT",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "fluticasone furoate-vilanterol",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "fluticasone propionate (inhalation) AEPB",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "fluticasone propionate (nasal) SUSP",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "fluticasone propionate CREA 0.05 %",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "fluticasone propionate hfa",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "fluticasone propionate LOTN",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "fluticasone propionate OINT",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "fluticasone-salmeterol AEPB 100 MCG/ACT-50 MCG/ACT, 250 MCG/ACT-50 MCG/ACT, 500 MCG/ACT-50 MCG/ACT",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "fluticasone-salmeterol AERO",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "fluvastatin sodium CAPS 20 MG",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "fluvastatin sodium CAPS 40 MG",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "fluvoxamine maleate TABS",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "FLUZONE HIGH-DOSE QUADRIVALENT",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "FLUZONE HIGH-DOSE SUSY",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "FLUZONE QUADRIVALENT SUSP",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "FLUZONE QUADRIVALENT SUSY",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "FLUZONE SUSP",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "FLUZONE SUSY",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "FML FORTE SUSP",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "folic acid TABS",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "FOLOTYN 20 MG/ML",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "FOLOTYN 40 MG/2ML",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "fondaparinux sodium 10 MG/0.8ML",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "fondaparinux sodium 2.5 MG/0.5ML",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "fondaparinux sodium 5 MG/0.4ML",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "fondaparinux sodium 7.5 MG/0.6ML",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "FORA GTEL BLOOD KETONE TEST",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "FORA TEST N'GO ADV-VOICE-6 CON",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "formoterol fumarate NEBU",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "FOSAMAX PLUS D",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "fosamprenavir calcium TABS",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "fosfomycin tromethamine",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "fosinopril sodium & hydrochlorothiazide",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "fosinopril sodium",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "fosphenytoin sodium",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "FOTIVDA",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "FRAGMIN SOSY",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "FREESTYLE LIBRE 14 DAY READER",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "FREESTYLE LIBRE 14 DAY SENSOR",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "FREESTYLE LIBRE 2 PLUS SENSOR",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "FREESTYLE LIBRE 2 READER",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "FREESTYLE LIBRE 2 SENSOR",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "FREESTYLE LIBRE 3 PLUS SENSOR",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "FREESTYLE LIBRE 3 READER",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "FREESTYLE LIBRE 3 SENSOR",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "FREESTYLE LIBRE READER",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "frovatriptan succinate",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "FRUZAQLA",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "FT PRENATAL TABS",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "fulvestrant SOSY",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "furosemide SOLN PO 8 MG/ML, 10 MG/ML",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "furosemide TABS",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "FUZEON SOLR",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "gabapentin CAPS",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "gabapentin SOLN",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "gabapentin TABS 600 MG, 800 MG",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "galantamine hydrobromide CP24",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "galantamine hydrobromide SOLN",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "galantamine hydrobromide TABS",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "ganciclovir sodium SOLR",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "ganirelix acetate",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "GARDASIL 9 SUSP 0.5 ML",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "GARDASIL 9 SUSY 0.5 ML",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "gatifloxacin (ophth)",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "GAVRETO",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "GAZYVA",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "gefitinib",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "GEMCITABINE HCL SOLN (gemcitabine hcl)",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "gemcitabine hcl SOLN",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "GEMCITABINE HCL SOLN",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "gemcitabine hcl SOLR 1 GM",
+      "page_number": 14
+    },
+    {
+      "Drug Name": "gemcitabine hcl SOLR 2 GM, 200 MG",
+      "page_number": 14
+    }
+  ],
+  "FormularyAbbreviations": []
+}
