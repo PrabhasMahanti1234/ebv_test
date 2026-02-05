@@ -451,16 +451,32 @@ def process_pdf_with_mistral_ocr(pdf_input, payer_name=None, filename: Optional[
                 include_image_base64=False
             )
 
-            # CRITICAL: Pass original_page_numbers for correct page mapping
-            if hasattr(ocr_response, 'document_annotation'):
-                try:
-                    with open("debug_response.json", "w", encoding="utf-8") as f:
-                        f.write(str(ocr_response.document_annotation))
-                except Exception as e:
-                    logger.error(f"Failed to write debug response: {e}")
+            # CRITICAL: Improved debug response writing
+            try:
+                debug_data = {}
+                if hasattr(ocr_response, 'document_annotation') and ocr_response.document_annotation:
+                    debug_data["document_annotation"] = ocr_response.document_annotation
+                
+                # Also capture page-level annotations if any
+                if hasattr(ocr_response, 'pages'):
+                    debug_data["pages"] = []
+                    for p in ocr_response.pages:
+                        if hasattr(p, 'document_annotation') and p.document_annotation:
+                            debug_data["pages"].append(p.document_annotation)
+                
+                with open("debug_response.json", "w", encoding="utf-8") as f:
+                    json.dump(debug_data, f, indent=2, default=str)
+                logger.info("✅ Written detailed OCR response to debug_response.json")
+            except Exception as e:
+                logger.error(f"Failed to write debug response: {e}")
             
             all_structured_data, all_acronyms, pages_processed = _process_ocr_response(ocr_response, original_page_numbers)
+            logger.info(f"🐛 DEBUG: extracted {len(all_structured_data)} raw items from _process_ocr_response")
+            if all_structured_data:
+                logger.info(f"🐛 DEBUG First Item Bypass Flag: {all_structured_data[0].get('_bypass_index_check')}")
+
             all_structured_data = _consolidate_and_clean_drug_table(all_structured_data)
+            logger.info(f"🐛 DEBUG: {len(all_structured_data)} items after _consolidate_and_clean_drug_table")
 
             try:
                 mistral_client.files.delete(file_id=uploaded_file.id)
@@ -626,6 +642,27 @@ def process_single_pdf_url_worker(plan_info):
 
         drug_table = structured_data.get("drug_table", [])
         acronyms = structured_data.get("acronyms", [])
+        
+        # ✅ HARD FILTER: Remove any drug with Tier > 6 (Per User Request)
+        # This catches index entries like "66, 77" that slipped through extraction.
+        # Standard tiers are 1, 2, 3, 4, 5, 6, Generic, Brand.
+        valid_drugs = []
+        for d in drug_table:
+            tier_val = str(d.get("drug_tier", "") or "").strip()
+            # Normalize list format "66, 77" -> check all numbers
+            tier_nums = re.findall(r'\d+', tier_val)
+            if tier_nums:
+                # If ANY number is > 6, assume it's an index page number and drop it
+                # Exception: "Tier 1", "Tier 2" -> these have numbers <= 6.
+                # Only drop if number > 6.
+                if any(int(n) > 6 for n in tier_nums):
+                    logger.warning(f"🚫 Dropping invalid drug with High Tier (Index data): {d.get('drug_name')} - Tier: {tier_val}")
+                    continue
+            valid_drugs.append(d)
+        
+        if len(drug_table) != len(valid_drugs):
+            logger.info(f"🧹 Hard Filter removed {len(drug_table) - len(valid_drugs)} invalid index entries.")
+            drug_table = valid_drugs
 
         # FINAL VALIDATION: Check if the entire drug_table looks like index page data
         # This is a last line of defense before database insertion
@@ -763,6 +800,10 @@ def process_single_pdf_url_worker(plan_info):
         
         # Insert enriched records into database
         if enriched_drug_records:
+            # DEBUG LOG
+            tiers_debug = [r.get("drug_tier") for r in enriched_drug_records[:5]]
+            logger.info(f"🐛 DEBUG: Enriched Records Sample Tiers: {tiers_debug}")
+            
             insert_drug_formulary_data(enriched_drug_records)
             logger.info(f"Inserted {len(enriched_drug_records)} drug records for plan {plan_id}")
         

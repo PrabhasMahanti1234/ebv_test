@@ -533,6 +533,7 @@ def normalize_drug_tier(raw_tier):
     Handles both 'Tier X' format and 'Generic/Brand' format.
     """
     if not raw_tier:
+        # logger.debug("normalize_drug_tier received empty input")
         return None
     
     cleaned = clean_special_chars(raw_tier)
@@ -577,6 +578,7 @@ def normalize_drug_tier(raw_tier):
         return f"Tier {tier_match.group(1)}"
     
     # Return the cleaned value as-is if it looks valid
+    logger.info(f"🐛 DEBUG: normalize_drug_tier returning raw cleaned: '{cleaned}' from '{raw_tier}'")
     return cleaned
 
 def infer_drug_tier_from_text(text: Optional[str]) -> Optional[str]:

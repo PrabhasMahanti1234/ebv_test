@@ -64,7 +64,7 @@ OCR_ANNOTATION_SCHEMA = {
             "properties": {
                 "PageHeaders": {
                     "type": ["array", "null"],
-                    "description": "🔍 CRITICAL - Extract ALL column headers from the table on this page. Examples: ['Drug Name', 'Limits/Required'], ['Drug Name', 'Tier', 'Requirements'], ['PRODUCT DESCRIPTION', 'TIER', 'LIMITS'], etc. If NO headers visible, return null or empty array. This helps distinguish drug data pages from index pages.",
+                    "description": " CRITICAL - Extract ALL column headers from the table on this page. Examples: ['Drug Name', 'Limits/Required'], ['Drug Name', 'Tier', 'Requirements'], ['PRODUCT DESCRIPTION', 'TIER', 'LIMITS'], etc. If NO headers visible, return null or empty array. This helps distinguish drug data pages from index pages.",
                     "items": {
                         "type": "string"
                     }
@@ -119,7 +119,7 @@ CRITICAL EXCLUSIONS:
 - Example: If text is "TREMFYA SOSY 100mg/ml\nQL (1 syringe / 28 days)", extract ONLY "TREMFYA SOSY 100mg/ml" as Drug Name. The "QL..." part goes to 'requirements'.
 - Example: If text is "XYZAL\nQL", extract ONLY "XYZAL".
 - EXTRACT THE FULL TEXT from the first column, including any dosage information, BUT STOP before any coverage restrictions.
-- IF THE COLUMN HEADER IS "pub drug name", EXTRACT DATA FROM THAT COLUMN.
+- IF THE COLUMN HEADER IS "pub drug name" OR "drug pub name", EXTRACT DATA FROM THAT COLUMN.
 - IF THERE IS A SEPARATE COLUMN FOR DOSAGE/STRENGTH (e.g. "pub strength", "strength"), AND IT IS NOT EXTRACTED IN THE 'Dosage Form/Strength' FIELD, APPEND IT TO THIS FIELD."""
                             },
                             "Dosage Form/Strength": {
@@ -128,15 +128,15 @@ CRITICAL EXCLUSIONS:
                             },
                             "BrandOrGeneric": {
                                 "type": ["string", "null"],
-                                "description": "The value from the 'Brand or Generic' column if present (often the 2nd column). Values like 'B', 'G', 'Brand', 'Generic'. EXTRACT THIS SEPARATELY so it does not get mixed into Drug Name or Tier."
+                                "description": "The value from the 'Brand or Generic' column if present (often the 2nd column). Values like 'B', 'G'. DO NOT EXTRACT FROM 'Pub Tier' COLUMN. If the column header is 'Pub Tier' or 'Tier', or if the value is 'Generic'/'Brand', PUT IT IN 'drug tier', NOT HERE. EXTRACT THIS SEPARATELY so it does not get mixed into Drug Name or Tier."
                             },
                             "drug tier": {
                                 "type": ["string", "null"], 
-                                "description": "The tier/drug type value. Copy exactly as shown. Can be: 'Tier 1', 'Tier 2', 'Tier 3', 'Tier 4', 'Tier 5', OR 'Generic', 'Brand', 'Specialty'. If the column contains costs (e.g., '$0/$1.60'), IGNORE the costs and extract the tier classification (e.g., 'Tier 1 - Generic', 'Tier 2'). IF THE COLUMN HEADER IS 'pub tier', EXTRACT DATA FROM THAT COLUMN. Leave null ONLY for category header rows. DO NOT INCLUDE 'B' or 'G' from the Brand/Generic column here."
+                                "description": "The tier/drug type value. Copy exactly as shown. Can be: 'Tier 1', 'Tier 2', 'Tier 3', 'Tier 4', 'Tier 5', OR 'Generic', 'Brand', 'Specialty'. IF THE COLUMN HEADER IS 'Pub Tier' OR 'pub tier' OR 'pubtier', YOU MUST EXTRACT DATA FROM THAT COLUMN INTO THIS FIELD, EVEN IF THE VALUE IS 'GENERIC' OR 'BRAND'. DO NOT put 'Pub Tier' data into 'BrandOrGeneric'. Leave null ONLY for category header rows. IMPORTANT: IF THE VALUE IS A NUMBER GREATER THAN 6 (e.g. '66, 77' or '45'), IT IS LIKELY A PAGE NUMBER FROM AN INDEX. RETURN NULL OR EXCLUDE THE ENTRY IF IT LOOKS LIKE AN INDEX LINE."
                             },
                             "requirements": {
                                 "type": ["string", "null"], 
-                                "description": "The restrictions from the Restrictions/Limits column (right column). Copy EXACTLY as shown. Examples: 'ST' (Step Therapy), 'PA' (Prior Authorization), 'QL (60 ML per 30 days)' (Quantity Limit with details), 'PA, QL', empty cells should be null. ALSO INCLUDE any limits (QL, PA, ST) that appear in the first column under the drug name. IF THE COLUMN HEADER IS 'drug edit', EXTRACT DATA FROM THAT COLUMN. DO NOT INCLUDE 'B' or 'G' here. For PREFERRED/NON-PREFERRED tables: set to 'PA' if the drug is in the 'PA Required' or 'Non-preferred Agents' column, set to null if the drug is in the 'No PA Required' or 'Preferred Agents' column."
+                                "description": "The restrictions from the Restrictions/Limits column (right column). Copy EXACTLY as shown. Examples: 'ST' (Step Therapy), 'PA' (Prior Authorization), 'QL (60 ML per 30 days)' (Quantity Limit with details), 'PA, QL', empty cells should be null. ALSO INCLUDE any limits (QL, PA, ST) that appear in the first column under the drug name. IF THE COLUMN HEADER IS 'drug edit' OR 'pub note' OR 'drugedit', EXTRACT DATA FROM THAT COLUMN. DO NOT INCLUDE 'B' or 'G' here. For PREFERRED/NON-PREFERRED tables: set to 'PA' if the drug is in the 'PA Required' or 'Non-preferred Agents' column, set to null if the drug is in the 'No PA Required' or 'Preferred Agents' column."
                             },
                             "preferred_agent": {
                                 "type": ["string", "null"],
@@ -364,6 +364,20 @@ def filter_index_entries_from_mistral_response(drug_info_list: List[dict]) -> Li
     index_entries_removed = 0
     
     for item in drug_info_list:
+        # 1. ALWAYS check for explicit index entries first (e.g. High Tier numbers "66, 77")
+        # This catches index garbage even if the page has valid headers (Bypassed).
+        if _is_index_entry(item):
+            index_entries_removed += 1
+            continue
+
+        # 2. ✅ BLIND BYPASS FLAG CHECK
+        # If it passed the index check above, AND has valid headers, we keep it.
+        # This preserves valid drugs that might fail the strict field checks below.
+        if item.get("_bypass_index_check"):
+            filtered.append(item)
+            continue
+            
+        # 3. Standard strict filtering for non-bypassed items
         # Check for page_number field
         has_page_number = item.get("page_number") is not None
         
@@ -598,14 +612,44 @@ def _is_index_entry(item: dict) -> bool:
     Check if a single drug entry looks like it came from an index page.
     Uses multiple heuristics to catch various OCR parsing patterns.
     """
-    # ✅ HEADER-BASED BYPASS
-    # If this flag is set, it means the page had valid headers indicating it's a Drug Data page.
-    # Therefore, we bypass all heuristic checks and assume it's valid.
-    if item.get("_bypass_index_check"):
-        return False
-
     drug_name = item.get("drug_name", "") or ""
-    tier = item.get("drug_tier", "") or ""
+    # Check both keys because OCR output key is "drug tier" but consolidated key is "drug_tier"
+    tier = item.get("drug tier") or item.get("drug_tier") or ""
+    
+    # ✅ HEADER-BASED BYPASS with SAFETY CHECK
+    # Even if headers indicate a drug page, if the "Tier" is clearly a list of page numbers (e.g. "66, 77, 79"),
+    # we must treating it as an index entry.
+    if item.get("_bypass_index_check"):
+        # SAFETY CHECK: Is the 'tier' actually a list of page numbers?
+        # Check if tier contains numbers > 6 (Standard tiers are 1-6)
+        # If we see "66", "77", or "12, 14", these are likely page numbers.
+        
+        # Normalize delimiters to commas
+        normalized_tier = re.sub(r'[;/]', ',', str(tier))
+        try:
+            # Extract all numbers
+            numbers = [int(n) for n in re.findall(r'\d+', normalized_tier)]
+            if numbers:
+                # If ALL numbers are > 10, it's definitely an index/page list
+                # E.g. "66, 77" -> All > 10 -> True (Index)
+                if all(n > 10 for n in numbers):
+                    return True
+                
+                # If ANY number is extremely high (>50), it's an index
+                if any(n > 50 for n in numbers):
+                    return True
+                
+                # If mixed small/large numbers? E.g. "2, 66" -> Ambiguous. 
+                # But typical tiered drugs are "1, 2, 3". 
+                # Index pages usually don't mix "2" and "66" unless page 2 and page 66.
+                # Let's say if average > 10, it's an index.
+                avg = sum(numbers) / len(numbers)
+                if avg > 10:
+                    return True
+        except ValueError:
+            pass
+            
+        return False
     reqs = item.get("drug_requirements", "") or ""
     
     # Heuristic 1: Tier is a high number (Page number)
@@ -917,34 +961,39 @@ def _is_header_row(drug_name: str) -> bool:
     # Headers often have " - " but NO strength/form info (mg, ml, tab, cap)
     
     # Regex for dosage/form - reused from RE_DOSAGE_FORM but broader
-    has_dosage = re.search(r'\d+\s*(mg|ml|mcg|unit|%|tab|cap|sol|cream|gel|patch|spray)', name_lower)
+    has_dosage = re.search(r'\d+\s*(mg|ml|mcg|unit|%|tab|cap|sol|cream|gel|patch|spray|gm|gram)', name_lower)
     
-    if not has_dosage:
-        # Normalize dashes: replace en-dash, em-dash with standard hyphen
-        normalized_name = name_lower.replace('–', '-').replace('—', '-').replace('−', '-')
+    # CRITICAL: If it has dosage info, it's a DRUG, not a header!
+    if has_dosage:
+        return False
+    
+    # Now check for header patterns ONLY if no dosage was found
+    # Normalize dashes: replace en-dash, em-dash with standard hyphen
+    normalized_name = name_lower.replace('–', '-').replace('—', '-').replace('−', '-')
+    
+    # If it has a hyphen and no dosage, it's suspicious.
+    # Check for " - " (spaced hyphen) OR just a hyphen if it looks like a compound category
+    if "-" in normalized_name:
+        # If it has " - " (spaced), it's very likely a header if no dosage
+        if " - " in normalized_name:
+            return True
         
-        # If it has a hyphen and no dosage, it's suspicious.
-        # Check for " - " (spaced hyphen) OR just a hyphen if it looks like a compound category
-        if "-" in normalized_name:
-            # If it has " - " (spaced), it's very likely a header if no dosage
-            if " - " in normalized_name:
-                return True
-            
-            # If it has a hyphen but no spaces (e.g. "Anti-Infective"), we need to be careful.
-            # But if it's "Category - Subcategory" with weird spacing like "Category-Subcategory",
-            # we might want to catch it.
-            # Let's check if the hyphen is surrounded by letters, which might be a valid drug name (e.g. "Anti-Infective").
-            # But "Urinary Antispasmodics-Direct Muscle Relaxants" is a header.
-            # Heuristic: If it's long (>20 chars) and has a hyphen, and NO dosage, it's likely a header
-            if len(normalized_name) > 20:
-                return True
-            
-        # Check for all caps words at start (common in headers)
-        # Only if the name is reasonably long (avoid filtering "ASPIRIN")
-        parts = drug_name.split(' ')
-        if len(parts) > 0 and parts[0].isupper() and len(parts[0]) > 4 and len(drug_name) > 20:
-             return True
-             
+        # If it has a hyphen but no spaces (e.g. "Anti-Infective"), we need to be careful.
+        # But if it's "Category - Subcategory" with weird spacing like "Category-Subcategory",
+        # we might want to catch it.
+        # Let's check if the hyphen is surrounded by letters, which might be a valid drug name (e.g. "Anti-Infective").
+        # But "Urinary Antispasmodics-Direct Muscle Relaxants" is a header.
+        # Heuristic: If it's long (>20 chars) and has a hyphen, and NO dosage, it's likely a header
+        if len(normalized_name) > 20:
+            return True
+        
+    # Check for all caps words at start (common in headers)
+    # ONLY if NO dosage info was found (already checked above)
+    # Only if the name is reasonably long (avoid filtering "ASPIRIN")
+    parts = drug_name.split(' ')
+    if len(parts) > 0 and parts[0].isupper() and len(parts[0]) > 4 and len(drug_name) > 20:
+         return True
+         
     return False
 
 

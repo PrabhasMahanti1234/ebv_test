@@ -256,6 +256,13 @@ def _process_ocr_response(ocr_response, original_pages: list) -> tuple:
                     for item in drug_info_list:
                         item["_bypass_index_check"] = True
                 
+                # ✅ BACKFILL TIER FROM BrandOrGeneric (Moved BEFORE filter)
+                # Some templates put "GENERIC" (or page nums) in BrandOrGeneric column but leave Tier empty.
+                # Must do this BEFORE filtering so we can catch "66, 77" page numbers.
+                for item in drug_info_list:
+                    if not item.get("drug tier") and item.get("BrandOrGeneric"):
+                        item["drug tier"] = item.get("BrandOrGeneric")
+
                 # Still call filter (it will respect the flag if set, or proceed normally if not)
                 drug_info_list = filter_index_entries_from_mistral_response(drug_info_list)
                 
