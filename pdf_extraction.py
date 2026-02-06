@@ -50,9 +50,10 @@ except ImportError:
 # OCR ANNOTATION SCHEMA - Supports Multiple PDF Formats
 # =============================================================================
 # FORMAT 1 (CareSource/Standard): Drug Name | Tier | Restrictions/Limits
-# FORMAT 2 (Traditional): Drug Name | Drug Tier | Requirements
-# FORMAT 3 (PDL): B,G,O | Comment | P,N,R,NR | Therapeutic Category
-# FORMAT 4 (Tier Designation): Drug Name | Tier Designation | dot-marked columns
+# FORMAT 2 (2-Column): Drug Name | Requirements/Limits (NO TIER COLUMN)
+# FORMAT 3 (Traditional): Drug Name | Drug Tier | Requirements
+# FORMAT 4 (PDL): B,G,O | Comment | P,N,R,NR | Therapeutic Category
+# FORMAT 5 (Tier Designation): Drug Name | Tier Designation | dot-marked columns
 # =============================================================================
 OCR_ANNOTATION_SCHEMA = {
     "type": "json_schema",
@@ -615,6 +616,19 @@ def _is_index_entry(item: dict) -> bool:
     drug_name = item.get("drug_name", "") or ""
     # Check both keys because OCR output key is "drug tier" but consolidated key is "drug_tier"
     tier = item.get("drug tier") or item.get("drug_tier") or ""
+    reqs = item.get("drug_requirements", "") or ""
+    
+    # ========== 2-COLUMN FORMAT VALIDATION ==========
+    # CRITICAL: If a drug has requirements but NO tier, it's from a valid 2-column format
+    # (Drug name | Requirements/Limits only)
+    # Example: "tazarotene cream 0.1%" | "QL (60 GM per 30 days) PA MO"
+    if reqs and not tier:
+        # Has requirements but no tier = Valid 2-column format
+        # Check if requirements look legitimate (contains known codes: QL, PA, ST, MO, etc.)
+        req_codes = ["QL", "PA", "ST", "MO", "LA", "NM", "B/D", "DL"]
+        if any(code in str(reqs).upper() for code in req_codes):
+            return False  # NOT an index entry
+    # ================================================
     
     # ✅ HEADER-BASED BYPASS with SAFETY CHECK
     # Even if headers indicate a drug page, if the "Tier" is clearly a list of page numbers (e.g. "66, 77, 79"),
@@ -650,7 +664,6 @@ def _is_index_entry(item: dict) -> bool:
             pass
             
         return False
-    reqs = item.get("drug_requirements", "") or ""
     
     # Heuristic 1: Tier is a high number (Page number)
     if str(tier).strip().isdigit():
@@ -681,10 +694,10 @@ def _is_index_entry(item: dict) -> bool:
             return True
     
     # Heuristic 6: Drug name is ONLY a drug name with NO dosage info
-    # AND tier/requirements are missing or suspicious
+    # AND BOTH tier AND requirements are missing
     # This catches index entries like "AMOXICILLIN" with no tier/requirements
     has_dosage = bool(RE_DOSAGE_FORM.search(drug_name))
-    if not has_dosage and not tier and not reqs:
+    if not has_dosage and not tier and not reqs:  # Changed: Only flag if BOTH tier AND reqs are missing
         # If drug name is just a plain name with no dosage, tier, or requirements
         # it's likely from an index page
         if len(drug_name) > 3 and drug_name.replace(' ', '').replace('-', '').isalpha():
@@ -743,6 +756,24 @@ def _is_extracted_data_from_index_page(drug_table: List[dict], page_headers: Lis
     if preferred_agent_count / total >= 0.50:
         logger.info(f"✅ PREFERRED/NON-PREFERRED format detected: {preferred_agent_count}/{total} entries have agent classification. NOT an index page.")
         return False
+    
+    # CRITICAL CHECK: 2-COLUMN Format Detection (Drug name | Requirements only, NO tier)
+    # If most drugs have requirements but NO tiers, this is a valid 2-column format table
+    has_requirements_count = 0
+    has_tier_count = 0
+    for item in drug_table:
+        if item.get("drug_requirements"):
+            has_requirements_count += 1
+        if item.get("drug_tier"):
+            has_tier_count += 1
+    
+    # If >50% have requirements but <20% have tiers, it's a 2-column format (NOT an index)
+    if total > 0:
+        reqs_ratio = has_requirements_count / total
+        tier_ratio = has_tier_count / total
+        if reqs_ratio >= 0.50 and tier_ratio < 0.20:
+            logger.info(f"✅ 2-COLUMN format detected: {has_requirements_count}/{total} entries have requirements, {has_tier_count}/{total} have tiers. NOT an index page.")
+            return False
     
     # Extract numbers from all entries
     numbers = []
