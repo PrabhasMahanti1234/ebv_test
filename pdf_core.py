@@ -327,6 +327,29 @@ def _process_ocr_response(ocr_response, original_pages: list) -> tuple:
             except Exception as e:
                 logger.debug(f"Could not parse page annotation: {e}")
 
+    # POST-PROCESSING: Auto-generate LD (Limited Distribution) acronym if detected
+    # Check if any drugs have Limited Distribution = true
+    has_ld_flag = any(
+        item.get("Limited Distribution") == True
+        for item in all_structured_data if isinstance(item, dict)
+    )
+    
+    if has_ld_flag:
+        # Check if LD acronym already exists
+        has_ld_acronym = any(
+            (str(acr.get("acronym", "")).upper() in ["LD", "LIMITED DISTRIBUTION"])
+            for acr in all_acronyms if isinstance(acr, dict)
+        )
+        
+        if not has_ld_acronym:
+            # Auto-add LD acronym entry
+            all_acronyms.append({
+                "acronym": "LD",
+                "full_text": "Limited Distribution",
+                "explanation": "Limited Distribution"
+            })
+            logger.info("✅ Auto-added LD (Limited Distribution) acronym")
+
     logger.info(f"📋 OCR extracted {len(all_structured_data)} drugs and {len(all_acronyms)} acronyms (raw, before cleaning)")
     return all_structured_data, all_acronyms, len(ocr_response.pages)
 

@@ -67,7 +67,7 @@ MIN_PAGE_TEXT_LENGTH = 100  # Minimum text characters to consider a page worth p
 SKIP_INDEX_PAGES = True  # Skip pages that look like index/TOC pages
 
 # Add these constants after your existing configuration
-MISTRAL_OCR_COST_PER_1K_PAGES = 2.0   # $2.00 per 1000 pages
+MISTRAL_OCR_COST_PER_1K_PAGES = 1.5  # $2.00 per 1000 pages
 
 CLIENT_TIMEOUT = 60.0  # 60 seconds for general read/write timeouts (was 300s, reduced for faster failure detection)
 CONNECT_TIMEOUT = 10.0  # 10 seconds for establishing a connection (was 15s)
@@ -105,7 +105,7 @@ PDF_PAGE_PROCESSING_CONFIG = {
     # Process pages to find the drug table
     # Increased range to capture full drug lists (some PDFs have 60+ pages of drugs)
     # Use "all" to process everything, or specific ranges like ["1-100"]
-    "default": ["105-136"]  # Only process page 313 (drug data page), skip 314 (index page)
+    "default": ["1-3"] # Only process page 313 (drug data page), skip 314 (index page)
     # Override for specific payers if needed:
     # "Cigna": "all",
     # "Select": ["1-80"],
