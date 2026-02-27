@@ -1,0 +1,54 @@
+======================================================================
+COVERAGE CLASSIFICATION MODEL - EVALUATION REPORT
+======================================================================
+Generated: 2026-02-04 12:21:28
+Model: Gradient Boosting
+
+----------------------------------------------------------------------
+1. DATA SUMMARY
+----------------------------------------------------------------------
+Total Records Evaluated: 9257
+
+Class Distribution:
+  Covered: 2868 (31.0%)
+  Covered with Condition: 6012 (64.9%)
+  Not Covered: 377 (4.1%)
+
+----------------------------------------------------------------------
+2. FIT STATUS ANALYSIS
+----------------------------------------------------------------------
+Status: WELL-FITTED
+
+Training Accuracy: 0.9995 (99.95%)
+Test Accuracy:     0.9973 (99.73%)
+Train-Test Gap:    0.0022 (0.22%)
+
+Analysis:
+  • Training and Test accuracies are consistent
+  • No significant accuracy gap detected
+  • Model generalizes well to unseen data
+
+----------------------------------------------------------------------
+3. CLASSIFICATION REPORT
+----------------------------------------------------------------------
+                        precision    recall  f1-score   support
+
+               Covered       1.00      0.99      1.00       574
+Covered with Condition       1.00      1.00      1.00      1203
+           Not Covered       0.97      1.00      0.99        75
+
+              accuracy                           1.00      1852
+             macro avg       0.99      1.00      0.99      1852
+          weighted avg       1.00      1.00      1.00      1852
+
+----------------------------------------------------------------------
+4. CONFUSION MATRIX
+----------------------------------------------------------------------
+                        Covered  Covered with Condition  Not Covered
+Covered                     571                       2            1
+Covered with Condition        1                    1201            1
+Not Covered                   0                       0           75
+
+======================================================================
+END OF REPORT
+======================================================================

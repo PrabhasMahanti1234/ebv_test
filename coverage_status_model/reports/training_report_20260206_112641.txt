@@ -1,0 +1,73 @@
+======================================================================
+COVERAGE CLASSIFICATION MODEL - TRAINING REPORT
+======================================================================
+Generated: 2026-02-06 11:26:41
+
+----------------------------------------------------------------------
+1. DATA SUMMARY
+----------------------------------------------------------------------
+Total Records: 10168
+Features Used: 500 TF-IDF + 528 Categorical
+
+Class Distribution:
+  Covered: 3271 (32.2%)
+  Covered with Condition: 6503 (64.0%)
+  Not Covered: 394 (3.9%)
+
+----------------------------------------------------------------------
+2. MODEL COMPARISON
+----------------------------------------------------------------------
+Model                     CV Accuracy     Test Accuracy   Time (s)  
+----------------------------------------------------------------------
+Random Forest             0.9720 (+/-0.0031)  0.9735         14.09
+Gradient Boosting         0.9970 (+/-0.0002)  0.9941         2081.64
+SVM                       0.9956 (+/-0.0014)  0.9946         507.44
+Logistic Regression       0.9950 (+/-0.0007)  0.9941         4.37
+
+----------------------------------------------------------------------
+3. BEST MODEL DETAILS
+----------------------------------------------------------------------
+Selected Model: SVM
+Training Accuracy: 0.9996 (99.96%)
+CV Accuracy: 0.9956 (+/- 0.0014)
+Test Accuracy: 0.9946 (99.46%)
+
+----------------------------------------------------------------------
+4. FIT STATUS ANALYSIS
+----------------------------------------------------------------------
+Status: WELL-FITTED
+
+Accuracy Gaps:
+  Train - CV Gap:   0.0041
+  Train - Test Gap: 0.0050
+  CV - Test Gap:    0.0010
+
+Analysis:
+  • Training, CV, and Test accuracies are consistent
+  • No significant accuracy gaps detected
+  • Model generalizes well to unseen data
+
+----------------------------------------------------------------------
+6. CLASSIFICATION REPORT
+----------------------------------------------------------------------
+                        precision    recall  f1-score   support
+
+               Covered       1.00      0.99      0.99       654
+Covered with Condition       0.99      1.00      1.00      1301
+           Not Covered       1.00      1.00      1.00        79
+
+              accuracy                           0.99      2034
+             macro avg       1.00      1.00      1.00      2034
+          weighted avg       0.99      0.99      0.99      2034
+
+----------------------------------------------------------------------
+7. CONFUSION MATRIX
+----------------------------------------------------------------------
+                        Covered  Covered with Condition  Not Covered
+Covered                     646                       8            0
+Covered with Condition        3                    1298            0
+Not Covered                   0                       0           79
+
+======================================================================
+END OF REPORT
+======================================================================

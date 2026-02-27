@@ -1,0 +1,97 @@
+======================================================================
+COVERAGE CLASSIFICATION MODEL - TRAINING REPORT
+======================================================================
+Generated: 2026-02-05 17:15:18
+
+----------------------------------------------------------------------
+1. DATA SUMMARY
+----------------------------------------------------------------------
+Total Records: 9270
+Features Used: 500 TF-IDF + 485 Categorical
+
+Class Distribution:
+  Covered: 2872 (31.0%)
+  Covered with Condition: 6020 (64.9%)
+  Not Covered: 378 (4.1%)
+
+----------------------------------------------------------------------
+2. MODEL COMPARISON
+----------------------------------------------------------------------
+Model                     CV Accuracy     Test Accuracy   Time (s)  
+----------------------------------------------------------------------
+Random Forest             0.9760 (+/-0.0054)  0.9800         11.01
+Gradient Boosting         0.9962 (+/-0.0011)  0.9973         3280.14
+SVM                       0.9964 (+/-0.0014)  0.9957         458.72
+Logistic Regression       0.9957 (+/-0.0013)  0.9957         3.62
+
+----------------------------------------------------------------------
+3. BEST MODEL DETAILS
+----------------------------------------------------------------------
+Selected Model: Gradient Boosting
+Training Accuracy: 1.0000 (100.00%)
+CV Accuracy: 0.9962 (+/- 0.0011)
+Test Accuracy: 0.9973 (99.73%)
+
+----------------------------------------------------------------------
+4. FIT STATUS ANALYSIS
+----------------------------------------------------------------------
+Status: WELL-FITTED
+
+Accuracy Gaps:
+  Train - CV Gap:   0.0038
+  Train - Test Gap: 0.0027
+  CV - Test Gap:    0.0011
+
+Analysis:
+  • Training, CV, and Test accuracies are consistent
+  • No significant accuracy gaps detected
+  • Model generalizes well to unseen data
+
+----------------------------------------------------------------------
+5. TOP 20 IMPORTANT FEATURES
+----------------------------------------------------------------------
+  cost                           0.239208
+  drugs                          0.163083
+  certain                        0.107186
+  covered                        0.069987
+  prescription drug              0.051920
+  used                           0.039927
+  includes                       0.030653
+  covered tier                   0.021140
+  supply                         0.019410
+  otc                            0.016539
+  ACRONYM_clean_EXC              0.015836
+  generic                        0.014972
+  marked                         0.014213
+  products                       0.011284
+  apply                          0.010448
+  preferred                      0.008720
+  drug covered                   0.007888
+  pay                            0.007275
+  authorization                  0.007162
+  care                           0.006359
+
+----------------------------------------------------------------------
+6. CLASSIFICATION REPORT
+----------------------------------------------------------------------
+                        precision    recall  f1-score   support
+
+               Covered       1.00      1.00      1.00       574
+Covered with Condition       1.00      1.00      1.00      1204
+           Not Covered       0.99      1.00      0.99        76
+
+              accuracy                           1.00      1854
+             macro avg       0.99      1.00      1.00      1854
+          weighted avg       1.00      1.00      1.00      1854
+
+----------------------------------------------------------------------
+7. CONFUSION MATRIX
+----------------------------------------------------------------------
+                        Covered  Covered with Condition  Not Covered
+Covered                     572                       2            0
+Covered with Condition        2                    1201            1
+Not Covered                   0                       0           76
+
+======================================================================
+END OF REPORT
+======================================================================
