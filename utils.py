@@ -249,11 +249,23 @@ def lookup_expansion(acronym, state_name, payer_name, conn, acronym_cache=None):
             """,
             (pattern, state_name, state_name, payer_name, payer_name)
         )
-        
         result = cur.fetchone()
-        logger.info(f"DB Result for acronym '{acronym}': {result}")
-
-    db_result = (result[0], result[1], result[2]) if result else (None, None, None)
+        
+    exp, expl, cs = result if result else (None, None, None)
+    if cs:
+        cs_norm = str(cs).strip().lower()
+        if cs_norm in ("covered with condition", "covered with ql"):
+            cs = "Covered with Conditions"
+        elif cs_norm == "not covered":
+            cs = "Not Covered"
+        elif cs_norm == "covered with pa":
+            cs = "Covered with PA"
+        elif cs_norm == "covered with st":
+            cs = "Covered with ST"
+        elif cs_norm == "covered":
+            cs = "Covered"
+            
+    db_result = (exp, expl, cs)
     
     # Store DB lookup result back into cache
     if acronym_cache is not None and db_result[0] is not None:

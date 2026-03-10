@@ -38,6 +38,27 @@ COVERAGE_PRIORITY = {
     "Covered": 5
 }
 
+def normalize_coverage_status(status):
+    """Normalize coverage status strings to a standard set."""
+    if not status:
+        return "Covered"
+    
+    s = str(status).strip().lower()
+    if s in ("covered with condition", "covered with conditions", "covered with ql"):
+        return "Covered with Conditions"
+    if s == "covered with pa":
+        return "Covered with PA"
+    if s == "covered with st":
+        return "Covered with ST"
+    if s == "not covered":
+        return "Not Covered"
+    if s == "covered":
+        return "Covered"
+    
+    # Capitalize for unknown but valid-looking statuses
+    return s.title()
+
+
 PA_KEYWORDS = [
     'prior authorization', 'prior auth', 'pa required', 'pa needed',
     'pa', 
@@ -267,8 +288,12 @@ def det_coverage_status(
 
     # Resolve Final Status by Priority
     if detected_results:
-        # Filter for valid statuses that exist in our priority map
-        valid_results = [r for r in detected_results if r[0] in COVERAGE_PRIORITY]
+        # Normalize and filter for valid statuses that exist in our priority map
+        valid_results = []
+        for r_status, r_conf, r_source in detected_results:
+            norm_status = normalize_coverage_status(r_status)
+            if norm_status in COVERAGE_PRIORITY:
+                valid_results.append((norm_status, r_conf, r_source))
         
         if valid_results:
             # Select the most restrictive result (lowest priority number)
