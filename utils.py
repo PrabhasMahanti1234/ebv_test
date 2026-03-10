@@ -193,11 +193,10 @@ def extract_requirements_from_drug_name(drug_name_cell):
     final_requirements = ', '.join(extracted_requirements) if extracted_requirements else ""
     return cleaned_name, final_requirements
 
-def lookup_expansion(acronym, state_name, payer_name, conn):
+def lookup_expansion(acronym, state_name, payer_name, conn, acronym_cache=None):
     """
-    Look up expansion and coverage status from tier_requirement_expansion SQL table
-    using acronym + state_name + payer_name.
-    Uses ILIKE '%acronym%' pattern matching to preserve whitespace and handle partial matches.
+    Look up expansion and coverage status from memory cache OR tier_requirement_expansion SQL table.
+    - acronym_cache: Optional dictionary mapping acronym -> (expansion, explanation, coverage_status)
     Returns (expansion, explanation, coverage_status) tuple if found, else (None, None, None).
     """
     if not acronym:
@@ -205,6 +204,15 @@ def lookup_expansion(acronym, state_name, payer_name, conn):
 
     # Do NOT strip whitespace as requested by user
     acronym = str(acronym)
+    
+    # Check cache first
+    if acronym_cache is not None:
+        if acronym in acronym_cache:
+            # logger.info(f"Memory Cache HIT for acronym: '{acronym}'")
+            return acronym_cache[acronym]
+        # Fallback to DB if not in cache
+        # Note: If cache is provided, it should ideally contain everything, but we fallback just in case
+        
     state_name = str(state_name).strip() if state_name else None
     payer_name = str(payer_name).strip() if payer_name else None
 
@@ -215,11 +223,12 @@ def lookup_expansion(acronym, state_name, payer_name, conn):
     with conn.cursor() as cur:
         cur.execute(
             """
-            SELECT expansion, explanation
+            SELECT expansion, explanation, coverage_status
             FROM tier_requirement_expansion 
             WHERE acronym ILIKE %s
-              AND (%s IS NULL OR UPPER(state_name) = UPPER(%s))
-              AND (%s IS NULL OR UPPER(payer_name) = UPPER(%s))
+              AND (%s IS NULL OR UPPER(state_name) = UPPER(%s) OR state_name IS NULL)
+              AND (%s IS NULL OR UPPER(payer_name) = UPPER(%s) OR payer_name IS NULL)
+            ORDER BY (state_name IS NOT NULL)::int DESC, (payer_name IS NOT NULL)::int DESC
             LIMIT 1
             """,
             (pattern, state_name, state_name, payer_name, payer_name)
@@ -228,7 +237,7 @@ def lookup_expansion(acronym, state_name, payer_name, conn):
         result = cur.fetchone()
         logger.info(f"DB Result for acronym '{acronym}': {result}")
 
-    return (result[0], result[1], None) if result else (None, None, None)
+    return (result[0], result[1], result[2]) if result else (None, None, None)
 
 def parse_requirements(text):
     """
@@ -585,3 +594,41 @@ def is_english(text: str) -> bool:
         # This can happen on very short or ambiguous text (like "PA" or "1").
         # We will assume these are valid, as they are not definitively non-English.
         return True
+
+def determine_db_coverage(sub_acronyms, conn, state_name, payer_name, acronym_cache=None):
+    """
+    Look up coverage status for multiple sub-acronyms and determine the final status.
+    - acronym_cache: Optional dictionary mapping acronym -> (expansion, explanation, coverage_status)
+    - If ANY is 'Not Covered' -> 'Not Covered'
+    - If ANY is 'Covered with Conditions' -> 'Covered with Conditions'
+    - If ALL are 'Covered' -> 'Covered'
+    - Returns ('Covered', 0.5) if no status found in DB, else (status, 0.9).
+    """
+    if not sub_acronyms or not conn:
+        return None
+
+    statuses = []
+    for sub_acronym in sub_acronyms:
+        _, _, db_cvg = lookup_expansion(sub_acronym, state_name, payer_name, conn, acronym_cache=acronym_cache)
+        if db_cvg:
+            statuses.append(db_cvg.strip())
+
+    if not statuses:
+        return "Covered", 50.0, "No DB Coverage Status Found"
+
+    # Prioritize 'Not Covered' (most restrictive)
+    if any(s.lower() == "not covered" for s in statuses):
+        return "Not Covered", 90.0, "At least one DB Coverage Status is 'Not Covered'"
+
+    # Then 'Covered with Conditions'
+    if any("Condition" in s or "PA" in s or "ST" in s or "QL" in s for s in statuses):
+        return "Covered with Conditions", 90.0, "At least one DB Coverage Status is 'Covered with Conditions'"
+    
+    # Finally 'Covered'
+    if any(s == "Covered" for s in statuses):
+        return "Covered", 90.0, "At least one DB Coverage Status is 'Covered'"
+    
+    # Default to "Covered with Conditions" if there are mixed or unknown statuses
+    return "Covered with Conditions", 70.0, "Mixed DB Coverage Statuses Found"
+
+ 

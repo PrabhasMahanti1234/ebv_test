@@ -3,47 +3,69 @@ import pandas as pd
 import logging
 from typing import Optional, Tuple
 from database import get_db_connection
-from clasify import ml_predict_coverage_status, ml_predict_coverage_status_batch
+# from clasify import ml_predict_coverage_status, ml_predict_coverage_status_batch
 # Setup logging
 logger = logging.getLogger(__name__)
 
-# Setup ML Output Logger
-ml_logger = logging.getLogger('ml_coverage_logger')
-ml_logger.setLevel(logging.INFO)
-# Prevent propagation to root logger to avoid duplicate logs in main log
-ml_logger.propagate = False 
+# # Setup ML Output Logger
+# ml_logger = logging.getLogger('ml_coverage_logger')
+# ml_logger.setLevel(logging.INFO)
+# # Prevent propagation to root logger to avoid duplicate logs in main log
+# ml_logger.propagate = False 
 
-# Create file handler
-fh = logging.FileHandler('ml_output.log')
-fh.setLevel(logging.INFO)
+# # Create file handler
+# fh = logging.FileHandler('ml_output.log', encoding='utf-8')
+# fh.setLevel(logging.INFO)
 
-# Create formatter
-formatter = logging.Formatter('%(asctime)s - %(message)s')
-fh.setFormatter(formatter)
+# # Create formatter
+# formatter = logging.Formatter('%(asctime)s - %(message)s')
+# fh.setFormatter(formatter)
 
-# Add handler to logger
-if not ml_logger.handlers:
-    ml_logger.addHandler(fh)
+# # Add handler to logger
+# if not ml_logger.handlers:
+#     ml_logger.addHandler(fh)
 
-def determine_ml_coverage_status(coverage_statuses):
-    """
-    Determine final coverage status when multiple statuses are found.
-    Order of precedence: Not Covered > Covered with Conditions > Covered
-    """
-    normalized = {s.strip().title() for s in coverage_statuses if s}
+# --- PRE-COMPILED REGEX PATTERNS (OPTIMIZATION) ---
+NC_INDICATORS = ["NC", "NF", "NOT COVERED", "EXCLUDED", "NON-FORMULARY", "NOT-COVERED"]
+RE_NC = re.compile(r'\b(?:' + '|'.join(map(re.escape, NC_INDICATORS)) + r')\b', re.IGNORECASE)
 
-    if "Not Covered" in normalized:
-        return "Not Covered"
-    elif "Covered With Pa" in normalized or "Covered With Prior Authorization" in normalized: 
-        return "Covered with PA"
-    elif "Covered With St" in normalized or "Covered With Step Therapy" in normalized:  
-        return "Covered with ST"
-    elif "Covered With Conditions" in normalized or "Covered With Condition" in normalized:
-        return "Covered with Condition"
-    elif "Covered" in normalized:
-        return "Covered"
-    else:
-        return "Covered/Unknown"
+PA_KEYWORDS = [
+    'prior authorization', 'prior auth', 'pa required', 'pa needed',
+    'pa', 
+    'authorization required',
+    'requires prior authorization',
+    'must be approved', 'approval needed', 'prior approval needed'
+]
+RE_PA = re.compile(r'(?:^|[^a-zA-Z0-9])(?:' + '|'.join(map(re.escape, PA_KEYWORDS)) + r')(?:\d*)(?:$|[^a-zA-Z0-9])', re.IGNORECASE)
+
+ST_KEYWORDS = [
+    'step therapy', 'step-therapy', 'st'
+]
+RE_ST = re.compile(r'(?:^|[^a-zA-Z0-9])(?:' + '|'.join(map(re.escape, ST_KEYWORDS)) + r')(?:\d*)(?:$|[^a-zA-Z0-9])', re.IGNORECASE)
+
+OTHER_CONDITIONS = ["QL", "AL", "LA", "BVD"]
+RE_OTHER_CONDITIONS = re.compile(r'(?:^|[^a-zA-Z0-9])(?:' + '|'.join(map(re.escape, OTHER_CONDITIONS)) + r')(?:$|[^a-zA-Z0-9])', re.IGNORECASE)
+
+# def determine_ml_coverage_status(coverage_statuses):
+#     """
+#     Determine final coverage status when multiple statuses are found.
+#     Order of precedence: Not Covered > Covered with Conditions > Covered
+#     """
+#     normalized = {s.strip().title() for s in coverage_statuses if s}
+
+#     if "Not Covered" in normalized:
+#         return "Not Covered"
+#     elif "Covered With Pa" in normalized or "Covered With Prior Authorization" in normalized: 
+#         return "Covered with PA"
+#     elif "Covered With St" in normalized or "Covered With Step Therapy" in normalized:  
+#         return "Covered with ST"
+#     elif "Covered With Conditions" in normalized or "Covered With Condition" in normalized:
+#         return "Covered with Condition"
+#     elif "Covered" in normalized:
+#         return "Covered"
+#     else:
+#         return "Covered"
+
 
 def detect_prior_authorization(requirements_text):
     """
@@ -53,21 +75,13 @@ def detect_prior_authorization(requirements_text):
     if not requirements_text or pd.isna(requirements_text):
         return False
     
-    requirements_lower = str(requirements_text).lower().strip()
+    text = str(requirements_text).strip()
     
-    if not requirements_lower or requirements_lower in ['', 'none', 'null', 'nan']:
+    if not text or text.lower() in ['', 'none', 'null', 'nan']:
         return False
     
-    # Common PA indicators
-    pa_keywords = [
-        'prior authorization', 'prior auth', 'pa required', 'pa needed',
-        'pa;', 'PA', 'pa', 
-        'pa,', 'authorization required', 'PA;',
-        'PA,', 'requires prior authorization',
-        'must be approved', 'approval needed', 'prior approval needed'
-    ]
-    
-    return any(keyword in requirements_lower for keyword in pa_keywords)
+    return bool(RE_PA.search(text))
+
 
 def detect_step_therapy(requirements_text):
     """
@@ -77,19 +91,12 @@ def detect_step_therapy(requirements_text):
     if not requirements_text or pd.isna(requirements_text):
         return False
     
-    requirements_lower = str(requirements_text).lower().strip()
+    text = str(requirements_text).strip()
     
-    if not requirements_lower or requirements_lower in ['', 'none', 'null', 'nan']:
+    if not text or text.lower() in ['', 'none', 'null', 'nan']:
         return False
     
-    # Common ST indicators
-    st_keywords = [
-        'step therapy', 'step-therapy', 'st', 'ST',
-        'ST;', 'st;', 'st,',
-        'ST,'
-    ]
-    
-    return any(keyword in requirements_lower for keyword in st_keywords)
+    return bool(RE_ST.search(text))
 
 def det_coverage_status(
     acronym=None,
@@ -100,8 +107,9 @@ def det_coverage_status(
     conn=None,
     state_name=None,
     payer_name=None,
-    ml_predict_fn=None,
-    drug_name=None
+    # ml_predict_fn=None,
+    drug_name=None,
+    acronym_cache=None
 ):
     """
     Main orchestrator for coverage status determination.
@@ -111,74 +119,35 @@ def det_coverage_status(
     log_id = drug_name or acronym or "Unknown Drug"
 
     # Use the imported ML prediction function if not provided
-    if ml_predict_fn is None:
-        ml_predict_fn = ml_predict_coverage_status
+    # if ml_predict_fn is None:
+    #     ml_predict_fn = ml_predict_coverage_status
 
     tier_text_clean = str(tier_text or "").upper().strip()
     req_text_clean = str(requirements_text or "").upper().strip()
-    nc_indicators = ["NC", "NF", "NOT COVERED", "EXCLUDED", "NON-FORMULARY", "NOT-COVERED"]
 
-    # 1. Both Null Fallback: If both are null AND no acronym context, return Covered/Unknown
-    #    BUT if we have an acronym, use the acronym itself as the requirements indicator
-    #    e.g. acronym="PA" → Covered with PA, "ST" → Covered with ST, "QL" → Covered with Conditions
+    # nc_indicators removed - using RE_NC
+
+    # 1. Both Null Fallback: If both are null, return Covered/Unknown immediately
     if not tier_text_clean and not req_text_clean:
-        if not acronym:
-            logger.info(f"Coverage for '{log_id}': Covered/Unknown (Source: Default Fallback - Both Tier and Req null)")
-            return "Covered/Unknown", 0.5, "Default"
-        
-        # ✅ Derive requirements signal from the acronym itself
-        acronym_upper = str(acronym).upper().strip()
-        acronym_tokens = set(t.strip() for t in acronym_upper.replace("/", " ").replace(",", " ").split())
-        
-        # NC/NF → Not Covered
-        nc_acronyms = {"NC", "NF", "NOT COVERED", "NON-FORMULARY", "EXCLUDED"}
-        if acronym_tokens & nc_acronyms:
-            logger.info(f"Coverage for '{log_id}': Not Covered (Source: Acronym NC Indicator '{acronym}')")
-            return "Not Covered", 0.9, "Acronym (NC)"
-        
-        # PA → Covered with PA
-        pa_acronyms = {"PA", "PRIOR AUTH", "PRIOR AUTHORIZATION"}
-        if acronym_tokens & pa_acronyms:
-            # Also check if ST present in same acronym e.g. "PA ST"
-            st_acronyms = {"ST", "STEP THERAPY"}
-            if acronym_tokens & st_acronyms:
-                logger.info(f"Coverage for '{log_id}': Covered with PA+ST (Source: Acronym '{acronym}')")
-                return "Covered with PA", 0.85, "Acronym (PA+ST)"
-            logger.info(f"Coverage for '{log_id}': Covered with PA (Source: Acronym '{acronym}')")
-            return "Covered with PA", 0.85, "Acronym (PA)"
-        
-        # ST → Covered with ST
-        st_acronyms = {"ST", "STEP THERAPY"}
-        if acronym_tokens & st_acronyms:
-            logger.info(f"Coverage for '{log_id}': Covered with ST (Source: Acronym '{acronym}')")
-            return "Covered with ST", 0.85, "Acronym (ST)"
-        
-        # QL/LA/AL/BVD/MME/SP/DL/7D/EC → Covered with Conditions
-        conditions_acronyms = {"QL", "LA", "AL", "BVD", "MME", "SP", "DL", "7D", "EC", "QUANTITY LIMIT",
-                                "QUANTITY LIMITS", "LIMITED ACCESS", "SPECIALTY", "DISPENSING LIMIT"}
-        if acronym_tokens & conditions_acronyms or "QL" in acronym_upper or "LIMIT" in acronym_upper:
-            logger.info(f"Coverage for '{log_id}': Covered with Conditions (Source: Acronym '{acronym}')")
-            return "Covered with Conditions", 0.8, "Acronym (Conditions)"
-        
-        # If acronym is known but doesn't match above, fall through to ML model below
-        logger.info(f"Coverage for '{log_id}': No acronym rule matched for '{acronym}', proceeding to ML")
-
+        logger.info(f"Coverage for '{log_id}': Covered/Unknown (Source: Default Fallback - Both Tier and Req null)")
+        return "Covered with Conditions", 50.0, "Default", True
 
     # 2. Tier NC Priority: if tier has nc indicators it is not covered
-    if tier_text_clean and any(ind in tier_text_clean for ind in nc_indicators):
+    # Use regex word boundaries to avoid false positives (e.g., "NC" in "CONC")
+    if tier_text_clean and RE_NC.search(tier_text_clean):
         logger.info(f"Coverage for '{log_id}': Not Covered (Source: Python Logic - NC Tier '{tier_text_clean}')")
-        return "Not Covered", 1.0, "Python Logic (NC Tier)"
+        return "Not Covered", 100.0, "Python Logic (NC Tier)", False
 
     # 3. Python Rule Logic: Check for PA, ST, QL, AL, LA, BVD, etc.
     is_pa = detect_prior_authorization(req_text_clean)
     is_st = detect_step_therapy(req_text_clean)
-    is_other_cond = any(code in req_text_clean for code in ["QL", "AL", "LA", "BVD"])
+    is_other_cond = bool(RE_OTHER_CONDITIONS.search(req_text_clean))
     is_specialty = "SP" in tier_text_clean or "SPECIALTY" in tier_text_clean
-    is_nc_req = any(ind in req_text_clean for ind in nc_indicators)
+    is_nc_req = bool(RE_NC.search(req_text_clean))
 
     if is_nc_req:
         logger.info(f"Coverage for '{log_id}': Not Covered (Source: Python Logic - NC Requirement '{req_text_clean}')")
-        return "Not Covered", 0.9, "Python Logic (NC Req)"
+        return "Not Covered", 90.0, "Python Logic (NC Req)", False
     
     if is_pa:
         reason = ["PA"]
@@ -186,84 +155,159 @@ def det_coverage_status(
         if is_other_cond: reason.append("Other Conditions")
         if is_specialty: reason.append("Specialty Tier")
         logger.info(f"Coverage for '{log_id}': Covered with PA (Source: Python Logic - {', '.join(reason)})")
-        return "Covered with PA", 0.85, "Python Logic"
+        return "Covered with PA", 85.0, "Python Logic", False
     
     if is_st:
         reason = ["ST"]
         if is_other_cond: reason.append("Other Conditions")
         if is_specialty: reason.append("Specialty Tier")
         logger.info(f"Coverage for '{log_id}': Covered with ST (Source: Python Logic - {', '.join(reason)})")
-        return "Covered with ST", 0.85, "Python Logic"
+        return "Covered with ST", 85.0, "Python Logic", False
 
     if is_other_cond or is_specialty:
         reason = []
         if is_other_cond: reason.append("Other Conditions")
         if is_specialty: reason.append("Specialty Tier")
         logger.info(f"Coverage for '{log_id}': Covered with Conditions (Source: Python Logic - {', '.join(reason)})")
-        return "Covered with Conditions", 0.85, "Python Logic"
+        return "Covered with Conditions", 85.0, "Python Logic", False
+    # 4. ML Model Logic (Requirement and Tier)
+    # if acronym:
+    #     # Split acronyms by common separators (comma, hyphen, slash, whitespace)
+    #     raw_parts = [a for a in re.split(r'[,\s\-/]+', str(acronym)) if a]
+    #     sub_acronyms = []
+    #     for part in raw_parts:
+    #         token = part.strip()
+            
+    #         # Special case: If QL is followed by "=", treat the acronym as just "QL"
+    #         if token.upper().startswith("QL="):
+    #             sub_acronyms.append("QL")
+    #             continue
 
-#    # 4. ML Model Logic (Requirement and Tier)
+    #         # Handle digit + symbol format (e.g., 5^, 3*)
+    #         # Only split if no letters are present (avoids splitting 5ST, 4PA)
+    #         if not re.search(r'[A-Z]', token, re.IGNORECASE):
+    #             match = re.match(r'^(\d+)([^\w\s]+)$', token)
+    #             if match:
+    #                 digit, symbol = match.groups()
+    #                 sub_acronyms.append(f"Tier {digit}")
+    #                 sub_acronyms.append(symbol)
+    #                 continue
+            
+    #         sub_acronyms.append(token)
+
+        
+    #     ml_predictions = []
+        
+    #     # Ensure we can look up expansion
+    #     from utils import lookup_expansion
+
+    #     for sub_acronym in sub_acronyms:
+    #         # Determine initial expansion/explanation for this part
+    #         # If there's only one acronym, use the provided arguments as base
+    #         sub_expansion = expansion if len(sub_acronyms) == 1 else None
+    #         sub_explanation = explanation if len(sub_acronyms) == 1 else None
+            
+    #         # DB Lookup to enrich or fill missing info
+    #         if conn:
+    #             db_exp, db_expl, _ = lookup_expansion(sub_acronym, state_name, payer_name, conn)
+    #             sub_expansion = sub_expansion or db_exp
+    #             sub_explanation = sub_explanation or db_expl
+            
+    #         # Predict
+    #         pred_label, pred_conf = ml_predict_fn(
+    #             payer_name, 
+    #             state_name, 
+    #             sub_acronym, 
+    #             sub_expansion, 
+    #             sub_explanation
+    #         )
+            
+    #         # Log individual prediction to ml_output.log
+    #         ml_logger.info(f"Drug: {log_id} | Input: {sub_acronym} | Expansion: {sub_expansion} | Explanation: {sub_explanation} | Prediction: {pred_label} | Confidence: {pred_conf} | Payer: {payer_name} | State: {state_name}")
+
+    #         if pred_label:
+    #             ml_predictions.append((pred_label, pred_conf))
+        
+    #     if ml_predictions:
+    #         # ml_predictions is a list of (prediction_label, prediction_confidence) tuples
+    #         statuses = [prediction_label for prediction_label, _ in ml_predictions]
+    #         final_status = determine_ml_coverage_status(statuses)
+    #         manual_verification_required = False
+            
+    #         # Determine confidence based on the winning status
+    #         final_conf = 0.0
+    #         normalized_target = final_status.lower().replace("conditions", "condition")
+            
+    #         for label, conf in ml_predictions:
+    #              normalized_label = label.lower().replace("conditions", "condition")
+    #              if normalized_label == normalized_target:
+    #                  final_conf = max(final_conf, conf)
+            
+    #         # Log final decision to ml_output.log
+    #         ml_logger.info(f"Drug: {log_id} | Final ML Status: {final_status} | Final Confidence: {final_conf}")
+
+    #         # Convert to percentage with 2 decimal places without rounding
+    #         final_conf_pct = float(int(final_conf * 10000) / 100.0)
+
+    #         logger.info(f"Coverage for '{log_id}': {final_status} (Source: ML Model - {acronym})")
+    #         if final_conf_pct < 80.0:
+    #             manual_verification_required = True
+    #         return final_status, final_conf_pct, "ML Model", manual_verification_required
+
+    #4. Cvg status look up using lookup_expansion()
     if acronym:
-        # Split acronyms by comma if present
-        sub_acronyms = [a.strip() for a in str(acronym).split(',') if a.strip()]
-        
-        ml_predictions = []
-        
-        # Ensure we can look up expansion
-        from utils import lookup_expansion
+        # Split acronyms by common separators (comma, hyphen, slash, whitespace)
+        raw_parts = [a for a in re.split(r'[,\s\-/]+', str(acronym)) if a]
+        sub_acronyms = []
+        for part in raw_parts:
+            token = part.strip()
+            
+            # Special case: If QL is followed by "=", treat the acronym as just "QL"
+            if token.upper().startswith("QL="):
+                sub_acronyms.append("QL")
+                continue
 
-        for sub_acronym in sub_acronyms:
-            # Determine initial expansion/explanation for this part
-            # If there's only one acronym, use the provided arguments as base
-            sub_expansion = expansion if len(sub_acronyms) == 1 else None
-            sub_explanation = explanation if len(sub_acronyms) == 1 else None
+            # Handle variants like "Tier 5^", "5^", "Tier-1", "1"
+            # Regex to handle optional prefix (Tier, tier-, etc.), then digit, then trailing symbols
+            match = re.match(r'^(?:TIER\s*|tier\s*|tier\-)?(\d+)\s*([^\w\s]*)$', token, re.IGNORECASE)
+            if match:
+                digit, symbol = match.groups()
+                # Normalize digit to "Tier X"
+                sub_acronyms.append(f"Tier {digit}")
+                if symbol:
+                    # Extract individual symbols if multiple are present (e.g., "^*")
+                    for char in symbol:
+                        if char.strip():
+                            sub_acronyms.append(char)
+                continue
             
-            # DB Lookup to enrich or fill missing info
-            if conn:
-                db_exp, db_expl, _ = lookup_expansion(sub_acronym, state_name, payer_name, conn)
-                sub_expansion = sub_expansion or db_exp
-                sub_explanation = sub_explanation or db_expl
-            
-            # Predict
-            pred_label, pred_conf = ml_predict_fn(
-                payer_name, 
-                state_name, 
-                sub_acronym, 
-                sub_expansion, 
-                sub_explanation
-            )
-            
-            # Log individual prediction to ml_output.log
-            ml_logger.info(f"Drug: {log_id} | Input: {sub_acronym} | Expansion: {sub_expansion} | Explanation: {sub_explanation} | Prediction: {pred_label} | Confidence: {pred_conf} | Payer: {payer_name} | State: {state_name}")
+            sub_acronyms.append(token)
+                
+        from utils import lookup_expansion, determine_db_coverage
 
-            if pred_label:
-                ml_predictions.append((pred_label, pred_conf))
+        # 1. Try lookup with the full original acronym string first (most specific)
+        if conn or acronym_cache:
+            _, _, cvg_status = lookup_expansion(acronym, state_name, payer_name, conn, acronym_cache=acronym_cache)
+            if cvg_status:
+                conf = 85.0
+                manual_review = bool(conf < 80.0)
+                logger.info(f"Coverage for '{log_id}': {cvg_status} (Source: DB Lookup - {acronym})")
+                return cvg_status, conf, "DB Lookup", manual_review
         
-        if ml_predictions:
-            statuses = [p[0] for p in ml_predictions]
-            final_status = determine_ml_coverage_status(statuses)
-            
-            # Determine confidence based on the winning status
-            final_conf = 0.0
-            normalized_target = final_status.lower().replace("conditions", "condition")
-            
-            for label, conf in ml_predictions:
-                 normalized_label = label.lower().replace("conditions", "condition")
-                 if normalized_label == normalized_target:
-                     final_conf = max(final_conf, conf)
-            
-            # Log final decision to ml_output.log
-            ml_logger.info(f"Drug: {log_id} | Final ML Status: {final_status} | Final Confidence: {final_conf}")
+        # 2. Check sub-acronyms individually if no full-string match was found
+        res = determine_db_coverage(sub_acronyms, conn, state_name, payer_name, acronym_cache=acronym_cache)
+        if res:
+            db_cvg_status, db_conf, db_status_msg = res
+            manual_review = bool(db_conf < 80.0)
+            logger.info(f"Coverage for '{log_id}': {db_cvg_status} (Source: {db_status_msg} - {acronym})")
+            return db_cvg_status, db_conf, "DB Lookup", manual_review
 
-            logger.info(f"Coverage for '{log_id}': {final_status} (Source: ML Model - {acronym})")
-            return final_status, final_conf, "ML Model"
-    # ========================================
-    # TIER 4: DEFAULT FALLBACK
-    # ========================================
-    # If no specific logic matched, default to "Covered"
-    # This applies to standard tier drugs without special requirements
-    logger.info(f"No specific coverage logic matched. Defaulting to 'Covered' with confidence 0.5")
-    return "Covered", 0.5, "Default"
+ 
+
+    # 5. Final Fallback (Should be rare)
+    logger.info(f"Coverage for '{log_id}': Covered with Conditions/Unknown parameters (Source: Final Default Fallback)")
+    return "Covered with Conditions", 50.0, "Default", True
+
 
 def normalize_drug_tier(raw_tier):
     """

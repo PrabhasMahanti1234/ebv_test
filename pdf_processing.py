@@ -4,20 +4,20 @@ pdf_processing.py - Main PDF Processing Pipeline
 This is the main entry point module that orchestrates the PDF processing pipeline.
 """
 
-import os
 import re
 import json
 import logging
 import time
 import traceback
 import requests
-import httpx
 import uuid   
 import concurrent.futures
 from io import BytesIO
 from typing import Optional, List, Tuple
 from collections import defaultdict
+from urllib.parse import urlparse
 
+from logger_setup import setup_logger
 from mistralai import Mistral
 from mistralai.models import DocumentURLChunk
 
@@ -68,7 +68,7 @@ from database import (
     get_cached_result, get_cached_result_by_url, cache_result, update_plan_file_hash,
     insert_acronyms_to_ref_table, insert_drug_formulary_data,
     delete_drug_formulary_records_for_plan, log_audit_event,
-    create_transaction, update_transaction
+    create_transaction, update_transaction, fetch_existing_coverage_by_file_hash
 )
 
 from utils import (
@@ -82,9 +82,82 @@ from coverage import (
     detect_prior_authorization, detect_step_therapy
 )
  
-from clasify import ml_predict_coverage_status
+# from clasify import ml_predict_coverage_status
+
+import boto3
+from botocore.exceptions import ClientError
 
 logger = logging.getLogger(__name__)
+coverage_logger = setup_logger("coverage", "logs/coverage.log")
+extraction_logger = setup_logger("extraction", "logs/extraction.log")
+s3_logger = setup_logger("s3", "logs/s3.log")
+
+# In-memory caches and counters (process scope)
+_pdf_mem_cache_by_url = {}
+_pdf_mem_cache_by_hash = {}
+_s3_header_checks_total = 0
+_s3_header_checks_direct = 0
+
+def consolidate_drug_records(records: list) -> list:
+    """
+    Consolidates duplicate drug records by (plan_id, drug_name, drug_tier).
+    Merges drug_requirements into a single string separated by "; ".
+    Removes duplicate requirement values.
+    """
+    if not records:
+        return []
+    
+    consolidated = {}
+    for record in records:
+        plan_id = record.get("plan_id")
+        # Normalize name and tier for grouping
+        drug_name = (record.get("drug_name") or "").strip().lower()
+        drug_tier = (record.get("drug_tier") or "").strip()
+        
+        key = (plan_id, drug_name, drug_tier)
+        
+        if key not in consolidated:
+            # First occurrence: Create a copy and initialize requirement set
+            new_record = record.copy()
+            reqs = record.get("drug_requirements")
+            # Split existing requirements if they contain "; "
+            if reqs:
+                new_record["_req_set"] = {r.strip() for r in str(reqs).split(";") if r.strip()}
+            else:
+                new_record["_req_set"] = set()
+            consolidated[key] = new_record
+        else:
+            # Subsequent occurrence: Merge requirements
+            new_reqs = record.get("drug_requirements")
+            if new_reqs:
+                new_req_parts = {r.strip() for r in str(new_reqs).split(";") if r.strip()}
+                consolidated[key]["_req_set"].update(new_req_parts)
+            
+            # Keep the record with the smaller page number if available
+            current_page = consolidated[key].get("page_number")
+            new_page = record.get("page_number")
+            if new_page is not None and (current_page is None or new_page < current_page):
+                consolidated[key]["page_number"] = new_page
+
+    # Finalize records: Convert sets back to strings and remove temporary keys
+    final_records = []
+    for record in consolidated.values():
+        req_set = record.pop("_req_set", set())
+        if req_set:
+            # Sort for deterministic output
+            record["drug_requirements"] = "; ".join(sorted(list(req_set)))
+        else:
+            record["drug_requirements"] = None
+        final_records.append(record)
+        
+    return final_records
+
+def _log_s3_header_check_summary():
+    try:
+        s3_logger.info(f"s3.header_check.summary total={_s3_header_checks_total} direct={_s3_header_checks_direct}")
+        logger.info(f"S3 header checks: total={_s3_header_checks_total}, direct={_s3_header_checks_direct}")
+    except Exception:
+        pass
 
 # ✅ Thread-level lock to prevent duplicate URL processing race condition.
 # When 2 plans share the same formulary_url and run in parallel, the 2nd worker
@@ -105,11 +178,10 @@ try:
 except ImportError:
     fitz = None
 
-try:
-    from langdetect import detect as detect_language
-    LANGDETECT_AVAILABLE = True  # ✅ FIXED: Set to True when import succeeds
-except ImportError:
-    LANGDETECT_AVAILABLE = False
+NON_LATIN_PATTERN = re.compile(r'[^\x00-\x7F]')
+
+def contains_non_latin(text: str) -> bool:
+    return bool(NON_LATIN_PATTERN.search(text))
 
 
 def process_single_chunk_parallel(chunk_info: dict) -> dict:
@@ -504,28 +576,68 @@ def deduplicate_dicts(dicts, primary_key='acronym'):
     return list(seen.values())
 
 
+# def get_all_plans_with_formulary_url():
+#     """Fetch all plans marked 'processing' with a non-null formulary_url."""
+#     with get_db_connection() as conn:
+#         cursor = conn.cursor()
+
+#         cursor.execute("""
+#             SELECT p.plan_id, p.plan_name, p.formulary_url, p.payer_id, p.state_name, pa.payer_name
+#             FROM plan_details p
+#             LEFT JOIN payer_details pa ON p.payer_id = pa.payer_id
+#             WHERE p.status = 'processing' AND p.formulary_url IS NOT NULL
+#         """)
+
+#         plans = cursor.fetchall()
+#         cursor.close()
+
+#     return [{"plan_id": p[0], "plan_name": p[1], "formulary_url": p[2], "payer_id": p[3], 
+#              "state_name": p[4], "payer_name": p[5]} for p in plans]
+
+#Updated Codebase - 2024-06-20: Modified to fetch all active plans with non-null s3_frozen_pdf_url instead of formulary_url, as we want to process only those with frozen PDFs ready for OCR.
 def get_all_plans_with_formulary_url():
-    """Fetch all plans marked 'processing' with a non-null formulary_url."""
+    """
+    Fetch all active plans with a non-null s3_frozen_pdf_url.
+    """
     with get_db_connection() as conn:
         cursor = conn.cursor()
 
         cursor.execute("""
-            SELECT p.plan_id, p.plan_name, p.formulary_url, p.payer_id, p.state_name, pa.payer_name
+            SELECT 
+                p.plan_id,
+                p.plan_name,
+                p.s3_frozen_pdf_url,
+                p.payer_id,
+                p.state_name,
+                pa.payer_name,
+                p.file_hash
             FROM plan_details p
-            LEFT JOIN payer_details pa ON p.payer_id = pa.payer_id
-            WHERE p.status = 'processing' AND p.formulary_url IS NOT NULL
+            LEFT JOIN payer_details pa 
+                ON p.payer_id = pa.payer_id
+            WHERE LOWER(p.status) = 'active'
+              AND p.s3_frozen_pdf_url IS NOT NULL
         """)
 
         plans = cursor.fetchall()
         cursor.close()
 
-    return [{"plan_id": p[0], "plan_name": p[1], "formulary_url": p[2], "payer_id": p[3], 
-             "state_name": p[4], "payer_name": p[5]} for p in plans]
+    return [
+        {
+            "plan_id": p[0],
+            "plan_name": p[1],
+            "s3_frozen_pdf_url": p[2],  # keep key same
+            "payer_id": p[3],
+            "state_name": p[4],
+            "payer_name": p[5],
+            "file_hash": p[6]
+        }
+        for p in plans
+    ]
 
 
 
 def _insert_cached_data_for_plan(cached_data, plan_id, plan_name, payer_id, payer_name,
-                                   state_name, formulary_url, transaction_id, file_hash):
+                                   state_name, s3_frozen_pdf_url, transaction_id, file_hash, acronym_cache=None):
     """
     Re-inserts drug formulary + acronym records for a NEW plan using previously cached data.
     Called when URL or hash cache hits to avoid skipping DB insertion for the new plan.
@@ -533,36 +645,74 @@ def _insert_cached_data_for_plan(cached_data, plan_id, plan_name, payer_id, paye
     drug_table = cached_data.get("drug_table", [])
     acronyms = cached_data.get("acronyms", [])
 
+    # Log the cache hit for this specific plan
+    logger.info(f"♻️ Plan {plan_id} ({plan_name}): Using file hash cache (Hash: {file_hash})")
+    coverage_logger.info(f"♻️ Plan {plan_id}: Re-inserting {len(drug_table)} drugs and {len(acronyms)} acronyms from file hash cache hit.")
+
     # Delete existing records for this plan before re-inserting
     delete_drug_formulary_records_for_plan(plan_id)
+
+    # --- ML REUSE OPTIMIZATION ---
+    # Fetch existing coverage results for this file hash to avoid re-predicting
+    cached_results = fetch_existing_coverage_by_file_hash(file_hash)
+    existing_coverage = cached_results.get("drugs", {})
+    existing_acronyms = cached_results.get("acronyms", {})
+    ml_reused_count = 0
+    acr_reused_count = 0
+    # ---
 
     enriched_drug_records = []
     with get_db_connection() as conn:
         for drug in drug_table:
+            drug_name = drug.get("drug_name")
             requirements_text = str(drug.get('drug_requirements', '') or '').strip()
-            requirements_text_norm = normalize_requirement_code(requirements_text)
             drug_tier = drug.get('drug_tier')
-            drug_tier_normalized = drug_tier or infer_drug_tier_from_text(requirements_text_norm)
-            combined_acronym_parts = []
-            if drug_tier_normalized:
-                combined_acronym_parts.append(str(drug_tier_normalized))
-            if requirements_text_norm:
-                combined_acronym_parts.append(str(requirements_text_norm))
-            combined_acronym = ", ".join(combined_acronym_parts) if combined_acronym_parts else None
 
-            # ✅ ML coverage status prediction
-            coverage_status, confidence_score, _ = det_coverage_status(
-                acronym=combined_acronym,
-                expansion=None,
-                explanation=None,
-                requirements_text=requirements_text_norm,
-                tier_text=drug_tier_normalized,
-                conn=conn,
-                state_name=state_name,
-                payer_name=payer_name,
-                ml_predict_fn=ml_predict_coverage_status,
-                drug_name=drug.get('drug_name')
+            # Normalize for lookup and for insertion/prediction
+            requirements_text_norm = normalize_requirement_code(requirements_text)
+            drug_tier_normalized = drug_tier or infer_drug_tier_from_text(requirements_text_norm)
+
+            # Key for cache lookup
+            lookup_key = (
+                drug_name.lower() if drug_name else '',
+                drug_tier,
+                requirements_text if requirements_text else None
             )
+
+            if existing_coverage and lookup_key in existing_coverage:
+                cached_coverage = existing_coverage[lookup_key]
+                coverage_status = cached_coverage["coverage_status"]
+                confidence_score = cached_coverage["confidence_score"]
+                manual_review = cached_coverage.get("manual_review", False)
+                ml_reused_count += 1
+                if ml_reused_count <= 20: # Log first few reuses
+                    logger.info(f"[ML-REUSE] Reused coverage for '{drug_name}' from hash '{file_hash}'")
+
+            else:
+                # Fallback to prediction if not found in cache
+                combined_acronym_parts = []
+                if drug_tier_normalized:
+                    combined_acronym_parts.append(str(drug_tier_normalized))
+                if requirements_text_norm:
+                    combined_acronym_parts.append(str(requirements_text_norm))
+                combined_acronym = ", ".join(combined_acronym_parts) if combined_acronym_parts else None
+
+                coverage_status, confidence_score, source, manual_review = det_coverage_status(
+                    acronym=combined_acronym,
+                    expansion=None,
+                    explanation=None,
+                    requirements_text=requirements_text_norm,
+                    tier_text=drug_tier_normalized,
+                    conn=conn,
+                    state_name=state_name,
+                    payer_name=payer_name,
+                    # ml_predict_fn=ml_predict_coverage_status,
+                    drug_name=drug.get('drug_name'),
+                    acronym_cache=acronym_cache
+                )
+                # no ml used now ignore ---Manual verification if ML confidence is low - this is now handled within det_coverage_status
+                # but we keep manual_review as returned from the function.
+
             enriched_drug_records.append({
                 "id": str(uuid.uuid4()),
                 "plan_id": plan_id,
@@ -575,7 +725,7 @@ def _insert_cached_data_for_plan(cached_data, plan_id, plan_name, payer_id, paye
                 "drug_requirements": requirements_text or None,
                 "page_number": drug.get("page_number"),
                 "state_name": state_name,
-                "coverage_status": coverage_status,        # ✅ ML predicted
+                "coverage_status": coverage_status,
                 "ndc_code": None,
                 "jcode": None,
                 "is_prior_authorization_required": detect_prior_authorization(requirements_text),
@@ -583,31 +733,53 @@ def _insert_cached_data_for_plan(cached_data, plan_id, plan_name, payer_id, paye
                 "is_quantity_limit_applied": False,
                 "coverage_details": None,
                 "confidence_score": confidence_score,
-                "source_url": formulary_url,
+                "manual_review": manual_review,
+                "s3_frozen_pdf_url": s3_frozen_pdf_url,  # Updated key name
+                "source_url": s3_frozen_pdf_url,
                 "file_name": f"{plan_name}.pdf"
             })
 
+    if ml_reused_count > 0:
+        logger.info(f"[ML-REUSE] Reused {ml_reused_count} coverage predictions from hash '{file_hash}'")
+
     if enriched_drug_records:
-        insert_drug_formulary_data(enriched_drug_records)
+        insert_drug_formulary_data(consolidate_drug_records(enriched_drug_records))
         logger.info(f"Cache re-insert: {len(enriched_drug_records)} drug records for plan {plan_id}")
 
     # ✅ Re-insert acronyms with ML coverage status
     if acronyms:
         with get_db_connection() as conn:
             for acronym in acronyms:
-                acr_coverage_status, _, _ = det_coverage_status(
-                    acronym=acronym.get('acronym'),
-                    expansion=acronym.get('expansion'),
-                    explanation=acronym.get('explanation'),
-                    requirements_text=None,
-                    tier_text=None,
-                    conn=conn,
-                    state_name=state_name,
-                    payer_name=payer_name,
-                    ml_predict_fn=ml_predict_coverage_status,
-                    drug_name=None
+                # --- ML REUSE OPTIMIZATION FOR ACRONYMS ---
+                acr_key = (
+                    acronym.get('acronym'),
+                    acronym.get('expansion'),
+                    acronym.get('explanation')
                 )
-                acronym['coverage_status'] = acr_coverage_status  # ✅ ML predicted
+                
+                if existing_acronyms and acr_key in existing_acronyms:
+                    acr_coverage_status = existing_acronyms[acr_key]
+                    acr_reused_count += 1
+                    if acr_reused_count <= 10:
+                        logger.info(f"[ML-REUSE] Reused coverage for acronym '{acr_key[0]}' from hash '{file_hash}'")
+                else:
+                    acr_coverage_status, _, _ = det_coverage_status(
+                        acronym=acronym.get('acronym'),
+                        expansion=acronym.get('expansion'),
+                        explanation=acronym.get('explanation'),
+                        requirements_text=None,
+                        tier_text=None,
+                        conn=conn,
+                        state_name=state_name,
+                        payer_name=payer_name,
+                        # ml_predict_fn=ml_predict_coverage_status,
+                        drug_name=None
+                    )
+                acronym['coverage_status'] = acr_coverage_status  # ✅ ML predicted (or reused)
+        
+        if acr_reused_count > 0:
+            logger.info(f"[ML-REUSE] Reused {acr_reused_count} acronym coverage predictions from hash '{file_hash}'")
+
         insert_acronyms_to_ref_table(acronyms, state_name, payer_name, plan_name, "pp_formulary_names")
         logger.info(f"Cache re-insert: {len(acronyms)} acronyms for plan {plan_id}")
 
@@ -621,14 +793,94 @@ def _insert_cached_data_for_plan(cached_data, plan_id, plan_name, payer_id, paye
     except Exception as e:
         logger.error(f"Failed to update statuses for cached plan {plan_id}: {e}")
 
+# Updated Codebase
+def download_pdf_bytes(pdf_url, log_prefix, proxies=None):
+    """
+    Download PDF from:
+    - Public HTTP/HTTPS
+    - S3 (public or private)
+    - Pre-signed S3 URL
+    Returns raw bytes
+    """
+ 
+    parsed = urlparse(pdf_url)
+
+    # Header check logging
+    global _s3_header_checks_total, _s3_header_checks_direct
+    _s3_header_checks_total += 1
+    is_direct_s3 = ("amazonaws.com" in parsed.netloc and "X-Amz-Signature" not in pdf_url)
+    if is_direct_s3:
+        _s3_header_checks_direct += 1
+    s3_logger.info(f"{log_prefix} s3.header_check url={pdf_url} direct={is_direct_s3}")
+
+    # --------------------------------------------------
+    # 1️⃣ If S3 direct URL (not pre-signed)
+    # --------------------------------------------------
+    if is_direct_s3:
+        logger.info(f"{log_prefix} Detected direct S3 URL")
+        s3_logger.info(f"{log_prefix} s3.download.start url={pdf_url}")
+ 
+        bucket = parsed.netloc.split(".")[0]
+        key = parsed.path.lstrip("/")
+ 
+        try:
+            s3 = boto3.client("s3")  # Uses IAM role or env creds
+            response = s3.get_object(Bucket=bucket, Key=key)
+            content = response["Body"].read()
+            s3_logger.info(f"{log_prefix} s3.download.success bytes={len(content)}")
+            return content
+        except ClientError as e:
+            logger.error(f"{log_prefix} S3 download failed: {e}")
+            s3_logger.error(f"{log_prefix} s3.download.failure error={e}")
+            raise
+ 
+    # --------------------------------------------------
+    # 2️⃣ HTTP / Pre-signed URL
+    # --------------------------------------------------
+    headers = {
+        "User-Agent": "Mozilla/5.0",
+        "Accept": "application/pdf,*/*",
+        "Accept-Language": "en-US,en;q=0.9",
+    }
+ 
+    for attempt in range(2):
+        try:
+            with requests.get(
+                pdf_url,
+                timeout=120,
+                headers=headers,
+                stream=True,
+                verify=(attempt == 0),
+                proxies=proxies
+            ) as resp:
+ 
+                resp.raise_for_status()
+                content_type = resp.headers.get("Content-Type", "")
+ 
+                if "text/html" in content_type.lower():
+                    raise Exception(f"HTML returned instead of PDF ({content_type})")
+ 
+                content = resp.content
+                if "amazonaws.com" in parsed.netloc:
+                    s3_logger.info(f"{log_prefix} s3.download.success bytes={len(content)} via_http")
+                return content
+ 
+        except requests.exceptions.SSLError:
+            logger.warning(f"{log_prefix} SSL error. Retrying without verification.")
+        except Exception as e:
+            logger.warning(f"{log_prefix} Attempt {attempt+1} failed: {e}")
+            if "amazonaws.com" in parsed.netloc:
+                s3_logger.warning(f"{log_prefix} s3.download.retry attempt={attempt+1} error={e}")
+ 
+    raise Exception("Download failed after retries")
+
 
 def process_single_pdf_url_worker(plan_info):
     """Worker: Download PDF from URL and process it entirely in-memory."""
-    import uuid
     
     plan_id = plan_info['plan_id']
     plan_name = plan_info['plan_name']
-    formulary_url = plan_info['formulary_url']
+    s3_frozen_pdf_url = plan_info['s3_frozen_pdf_url']  # Updated key name
     payer_id = plan_info.get('payer_id')
     state_name = plan_info.get('state_name', 'Unknown')
     payer_name = plan_info.get('payer_name', plan_name)
@@ -641,355 +893,415 @@ def process_single_pdf_url_worker(plan_info):
         plan_id=plan_id,
         payer_id=payer_id,
         file_name=f"{plan_name}.pdf",
-        request_summary={"plan_name": plan_name, "formulary_url": formulary_url},
+        request_summary={"plan_name": plan_name, "s3_frozen_pdf_url": s3_frozen_pdf_url},
         status="in_progress"
     )
 
     logger.info(f"Processing plan: {plan_name} (ID: {plan_id}) [Transaction: {transaction_id}]")
 
+    # ✅ Optimization: Pre-load all acronyms for this Payer and State once
+    from database import fetch_acronym_cache
+    acronym_cache = fetch_acronym_cache(payer_name, state_name)
+
     try:
         # Validate URL before attempting download
-        if not formulary_url or not isinstance(formulary_url, str):
-            logger.error(f"Plan {plan_id}: Invalid or missing formulary_url")
+        if not s3_frozen_pdf_url or not isinstance(s3_frozen_pdf_url, str):
+            logger.error(f"Plan {plan_id}: Invalid or missing s3_frozen_pdf_url")
             update_transaction(transaction_id=transaction_id, status="failed",
                 completed_at=time.strftime('%Y-%m-%d %H:%M:%S'),
-                response_summary={"error": "Invalid or missing formulary_url"})
+                response_summary={"error": "Invalid or missing s3_frozen_pdf_url"})
             log_audit_event(transaction_id=transaction_id, event_type="validation.invalid_url",
-                service="pdf_processing", error_message="Invalid or missing formulary_url",
+                service="pdf_processing", error_message="Invalid or missing s3_frozen_pdf_url",
                 payload={"plan_id": plan_id})
-            return plan_id, {"error": "Invalid or missing formulary_url", "drug_table": [], "acronyms": []}
-        
+            return plan_id, {"error": "Invalid or missing s3_frozen_pdf_url", "drug_table": [], "acronyms": []}
+    # try:
+        pdf_url = transform_viewer_url(s3_frozen_pdf_url)
+        log_prefix = f"Plan {plan_id}:"
+
+        # Use browser-like headers to avoid 406 errors from websites blocking bots
+        download_headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'application/pdf,*/*',
+            'Accept-Language': 'en-US,en;q=0.9',
+        } 
         # Check if URL has a valid scheme (http:// or https://)
-        if not formulary_url.startswith(('http://', 'https://')):
-            logger.error(f"Plan {plan_id}: Invalid URL format '{formulary_url[:100]}' - not a valid http/https URL. Skipping.")
-            update_transaction(transaction_id=transaction_id, status="failed",
-                completed_at=time.strftime('%Y-%m-%d %H:%M:%S'),
-                response_summary={"error": f"Invalid URL format — not http/https: {formulary_url[:120]}"})
-            log_audit_event(transaction_id=transaction_id, event_type="validation.invalid_url",
-                service="pdf_processing", error_message=f"formulary_url is not a valid URL: {formulary_url[:120]}",
-                payload={"plan_id": plan_id, "bad_value": formulary_url[:200]})
-            return plan_id, {"error": f"Invalid URL format: {formulary_url[:100]}", "drug_table": [], "acronyms": []}
-        
-        # ✅ Per-URL lock: prevents 2 parallel workers with same URL from both doing OCR.
-        # 2nd worker waits here until 1st finishes and caches the result, then gets cache hit.
-        url_lock = _get_url_lock(formulary_url)
+        # if not formulary_url.startswith(('http://', 'https://')):
+        #     logger.error(f"Plan {plan_id}: Invalid URL format '{formulary_url[:100]}' - not a valid http/https URL. Skipping.")
+        #     update_transaction(transaction_id=transaction_id, status="failed",
+        #         completed_at=time.strftime('%Y-%m-%d %H:%M:%S'),
+        #         response_summary={"error": f"Invalid URL format — not http/https: {formulary_url[:120]}"})
+        #     log_audit_event(transaction_id=transaction_id, event_type="validation.invalid_url",
+        #         service="pdf_processing", error_message=f"formulary_url is not a valid URL: {formulary_url[:120]}",
+        #         payload={"plan_id": plan_id, "bad_value": formulary_url[:200]})
+        #     return plan_id, {"error": f"Invalid URL format: {formulary_url[:100]}", "drug_table": [], "acronyms": []}
+
+        # Acquire URL-level lock BEFORE any network I/O to avoid duplicate downloads
+        url_lock = _get_url_lock(s3_frozen_pdf_url)
         url_lock.acquire()
         try:
-            # ✅ STEP 1: Check cache by URL BEFORE downloading (inside lock — gets hit if another worker just finished)
-            cached_file_hash, cached_data, cached_content = get_cached_result_by_url(formulary_url)
-        finally:
+            # STEP 1: Check cache by URL (inside lock — handles case where another worker finished while this one was queued)
+            cached_file_hash, cached_data, cached_content = get_cached_result_by_url(s3_frozen_pdf_url)
             if cached_data:
-                url_lock.release()  # Release immediately if cache hit — no need to hold lock
+                logger.info(f"🎯 URL Cache HIT for plan {plan_id} - Re-inserting from cache")
+                log_audit_event(
+                    transaction_id=transaction_id,
+                    event_type="cache.hit",
+                    service="pdf_processing",
+                    payload={"plan_id": plan_id, "file_hash": cached_file_hash, "s3_frozen_pdf_url": s3_frozen_pdf_url[:100]}
+                )
+                _insert_cached_data_for_plan(
+                    cached_data=cached_data,
+                    plan_id=plan_id, plan_name=plan_name, payer_id=payer_id,
+                    payer_name=payer_name, state_name=state_name,
+                    s3_frozen_pdf_url=s3_frozen_pdf_url, transaction_id=transaction_id,
+                    file_hash=cached_file_hash,
+                    acronym_cache=acronym_cache
+                )
+                update_transaction(
+                    transaction_id=transaction_id,
+                    status="completed",
+                    completed_at=time.strftime('%Y-%m-%d %H:%M:%S'),
+                    file_hash=cached_file_hash,
+                    rows_inserted=len(cached_data.get('drug_table', [])),
+                    ocr_pages_processed=0,
+                    response_summary={"cache_hit": True, "source": "url"}
+                )
+                return plan_id, cached_data
 
-        if cached_data:
+            # STEP 2: In-memory URL cache (within this process run)
+            pdf_content_bytes = _pdf_mem_cache_by_url.get(s3_frozen_pdf_url)
+            if pdf_content_bytes is None:
+                try:
+                    log_audit_event(transaction_id=transaction_id, event_type="s3.download.start", service="pdf_processing",
+                                    payload={"plan_id": plan_id, "url": pdf_url})
+                    pdf_content_bytes = download_pdf_bytes(
+                        pdf_url,
+                        log_prefix,
+                        proxies=None
+                    )
+                    logger.info(f"{log_prefix} Download successful")
+                    log_audit_event(transaction_id=transaction_id, event_type="s3.download.success", service="pdf_processing",
+                                    payload={"plan_id": plan_id, "bytes": len(pdf_content_bytes)})
+                    _pdf_mem_cache_by_url[s3_frozen_pdf_url] = pdf_content_bytes
+                except Exception as e:
+                    logger.warning(f"{log_prefix} Download failed: {e}")
+                    update_transaction(transaction_id=transaction_id, status="failed",
+                        completed_at=time.strftime('%Y-%m-%d %H:%M:%S'),
+                        response_summary={"error": f"Download failed: {e}"})
+                    log_audit_event(transaction_id=transaction_id, event_type="download.failed",
+                        service="pdf_processing", error_message=f"Download failed: {e}",
+                        payload={"plan_id": plan_id, "s3_frozen_pdf_url": s3_frozen_pdf_url})
+                    return plan_id, {"error": f"Download failed: {e}", "drug_table": [], "acronyms": []}
 
-            logger.info(f"🎯 URL Cache HIT for plan {plan_id} - Re-inserting for this plan from cache")
-            
-            log_audit_event(
-                transaction_id=transaction_id,
-                event_type="cache.hit_by_url",
-                service="pdf_processing",
-                payload={"plan_id": plan_id, "formulary_url": formulary_url[:100], "file_hash": cached_file_hash}
-            )
-            
-            # ✅ Re-insert drugs and acronyms for THIS plan from cached data
-            _insert_cached_data_for_plan(
-                cached_data=cached_data,
-                plan_id=plan_id, plan_name=plan_name, payer_id=payer_id,
-                payer_name=payer_name, state_name=state_name,
-                formulary_url=formulary_url, transaction_id=transaction_id,
-                file_hash=cached_file_hash
-            )
-            
-            update_transaction(
-                transaction_id=transaction_id,
-                status="completed",
-                completed_at=time.strftime('%Y-%m-%d %H:%M:%S'),
-                file_hash=cached_file_hash,
-                rows_inserted=len(cached_data.get('drug_table', [])),
-                ocr_pages_processed=0,
-                response_summary={"cache_hit_by_url": True, "skipped_download": True,
-                                   "drugs_reinserted": len(cached_data.get('drug_table', [])),
-                                   "acronyms_reinserted": len(cached_data.get('acronyms', []))}
-            )
-            
-            return plan_id, cached_data
-        
-        # ✅ STEP 2: URL not in cache - proceed with download
-        pdf_url = transform_viewer_url(formulary_url)
+            # Compute hash and store in in-memory hash cache
+            file_hash = calculate_bytes_hash(pdf_content_bytes)
+            _pdf_mem_cache_by_hash[file_hash] = pdf_content_bytes
 
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-        }
-        response = requests.get(pdf_url, headers=headers, timeout=120, stream=True)
-        response.raise_for_status()
+            # STEP 3: Check cache by file hash (if identical PDF already processed under a different URL)
+            if not cached_data:
+                # ✅ STEP 2: Check cache by file hash (in case URL changed but PDF is the same)
+                cached_data, cached_content = get_cached_result(file_hash)
+                cached_file_hash = file_hash if cached_data else None
 
-        pdf_bytes = BytesIO(response.content)
-        file_hash = calculate_bytes_hash(pdf_bytes.getvalue())
-
-        # ✅ STEP 3: Check cache by file hash (in case URL changed but PDF is the same)
-        cached_data, cached_content = get_cached_result(file_hash)
-        if cached_data:
-            logger.info(f"♻️ Hash Cache HIT for plan {plan_id} - Re-inserting for this plan from cache")
-            
-            log_audit_event(
-                transaction_id=transaction_id,
-                event_type="cache.hit",
-                service="pdf_processing",
-                payload={"plan_id": plan_id, "file_hash": file_hash}
-            )
-            
-            # ✅ Re-insert drugs and acronyms for THIS plan from cached data
-            _insert_cached_data_for_plan(
-                cached_data=cached_data,
-                plan_id=plan_id, plan_name=plan_name, payer_id=payer_id,
-                payer_name=payer_name, state_name=state_name,
-                formulary_url=formulary_url, transaction_id=transaction_id,
-                file_hash=file_hash
-            )
-            
-            update_transaction(
-                transaction_id=transaction_id,
-                status="completed",
-                completed_at=time.strftime('%Y-%m-%d %H:%M:%S'),
-                file_hash=file_hash,
-                rows_inserted=len(cached_data.get('drug_table', [])),
-                ocr_pages_processed=0,
-                response_summary={"cache_hit": True,
-                                   "drugs_reinserted": len(cached_data.get('drug_table', [])),
-                                   "acronyms_reinserted": len(cached_data.get('acronyms', []))}
-            )
-            
-            return plan_id, cached_data
-
-        structured_data, method, costs = process_pdf_with_mistral_ocr(
-            pdf_bytes,
-            payer_name=plan_name,
-            filename=f"{plan_name}.pdf"
-        )
-
-        drug_table = structured_data.get("drug_table", [])
-        acronyms = structured_data.get("acronyms", [])
-
-        if _is_extracted_data_from_index_page(drug_table):
-            logger.warning(f"Plan {plan_id}: Detected index page, skipping")
-            
-            # Log index page detection
-            log_audit_event(
-                transaction_id=transaction_id,
-                event_type="validation.index_page_detected",
-                service="pdf_processing",
-                payload={"plan_id": plan_id}
-            )
-            
-            update_transaction(
-                transaction_id=transaction_id,
-                status="completed",
-                completed_at=time.strftime('%Y-%m-%d %H:%M:%S'),
-                response_summary={"status": "index_page", "drugs_extracted": 0}
-            )
-            
-            return plan_id, {"drug_table": [], "acronyms": [], "status": "index_page"}
-
-        if LANGDETECT_AVAILABLE:
-            def is_fully_english(item: dict) -> bool:
-                for value in item.values():
-                    # Only check long strings - short drug names may be misdetected
-                    if isinstance(value, str) and len(value) > 50:  # Increased from 20 to 50
-                        try:
-                            detected_lang = detect_language(value)
-                            if detected_lang not in ['en', 'la']:  # Allow Latin (medical terms)
-                                return False
-                        except:
-                            pass  # If detection fails, keep the drug
-                return True
-
-            before_lang_filter = len(drug_table)
-            drug_table = [d for d in drug_table if is_fully_english(d)]
-            filtered_by_lang = before_lang_filter - len(drug_table)
-            if filtered_by_lang > 0:
-                logger.warning(f"⚠️ Language filter removed {filtered_by_lang} drugs (kept {len(drug_table)})")
-
-        # Clean and normalize drug data
-        for drug in drug_table:
-            if drug.get("drug_name"):
-                cleaned_name, extracted_reqs = clean_drug_name(drug["drug_name"])
-                drug["drug_name"] = cleaned_name
+            if cached_data:
+                logger.info(f"🎯 Cache HIT (URL/Hash) for plan {plan_id} - Using hash: {cached_file_hash}")
+                coverage_logger.info(f"🎯 Plan {plan_id}: Cache HIT found for hash {cached_file_hash}. Re-inserting cached data.")
                 
-                # Append extracted requirements to existing requirements if they exist
-                if extracted_reqs:
-                    existing_reqs = drug.get("drug_requirements")
-                    if existing_reqs:
-                        drug["drug_requirements"] = f"{existing_reqs}, {extracted_reqs}"
-                    else:
-                        drug["drug_requirements"] = extracted_reqs
+                log_audit_event(
+                    transaction_id=transaction_id,
+                    event_type="cache.hit",
+                    service="pdf_processing",
+                    payload={"plan_id": plan_id, "file_hash": cached_file_hash, "s3_frozen_pdf_url": s3_frozen_pdf_url[:100]}
+                )
+                
+                # ✅ Re-insert drugs and acronyms for THIS plan from cached data
+                _insert_cached_data_for_plan(
+                    cached_data=cached_data,
+                    plan_id=plan_id, plan_name=plan_name, payer_id=payer_id,
+                    payer_name=payer_name, state_name=state_name,
+                    s3_frozen_pdf_url=s3_frozen_pdf_url, transaction_id=transaction_id,
+                    file_hash=cached_file_hash,
+                    acronym_cache=acronym_cache
+                )
+                
+                update_transaction(
+                    transaction_id=transaction_id,
+                    status="completed",
+                    completed_at=time.strftime('%Y-%m-%d %H:%M:%S'),
+                    file_hash=cached_file_hash,
+                    rows_inserted=len(cached_data.get('drug_table', [])),
+                    ocr_pages_processed=0,
+                    response_summary={"cache_hit": True, "source": "hash",
+                                       "drugs_reinserted": len(cached_data.get('drug_table', [])),
+                                       "acronyms_reinserted": len(cached_data.get('acronyms', []))}
+                )
+                
+                return plan_id, cached_data
+            
+            # ✅ STEP 4: Proceed with OCR (no cache hit)
+            pdf_bytes = BytesIO(pdf_content_bytes)
+            structured_data, method, costs = process_pdf_with_mistral_ocr(
+                pdf_bytes,
+                payer_name=plan_name,
+                filename=f"{plan_name}.pdf"
+            )
 
-            if drug.get("drug_tier"):
-                drug["drug_tier"] = normalize_drug_tier(drug["drug_tier"])
+            drug_table = structured_data.get("drug_table", [])
+            acronyms = structured_data.get("acronyms", [])
 
-        acronyms = deduplicate_dicts(acronyms, 'acronym')
-        
-        # Log OCR completion
-        log_audit_event(
-            transaction_id=transaction_id,
-            event_type="ocr.completed",
-            service="mistral_ocr",
-            payload={
+            if _is_extracted_data_from_index_page(drug_table):
+                logger.warning(f"Plan {plan_id}: Detected index page, skipping")
+                
+                # Log index page detection
+                log_audit_event(
+                    transaction_id=transaction_id,
+                    event_type="validation.index_page_detected",
+                    service="pdf_processing",
+                    payload={"plan_id": plan_id}
+                )
+                
+                update_transaction(
+                    transaction_id=transaction_id,
+                    status="completed",
+                    completed_at=time.strftime('%Y-%m-%d %H:%M:%S'),
+                    response_summary={"status": "index_page", "drugs_extracted": 0}
+                )
+                
+                return plan_id, {"drug_table": [], "acronyms": [], "status": "index_page"}
+            filtered_by_lang = 0
+            removed_drugs = []
+            filtered_drugs = []
+            for drug in drug_table:
+                remove_row = False
+                for key, value in drug.items():
+                    if isinstance(value, str) and value.strip():
+                        if key == "drug_name":
+                            continue
+                        if contains_non_latin(value):
+                            remove_row = True
+                            break
+                if remove_row:
+                    removed_drugs.append(drug)
+                else:
+                    filtered_drugs.append(drug)
+            drug_table = filtered_drugs
+            filtered_by_lang = len(removed_drugs)
+            if filtered_by_lang > 0:
+                logger.warning(
+                    f"⚠️ Language filter removed {filtered_by_lang} drugs "
+                    f"(kept {len(drug_table)})"
+                )
+                for drug in removed_drugs:
+                    drug_name = drug.get("drug_name", "UNKNOWN_DRUG")
+                    logger.warning(
+                        f"❌ Removed drug due to non-Latin characters: {drug_name}"
+                    )
+            else:
+                logger.info("🌐 Language filter applied — no drugs removed")
+
+
+            # Clean and normalize drug data
+            for drug in drug_table:
+                if drug.get("drug_name"):
+                    cleaned_name, extracted_reqs = clean_drug_name(drug["drug_name"])
+                    drug["drug_name"] = cleaned_name
+                    
+                    # Append extracted requirements to existing requirements if they exist
+                    if extracted_reqs:
+                        existing_reqs = drug.get("drug_requirements")
+                        if existing_reqs:
+                            drug["drug_requirements"] = f"{existing_reqs}, {extracted_reqs}"
+                        else:
+                            drug["drug_requirements"] = extracted_reqs
+
+                if drug.get("drug_tier"):
+                    drug["drug_tier"] = normalize_drug_tier(drug["drug_tier"])
+
+            acronyms = deduplicate_dicts(acronyms, 'acronym')
+            
+            # Log OCR completion
+            log_audit_event(
+                transaction_id=transaction_id,
+                event_type="ocr.completed",
+                service="mistral_ocr",
+                payload={
+                    "plan_id": plan_id,
+                    "method": method,
+                    "drugs_extracted": len(drug_table),
+                    "acronyms_extracted": len(acronyms)
+                }
+            )
+            extraction_logger.info(json.dumps({
+                "event": "ocr.completed",
                 "plan_id": plan_id,
                 "method": method,
                 "drugs_extracted": len(drug_table),
                 "acronyms_extracted": len(acronyms)
-            }
-        )
+            }))
 
-        # Delete existing records for this plan
-        delete_drug_formulary_records_for_plan(plan_id)
-        
-        # Enrich drug records with plan metadata for database insertion
-        enriched_drug_records = []
+            # Delete existing records for this plan
+            delete_drug_formulary_records_for_plan(plan_id)
+            
+            # Enrich drug records with plan metadata for database insertion
+            enriched_drug_records = []
 
-        with get_db_connection() as conn:
-            for drug in drug_table:
-                requirements_text = str(drug.get('drug_requirements', '') or '').strip()
-                requirements_text_norm = normalize_requirement_code(requirements_text)
-                
-                # Tier normalization and inference
-                drug_tier = drug.get('drug_tier')
-                drug_tier_normalized = drug_tier or infer_drug_tier_from_text(requirements_text_norm) or infer_drug_tier_from_text(drug.get("drug_name"))
-                
-                # Combine tier and requirements for ML model input (passed as acronym)
-                combined_acronym_parts = []
-                if drug_tier_normalized:
-                    combined_acronym_parts.append(str(drug_tier_normalized))
-                if requirements_text_norm:
-                    combined_acronym_parts.append(str(requirements_text_norm))
-                
-                combined_acronym = ", ".join(combined_acronym_parts) if combined_acronym_parts else None
-
-                # Determine coverage status using ML-powered logic
-                coverage_status, confidence_score, source = det_coverage_status(
-                    acronym=combined_acronym,
-                    expansion=None,
-                    explanation=None,
-                    requirements_text=requirements_text_norm,
-                    tier_text=drug_tier_normalized,
-                    conn=conn,
-                    state_name=state_name,
-                    payer_name=payer_name,
-                    ml_predict_fn=ml_predict_coverage_status,
-                    drug_name=drug.get("drug_name")
-                )
-                
-                # Update the drug dict with final status
-                drug["coverage_status"] = coverage_status
-                
-                enriched_record = {
-                    "id": str(uuid.uuid4()),
-                    "plan_id": plan_id,
-                    "payer_id": payer_id,
-                    "plan_name": plan_name,
-                    "payer_name": payer_name,
-                    "drug_name": drug.get("drug_name"),
-                    "drug_tier": drug_tier_normalized,
-                    "drug_requirements": requirements_text or None,
-                    "page_number": drug.get("page_number"),
-                    "state_name": state_name,
-                    "coverage_status": coverage_status,
-                    "ndc_code": None,
-                    "jcode": None,
-                    "is_prior_authorization_required": detect_prior_authorization(requirements_text),
-                    "is_step_therapy_required": detect_step_therapy(requirements_text),
-                    "is_quantity_limit_applied": "Yes" if "ql" in (requirements_text or "").lower() else "No",
-                    "coverage_details": None,
-                    "confidence_score": confidence_score,
-                    "source_url": formulary_url,
-                    "file_name": f"{plan_name}.pdf"
-                }
-                enriched_drug_records.append(enriched_record)
-        
-        # Insert enriched records into database
-        if enriched_drug_records:
-            insert_drug_formulary_data(enriched_drug_records)
-            logger.info(f"Inserted {len(enriched_drug_records)} drug records for plan {plan_id}")
-        
-        # Insert Acronyms into pp_formulary_names with coverage status
-        if acronyms:
-            # ✅ Enrich acronyms with coverage_status before insertion
             with get_db_connection() as conn:
-                for acronym in acronyms:
-                    # Determine coverage status for each acronym
-                    coverage_status, confidence_score, source = det_coverage_status(
-                        acronym=acronym.get("acronym"),
-                        expansion=acronym.get("expansion"),
-                        explanation=acronym.get("explanation"),
-                        requirements_text=None,  # Acronyms don't have requirements
-                        tier_text=None,  # Acronyms don't have tiers
+                for drug in drug_table:
+                    requirements_text = str(drug.get('drug_requirements', '') or '').strip()
+                    requirements_text_norm = normalize_requirement_code(requirements_text)
+                    
+                    # Tier normalization and inference
+                    drug_tier = drug.get('drug_tier')
+                    drug_tier_normalized = drug_tier or infer_drug_tier_from_text(requirements_text_norm) or infer_drug_tier_from_text(drug.get("drug_name"))
+                    
+                    # Combine tier and requirements for ML model input (passed as acronym)
+                    combined_acronym_parts = []
+                    if drug_tier_normalized:
+                        combined_acronym_parts.append(str(drug_tier_normalized))
+                    if requirements_text_norm:
+                        combined_acronym_parts.append(str(requirements_text_norm))
+                    
+                    combined_acronym = ", ".join(combined_acronym_parts) if combined_acronym_parts else None
+
+                    # Determine coverage status using ML-powered logic
+                    coverage_status, confidence_score, source, manual_review = det_coverage_status(
+                        acronym=combined_acronym,
+                        expansion=None,
+                        explanation=None,
+                        requirements_text=requirements_text_norm,
+                        tier_text=drug_tier_normalized,
                         conn=conn,
                         state_name=state_name,
                         payer_name=payer_name,
-                        ml_predict_fn=ml_predict_coverage_status,
-                        drug_name=None  # Acronyms are not drugs
+                        # ml_predict_fn=ml_predict_coverage_status,
+                        drug_name=drug.get("drug_name"),
+                        acronym_cache=acronym_cache
                     )
+                    coverage_logger.info(json.dumps({
+                        "plan_id": plan_id,
+                        "drug_name": drug.get("drug_name"),
+                        "tier": drug_tier_normalized,
+                        "requirements": requirements_text_norm,
+                        "coverage_status": coverage_status,
+                        "confidence": confidence_score
+                    }))
                     
-                    # Add coverage_status to acronym dict
-                    acronym["coverage_status"] = coverage_status
+                    # Update the drug dict with final status
+                    drug["coverage_status"] = coverage_status
+                    
+                    # Manual verification if ML confidence is low - this is now handled within det_coverage_status
+                    # but we keep manual_review as returned from the function.
+
+                    enriched_record = {
+                        "id": str(uuid.uuid4()),
+                        "plan_id": plan_id,
+                        "payer_id": payer_id,
+                        "plan_name": plan_name,
+                        "payer_name": payer_name,
+                        "drug_name": drug.get("drug_name"),
+                        "drug_tier": drug_tier_normalized,
+                        "drug_requirements": requirements_text or None,
+                        "page_number": drug.get("page_number"),
+                        "state_name": state_name,
+                        "coverage_status": coverage_status,
+                        "ndc_code": None,
+                        "jcode": None,
+                        "is_prior_authorization_required": detect_prior_authorization(requirements_text),
+                        "is_step_therapy_required": detect_step_therapy(requirements_text),
+                        "is_quantity_limit_applied": "Yes" if "ql" in (requirements_text or "").lower() else "No",
+                        "coverage_details": None,
+                        "confidence_score": confidence_score,
+                        "manual_review": manual_review,
+                        "source_url": s3_frozen_pdf_url,
+                        "file_name": f"{plan_name}.pdf"
+                    }
+                    enriched_drug_records.append(enriched_record)
             
-            insert_acronyms_to_ref_table(acronyms, state_name, payer_name, plan_name, "pp_formulary_names")
-            logger.info(f"Inserted {len(acronyms)} acronyms with coverage status into pp_formulary_names for plan {plan_id}")
-        
-        # Log database insertion
-        log_audit_event(
-            transaction_id=transaction_id,
-            event_type="database.insert",
-            service="pdf_processing",
-            payload={
-                "plan_id": plan_id,
-                "records_inserted": len(enriched_drug_records),
-                "acronyms_inserted": len(acronyms)
-            }
-        )
+            # Insert enriched records into database
+            if enriched_drug_records:
+                insert_drug_formulary_data(consolidate_drug_records(enriched_drug_records))
+                logger.info(f"Inserted {len(enriched_drug_records)} drug records for plan {plan_id}")
+                log_audit_event(transaction_id=transaction_id, event_type="database.insert.details",
+                                service="pdf_processing",
+                                payload={"plan_id": plan_id, "records": len(enriched_drug_records)})
+            
+            # Insert Acronyms into pp_formulary_names with coverage status
+            if acronyms:
+                # ✅ Enrich acronyms with coverage_status before insertion
+                with get_db_connection() as conn:
+                    for acronym in acronyms:
+                        # Determine coverage status for each acronym
+                        coverage_status, confidence_score, source, _ = det_coverage_status(
+                            acronym=acronym.get("acronym"),
+                            expansion=acronym.get("expansion"),
+                            explanation=acronym.get("explanation"),
+                            requirements_text=None,  # Acronyms don't have requirements
+                            tier_text=None,  # Acronyms don't have tiers
+                            conn=conn,
+                            state_name=state_name,
+                            payer_name=payer_name,
+                            # ml_predict_fn=ml_predict_coverage_status,
+                            drug_name=None  # Acronyms are not drugs
+                        )
+                        
+                        # Add coverage_status to acronym dict
+                        acronym["coverage_status"] = coverage_status
+                
+                insert_acronyms_to_ref_table(acronyms, state_name, payer_name, plan_name, "pp_formulary_names")
+                logger.info(f"Inserted {len(acronyms)} acronyms with coverage status into pp_formulary_names for plan {plan_id}")
+                log_audit_event(transaction_id=transaction_id, event_type="database.insert.acronyms",
+                                service="pdf_processing",
+                                payload={"plan_id": plan_id, "acronyms": len(acronyms)})
+            
+            # Log database insertion
+            log_audit_event(
+                transaction_id=transaction_id,
+                event_type="database.insert",
+                service="pdf_processing",
+                payload={
+                    "plan_id": plan_id,
+                    "records_inserted": len(enriched_drug_records),
+                    "acronyms_inserted": len(acronyms)
+                }
+            )
 
-        result = {
-            "drug_table": drug_table,
-            "acronyms": acronyms,
-            "method": method,
-            "drug_count": len(drug_table)
-        }
-        cache_result(file_hash, result, None, formulary_url=formulary_url)  # ✅ Cache with URL
-         
-        try:
-            url_lock.release()
-        except RuntimeError:
-            pass  # Already released (cache hit path released it in finally block)
-        update_plan_file_hash(plan_id, file_hash)
-        
-        # Update transaction as completed
-        update_transaction(
-            transaction_id=transaction_id,
-            status="completed",
-            completed_at=time.strftime('%Y-%m-%d %H:%M:%S'),
-            rows_inserted=len(enriched_drug_records),
-            ocr_pages_processed=costs.get("pages_processed", 0) if isinstance(costs, dict) else 0,
-            mistral_cost=costs.get("total_cost", 0) if isinstance(costs, dict) else 0,
-            file_hash=file_hash,
-            file_name=f"{plan_name}.pdf",
-            response_summary={
-                "drugs_extracted": len(drug_table),
-                "acronyms_extracted": len(acronyms),
-                "method": method
+            result = {
+                "drug_table": drug_table,
+                "acronyms": acronyms,
+                "method": method,
+                "drug_count": len(drug_table)
             }
-        )
+            cache_result(file_hash, result, None, formulary_url=s3_frozen_pdf_url)
+            
+            update_plan_file_hash(plan_id, file_hash)
+            
+            # Update transaction as completed
+            update_transaction(
+                transaction_id=transaction_id,
+                status="completed",
+                completed_at=time.strftime('%Y-%m-%d %H:%M:%S'),
+                rows_inserted=len(enriched_drug_records),
+                ocr_pages_processed=costs.get("pages_processed", 0) if isinstance(costs, dict) else 0,
+                mistral_cost=costs.get("total_cost", 0) if isinstance(costs, dict) else 0,
+                file_hash=file_hash,
+                file_name=f"{plan_name}.pdf",
+                response_summary={
+                    "drugs_extracted": len(drug_table),
+                    "acronyms_extracted": len(acronyms),
+                    "method": method
+                }
+            )
 
-        logger.info(f"Plan {plan_id}: Extracted {len(drug_table)} drugs")
-        return plan_id, result
+            logger.info(f"Plan {plan_id}: Extracted {len(drug_table)} drugs")
+            return plan_id, result
+
+        finally:
+            try:
+                url_lock.release()
+            except (RuntimeError, UnboundLocalError):
+                pass
 
     except Exception as e:
-        
-        try:
-            url_lock.release()
-        except (RuntimeError, UnboundLocalError):
-            pass  # Lock was never acquired (error before url_lock was set)
-
         # Log error audit event
         log_audit_event(
             transaction_id=transaction_id,
@@ -1027,11 +1339,131 @@ def process_pdfs_from_urls_in_parallel():
 
     processed_plan_ids = []
     all_results = []
+    
+    # -------------------------------------------------------------------------
+    # OPTIMIZATION: Check for cache hits BEFORE spawning workers (saves memory/bandwidth)
+    # -------------------------------------------------------------------------
+    plans_to_submit = []
+    for plan in plans:
+        plan_id = plan['plan_id']
+        s3_frozen_pdf_url = plan['s3_frozen_pdf_url']
+        plan_file_hash = plan.get('file_hash')
+        
+        # 1. Check by plan_file_hash (best case - no download/OCR needed)
+        if plan_file_hash:
+            cached_data, _ = get_cached_result(plan_file_hash)
+            if cached_data:
+                logger.info(f"♻️ Pre-dispatch Cache HIT (hash) for plan {plan_id} - Handling immediately")
+                # Handle re-insertion here (sequentially or in a light thread)
+                # For simplicity and correctness, we use a separate small pool or the worker pool but with a flag
+                # However, the user wants "before the worker is sent".
+                # We'll just submit it to the pool anyway but the worker will handle it.
+                # Wait, if we submit it to the pool, we are still spawning a worker.
+                # To really save memory, we handle it here.
+                try:
+                    # We still need a transaction for audit/history
+                    transaction_id = str(uuid.uuid4())
+                    create_transaction(
+                        transaction_id=transaction_id,
+                        job_type="cache_hit_realtime",
+                        plan_id=plan_id,
+                        payer_id=plan.get('payer_id'),
+                        file_name=f"{plan['plan_name']}.pdf",
+                        request_summary={"plan_name": plan['plan_name'], "s3_frozen_pdf_url": s3_frozen_pdf_url},
+                        status="in_progress"
+                    )
+                    
+                    log_audit_event(
+                        transaction_id=transaction_id,
+                        event_type="cache.hit",
+                        service="pdf_dispatcher",
+                        payload={"plan_id": plan_id, "file_hash": plan_file_hash, "source": "pre_dispatch_hash"}
+                    )
+                    
+                    _insert_cached_data_for_plan(
+                        cached_data=cached_data,
+                        plan_id=plan_id, plan_name=plan['plan_name'], payer_id=plan.get('payer_id'),
+                        payer_name=plan.get('payer_name', plan['plan_name']), state_name=plan.get('state_name', 'Unknown'),
+                        s3_frozen_pdf_url=s3_frozen_pdf_url, transaction_id=transaction_id,
+                        file_hash=plan_file_hash
+                    )
+                    
+                    update_transaction(
+                        transaction_id=transaction_id,
+                        status="completed",
+                        completed_at=time.strftime('%Y-%m-%d %H:%M:%S'),
+                        file_hash=plan_file_hash,
+                        rows_inserted=len(cached_data.get('drug_table', [])),
+                        ocr_pages_processed=0,
+                        response_summary={"cache_hit": True, "source": "pre_dispatch_hash"}
+                    )
+                    
+                    processed_plan_ids.append(plan_id)
+                    all_results.append({"plan_id": plan_id, "result": cached_data})
+                    continue
+                except Exception as e:
+                    logger.error(f"Failed handling pre-dispatch cache hit for plan {plan_id}: {e}")
+                    # Fallback to submitting it to the pool if pre-dispatch handling fails
+        
+        # 2. Check by URL (no download needed if PDF already cached for this URL)
+        cached_hash, cached_data, _ = get_cached_result_by_url(s3_frozen_pdf_url)
+        if cached_data:
+            logger.info(f"🎯 Pre-dispatch Cache HIT (url) for plan {plan_id} - Handling immediately")
+            try:
+                transaction_id = str(uuid.uuid4())
+                create_transaction(
+                    transaction_id=transaction_id,
+                    job_type="cache_hit_realtime",
+                    plan_id=plan_id,
+                    payer_id=plan.get('payer_id'),
+                    file_name=f"{plan['plan_name']}.pdf",
+                    request_summary={"plan_name": plan['plan_name'], "s3_frozen_pdf_url": s3_frozen_pdf_url},
+                    status="in_progress"
+                )
+                
+                log_audit_event(
+                    transaction_id=transaction_id,
+                    event_type="cache.hit",
+                    service="pdf_dispatcher",
+                    payload={"plan_id": plan_id, "file_hash": cached_hash, "source": "pre_dispatch_url"}
+                )
+                
+                _insert_cached_data_for_plan(
+                    cached_data=cached_data,
+                    plan_id=plan_id, plan_name=plan['plan_name'], payer_id=plan.get('payer_id'),
+                    payer_name=plan.get('payer_name', plan['plan_name']), state_name=plan.get('state_name', 'Unknown'),
+                    s3_frozen_pdf_url=s3_frozen_pdf_url, transaction_id=transaction_id,
+                    file_hash=cached_hash
+                )
+                
+                update_transaction(
+                    transaction_id=transaction_id,
+                    status="completed",
+                    completed_at=time.strftime('%Y-%m-%d %H:%M:%S'),
+                    file_hash=cached_hash,
+                    rows_inserted=len(cached_data.get('drug_table', [])),
+                    ocr_pages_processed=0,
+                    response_summary={"cache_hit": True, "source": "pre_dispatch_url"}
+                )
+                
+                processed_plan_ids.append(plan_id)
+                all_results.append({"plan_id": plan_id, "result": cached_data})
+                continue
+            except Exception as e:
+                logger.error(f"Failed handling pre-dispatch cache hit for plan {plan_id}: {e}")
+        
+        plans_to_submit.append(plan)
 
-    max_workers = min(6, len(plans))
+    if not plans_to_submit:
+        logger.info(f"All {len(plans)} plans were handled via pre-dispatch cache hits.")
+        _log_s3_header_check_summary()
+        return processed_plan_ids, all_results
+
+    logger.info(f"Submitting {len(plans_to_submit)} plans to the worker pool for processing.")
+    max_workers = min(6, len(plans_to_submit))
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-        future_to_plan = {executor.submit(process_single_pdf_url_worker, plan): plan for plan in plans}
+        future_to_plan = {executor.submit(process_single_pdf_url_worker, plan): plan for plan in plans_to_submit}
 
         for future in concurrent.futures.as_completed(future_to_plan):
             plan = future_to_plan[future]
@@ -1043,48 +1475,77 @@ def process_pdfs_from_urls_in_parallel():
                 logger.error(f"Plan {plan.get('plan_id')} failed: {e}")
 
     logger.info(f"Processed {len(processed_plan_ids)} plans")
+    _log_s3_header_check_summary()
     return processed_plan_ids, all_results
 
+
+def _upload_chunk_for_batch(mistral_client, chunk_bytes, chunk_idx, plan_id, original_chunk_pages):
+    """Helper to upload a single chunk to Mistral concurrently."""
+    try:
+        uploaded_file = _upload_pdf_to_mistral(
+            mistral_client, 
+            chunk_bytes, 
+            f"{plan_id}_chunk_{chunk_idx}.pdf"
+        )
+        
+        if not uploaded_file:
+            raise Exception(f"Failed to upload chunk {chunk_idx} for plan {plan_id} after retries.")
+
+        # Get signed URL (24 hours expiry)
+        signed_url = mistral_client.files.get_signed_url(file_id=uploaded_file.id, expiry=24)
+        
+        custom_id_data = {
+            "plan_id": str(plan_id),
+            "original_pages": original_chunk_pages
+        }
+        
+        request_item = {
+            "custom_id": json.dumps(custom_id_data),
+            "body": {
+                "model": MISTRAL_OCR_MODEL,
+                "document": {
+                    "type": "document_url",
+                    "document_url": signed_url.url
+                },
+                "document_annotation_format": OCR_ANNOTATION_SCHEMA,
+                "include_image_base64": False
+            }
+        }
+        return request_item, uploaded_file.id
+    except Exception as e:
+        logger.error(f"Error in chunk upload {chunk_idx} for plan {plan_id}: {e}")
+        raise
 
 def process_single_plan_for_batch(plan: dict, mistral_client) -> Tuple[List[dict], List[str]]:
     """
     Helper function to process a single plan for batch preparation.
-    Downloads, extracts pages, chunks, and uploads to Mistral.
+    Downloads, extracts pages, chunks, and uploads to Mistral in PARALLEL.
     """
     requests_payload = []
-    uploaded_file_ids = []
+    uploaded_file_ids =[]
     
     plan_id = plan['plan_id']
     plan_name = plan['plan_name']
-    formulary_url = plan['formulary_url']
+    s3_frozen_pdf_url = plan['s3_frozen_pdf_url']
     
     try:
         # 1. Download PDF
-        pdf_url = transform_viewer_url(formulary_url)
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-        }
-        response = requests.get(pdf_url, headers=headers, timeout=120, stream=True)
-        response.raise_for_status()
-        pdf_bytes = BytesIO(response.content).getvalue()
+        pdf_url = transform_viewer_url(s3_frozen_pdf_url)
+        pdf_bytes = download_pdf_bytes(pdf_url, log_prefix=f"[Plan {plan_id}]")
         
         # Calculate Hash and Check Cache
         file_hash = calculate_bytes_hash(pdf_bytes)
-        # Store hash for this plan immediately so we can link it later
         update_plan_file_hash(plan_id, file_hash)
         
         cached_data, cached_content = get_cached_result(file_hash)
         
         if cached_data:
             logger.info(f"Plan {plan_id}: Hash {file_hash} found in cache. Using cached data (Skipping Batch Submission).")
-            # Reuse cached data logic
-            drug_table = cached_data.get("drug_table", [])
-            
-            # Delete existing records for this plan
+            # Reuse cached data logic (same as your original)
+            drug_table = cached_data.get("drug_table",[])
             delete_drug_formulary_records_for_plan(plan_id)
             
-            # Enrich and Insert with ML coverage status
-            enriched_drug_records = []
+            enriched_drug_records =[]
             state_name_local = plan.get('state_name', 'Unknown')
             payer_name_local = plan.get('payer_name', plan_name)
             with get_db_connection() as conn:
@@ -1093,65 +1554,51 @@ def process_single_plan_for_batch(plan: dict, mistral_client) -> Tuple[List[dict
                     requirements_text_norm = normalize_requirement_code(requirements_text)
                     drug_tier = drug.get('drug_tier')
                     drug_tier_normalized = drug_tier or infer_drug_tier_from_text(requirements_text_norm)
-                    combined_acronym_parts = []
+                    combined_acronym_parts =[]
                     if drug_tier_normalized:
                         combined_acronym_parts.append(str(drug_tier_normalized))
                     if requirements_text_norm:
                         combined_acronym_parts.append(str(requirements_text_norm))
                     combined_acronym = ", ".join(combined_acronym_parts) if combined_acronym_parts else None
-                    # ✅ ML coverage status prediction
-                    coverage_status, confidence_score, _ = det_coverage_status(
+                    
+                    coverage_status, confidence_score, source, manual_review = det_coverage_status(
                         acronym=combined_acronym,
-                        expansion=None,
-                        explanation=None,
+                        expansion=None, explanation=None,
                         requirements_text=requirements_text_norm,
                         tier_text=drug_tier_normalized,
-                        conn=conn,
-                        state_name=state_name_local,
-                        payer_name=payer_name_local,
-                        ml_predict_fn=ml_predict_coverage_status,
+                        conn=conn, state_name=state_name_local, payer_name=payer_name_local,
                         drug_name=drug.get('drug_name')
                     )
+
                     enriched_record = {
-                        "id": str(uuid.uuid4()),
-                        "plan_id": plan_id,
-                        "payer_id": plan.get('payer_id'),
-                        "plan_name": plan_name,
-                        "payer_name": payer_name_local,
-                        "drug_name": drug.get("drug_name"),
-                        "drug_tier": drug_tier_normalized,
-                        "drug_cost": drug.get("drug_cost"),
-                        "drug_requirements": requirements_text or None,
-                        "page_number": drug.get("page_number"),
-                        "state_name": state_name_local,
-                        "coverage_status": coverage_status,  # ✅ ML predicted
-                        "ndc_code": None,
-                        "jcode": None,
+                        "id": str(uuid.uuid4()), "plan_id": plan_id, "payer_id": plan.get('payer_id'),
+                        "plan_name": plan_name, "payer_name": payer_name_local,
+                        "drug_name": drug.get("drug_name"), "drug_tier": drug_tier_normalized,
+                        "drug_cost": drug.get("drug_cost"), "drug_requirements": requirements_text or None,
+                        "page_number": drug.get("page_number"), "state_name": state_name_local,
+                        "coverage_status": coverage_status, "ndc_code": None, "jcode": None,
                         "is_prior_authorization_required": detect_prior_authorization(requirements_text),
                         "is_step_therapy_required": detect_step_therapy(requirements_text),
-                        "is_quantity_limit_applied": False,
-                        "coverage_details": None,
-                        "confidence_score": confidence_score,
-                        "source_url": formulary_url,
-                        "file_name": f"{plan_name}.pdf"
+                        "is_quantity_limit_applied": False, "coverage_details": None,
+                        "confidence_score": confidence_score, "manual_review": manual_review,
+                        "source_url": s3_frozen_pdf_url, "file_name": f"{plan_name}.pdf"
                     }
                     enriched_drug_records.append(enriched_record)
             
             if enriched_drug_records:
-                insert_drug_formulary_data(enriched_drug_records)
-                logger.info(f"Plan {plan_id}: Inserted {len(enriched_drug_records)} cached records with ML coverage status.")
+                insert_drug_formulary_data(consolidate_drug_records(enriched_drug_records))
+                logger.info(f"Plan {plan_id}: Inserted {len(enriched_drug_records)} cached records.")
                 
-            update_plan_file_hash(plan_id, file_hash)
-            return [], [] # Return empty requests as we handled it via cache
+            return [],[] # Handled via cache
         
-        # 2. Extract/Prefilter Pages (Reuse existing logic)
+        # 2. Extract/Prefilter Pages
         src_doc = fitz.open(stream=pdf_bytes, filetype="pdf")
         total_pages = len(src_doc)
         src_doc.close()
         
         if total_pages > MAX_PDF_PAGES:
             logger.warning(f"Plan {plan_id}: PDF too large ({total_pages} pages), skipping.")
-            return [], []
+            return[],[]
 
         page_indices_0_based = _get_pages_to_process(f"{plan_name}.pdf", total_pages)
         if not page_indices_0_based:
@@ -1165,76 +1612,53 @@ def process_single_plan_for_batch(plan: dict, mistral_client) -> Tuple[List[dict
             original_page_numbers = pages_to_process.copy()
             
         if not pages_to_process:
-            logger.warning(f"Plan {plan_id}: No pages to process after filtering.")
-            return [], []
+            return [],[]
             
-        # Extract relevant pages to a new PDF
         extracted_pdf = _extract_pages_from_pdf(BytesIO(pdf_bytes), pages_to_process)
         if not extracted_pdf:
-            logger.warning(f"Plan {plan_id}: Failed to extract pages.")
-            return [], []
+            return [],[]
             
         final_pdf_bytes = extracted_pdf.getvalue()
         
-        # 3. Chunking
+        # 3. Create Chunk Payloads in memory FIRST
         src_doc = fitz.open(stream=final_pdf_bytes, filetype="pdf")
-        num_pages_in_upload = len(src_doc)
+        sequential_pages = list(range(1, len(src_doc) + 1))
         
-        sequential_pages = list(range(1, num_pages_in_upload + 1))
-        
+        chunk_tasks =[]
         for i in range(0, len(sequential_pages), MAX_PAGES_PER_OCR_REQUEST):
             chunk_pages = sequential_pages[i:i + MAX_PAGES_PER_OCR_REQUEST]
+            original_chunk_pages = original_page_numbers[i:i + len(chunk_pages)]
             
-            chunk_start_idx = i
-            chunk_end_idx = i + len(chunk_pages)
-            original_chunk_pages = original_page_numbers[chunk_start_idx:chunk_end_idx]
-            
-            # Create chunk PDF
             chunk_doc = fitz.open()
             for page_num in chunk_pages:
-                    chunk_doc.insert_pdf(src_doc, from_page=page_num-1, to_page=page_num-1)
-            chunk_bytes = chunk_doc.tobytes()
+                chunk_doc.insert_pdf(src_doc, from_page=page_num-1, to_page=page_num-1)
+            
+            chunk_tasks.append({
+                "bytes": chunk_doc.tobytes(),
+                "idx": i,
+                "original_pages": original_chunk_pages
+            })
             chunk_doc.close()
             
-            # 4. Upload Chunk
-            # Use resilient upload with retries
-            uploaded_file = _upload_pdf_to_mistral(
-                mistral_client, 
-                chunk_bytes, 
-                f"{plan_id}_chunk_{i}.pdf"
-            )
-            
-            if not uploaded_file:
-                raise Exception(f"Failed to upload chunk {i} for plan {plan_id} after retries.")
-
-            uploaded_file_ids.append(uploaded_file.id)
-            
-            # Get signed URL (24 hours expiry)
-            signed_url = mistral_client.files.get_signed_url(file_id=uploaded_file.id, expiry=24)
-            
-            # 5. Create Request Object
-            custom_id_data = {
-                "plan_id": str(plan_id),
-                "original_pages": original_chunk_pages
-            }
-            custom_id = json.dumps(custom_id_data)
-            
-            request_item = {
-                "custom_id": custom_id,
-                "body": {
-                    "model": MISTRAL_OCR_MODEL,
-                    "document": {
-                        "type": "document_url",
-                        "document_url": signed_url.url
-                    },
-                    "document_annotation_format": OCR_ANNOTATION_SCHEMA,
-                    "include_image_base64": False
-                }
-            }
-            requests_payload.append(request_item)
-            
         src_doc.close()
-        logger.info(f"Plan {plan_id} prepared with {len(requests_payload)} chunks.")
+
+        # 4. Upload Chunks CONCURRENTLY (Massive Speedup 🚀)
+        logger.info(f"Plan {plan_id}: Uploading {len(chunk_tasks)} chunks concurrently...")
+        with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
+            futures =[
+                executor.submit(_upload_chunk_for_batch, mistral_client, t["bytes"], t["idx"], plan_id, t["original_pages"])
+                for t in chunk_tasks
+            ]
+            
+            for future in concurrent.futures.as_completed(futures):
+                try:
+                    req_item, file_id = future.result()
+                    requests_payload.append(req_item)
+                    uploaded_file_ids.append(file_id)
+                except Exception as e:
+                    logger.error(f"Failed concurrent chunk upload for Plan {plan_id}: {e}")
+                    
+        logger.info(f"Plan {plan_id} completely prepared with {len(requests_payload)} chunks.")
         
     except Exception as e:
         logger.error(f"Failed to prepare plan {plan_id}: {e}")
@@ -1279,14 +1703,151 @@ def prepare_batch_requests(plans: List[dict]) -> Tuple[List[dict], List[str]]:
     return all_requests_payload, all_uploaded_file_ids
 
 
+def process_plan_batch_result(plan_id: str, chunks: list):
+    """Processes Mistral Batch Output for a single plan and saves to DB."""
+    import uuid
+    transaction_id = str(uuid.uuid4())
+    create_transaction(
+        transaction_id=transaction_id,
+        job_type="batch_process_plan",
+        plan_id=plan_id,
+        status="in_progress"
+    )
+    
+    logger.info(f"Processing results for plan {plan_id} ({len(chunks)} chunks)... [Transaction: {transaction_id}]")
+    
+    try:
+        all_drugs = []
+        all_acronyms =[]
+        
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT p.plan_name, p.payer_id, p.state_name, pa.payer_name, p.s3_frozen_pdf_url
+                FROM plan_details p
+                LEFT JOIN payer_details pa ON p.payer_id = pa.payer_id
+                WHERE p.plan_id = %s
+            """, (plan_id,))
+            plan_data = cursor.fetchone()
+            cursor.close()
+            
+        if not plan_data:
+            logger.error(f"Plan {plan_id} not found in DB, skipping insertion.")
+            update_transaction(transaction_id=transaction_id, status="failed", completed_at=time.strftime('%Y-%m-%d %H:%M:%S'), response_summary={"error": "Plan not found"})
+            return
+            
+        plan_name, payer_id, state_name, payer_name, s3_frozen_pdf_url = plan_data
+        payer_name = payer_name or plan_name
+        state_name = state_name or 'Unknown'
+
+        from database import fetch_acronym_cache
+        acronym_cache = fetch_acronym_cache(payer_name, state_name)
+        update_transaction(transaction_id=transaction_id, file_name=f"{plan_name}.pdf")
+        
+        # Compile chunks
+        class MockResponse:
+            def __init__(self, data):
+                self.pages = data.get('pages',[])
+                self.document_annotation = data.get('document_annotation')
+                
+        all_pages_processed = set()
+        for chunk in chunks:
+            original_pages = chunk['original_pages']
+            all_pages_processed.update(original_pages)
+            
+            mock_response = MockResponse(chunk['ocr_response'])
+            chunk_drugs, chunk_acronyms, _ = _process_ocr_response(mock_response, original_pages)
+            all_drugs.extend(chunk_drugs)
+            all_acronyms.extend(chunk_acronyms)
+            
+        track_mistral_cost(payer_name, len(all_pages_processed))
+        all_drugs = _consolidate_and_clean_drug_table(all_drugs)
+        
+        if _is_extracted_data_from_index_page(all_drugs):
+            logger.warning(f"Plan {plan_id}: Detected index page data after merge, discarding.")
+            all_drugs =[]
+            
+        delete_drug_formulary_records_for_plan(plan_id)
+        
+        enriched_drug_records =[]
+        with get_db_connection() as conn:
+            for drug in all_drugs:
+                requirements_text = str(drug.get('drug_requirements', '') or '').strip()
+                requirements_text_norm = normalize_requirement_code(requirements_text)
+                drug_tier = drug.get('drug_tier')
+                drug_tier_normalized = drug_tier or infer_drug_tier_from_text(requirements_text_norm)
+                combined_acronym_parts =[str(t) for t in [drug_tier_normalized, requirements_text_norm] if t]
+                combined_acronym = ", ".join(combined_acronym_parts) if combined_acronym_parts else None
+                
+                coverage_status, confidence_score, source, manual_review = det_coverage_status(
+                    acronym=combined_acronym, expansion=None, explanation=None,
+                    requirements_text=requirements_text_norm, tier_text=drug_tier_normalized,
+                    conn=conn, state_name=state_name, payer_name=payer_name,
+                    drug_name=drug.get('drug_name'), acronym_cache=acronym_cache
+                )
+
+                enriched_drug_records.append({
+                    "id": str(uuid.uuid4()), "plan_id": plan_id, "payer_id": payer_id,
+                    "plan_name": plan_name, "payer_name": payer_name,
+                    "drug_name": drug.get("drug_name"), "drug_tier": drug_tier_normalized,
+                    "drug_cost": drug.get("drug_cost"), "drug_requirements": requirements_text or None,
+                    "page_number": drug.get("page_number"), "state_name": state_name,
+                    "coverage_status": coverage_status, "confidence_score": confidence_score,
+                    "manual_review": manual_review, "source_url": s3_frozen_pdf_url,
+                    "is_prior_authorization_required": detect_prior_authorization(requirements_text),
+                    "is_step_therapy_required": detect_step_therapy(requirements_text),
+                    "is_quantity_limit_applied": False, "file_name": f"{plan_name}.pdf"
+                })
+            
+        if enriched_drug_records:
+            insert_drug_formulary_data(consolidate_drug_records(enriched_drug_records))
+            
+        if all_acronyms:
+            from database import insert_acronyms_to_ref_table
+            with get_db_connection() as conn:
+                for acronym in all_acronyms:
+                    acr_coverage_status, _, _, _ = det_coverage_status(
+                        acronym=acronym.get('acronym'), expansion=acronym.get('expansion'),
+                        explanation=acronym.get('explanation'), requirements_text=None,
+                        tier_text=None, conn=conn, state_name=state_name, payer_name=payer_name,
+                        acronym_cache=acronym_cache
+                    )
+                    acronym['coverage_status'] = acr_coverage_status
+            insert_acronyms_to_ref_table(all_acronyms, state_name, payer_name, plan_name, "pp_formulary_names")
+             
+        file_hash = None
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT file_hash FROM plan_details WHERE plan_id = %s", (plan_id,))
+            res = cursor.fetchone()
+            if res and res[0]:
+                file_hash = res[0]
+                
+        if file_hash:
+            cache_result(file_hash, {"drug_table": all_drugs, "acronyms": all_acronyms, "method": "MISTRAL_BATCH", "drug_count": len(all_drugs)}, None, formulary_url=s3_frozen_pdf_url)
+            
+        from database import update_drug_formulary_status, update_plan_and_payer_statuses
+        update_drug_formulary_status([plan_id])
+        update_plan_and_payer_statuses([plan_id], finalize_run=False)
+        
+        update_transaction(
+            transaction_id=transaction_id, status="completed", completed_at=time.strftime('%Y-%m-%d %H:%M:%S'),
+            rows_inserted=len(enriched_drug_records), ocr_pages_processed=len(all_pages_processed),
+            file_hash=file_hash, response_summary={"drugs": len(all_drugs), "acronyms": len(all_acronyms)}
+        )
+        
+    except Exception as e:
+        update_transaction(transaction_id=transaction_id, status="failed", completed_at=time.strftime('%Y-%m-%d %H:%M:%S'), response_summary={"error": str(e)})
+        logger.error(f"Failed to process plan {plan_id}: {e}")
+        traceback.print_exc()
+
 def process_batch_output(output_file_path: str):
     """
-    Processes the output JSONL file from a Mistral Batch job.
-    Parses results, cleans data, and inserts into database.
+    Reads the downloaded Mistral Batch output JSONL file and delegates
+    the processing to a ThreadPool to process all plans concurrently.
     """
     logger.info(f"Processing batch output from: {output_file_path}")
     
-    # Group results by plan_id
     plan_results = defaultdict(list)
     
     with open(output_file_path, 'r', encoding='utf-8') as f:
@@ -1299,299 +1860,32 @@ def process_batch_output(output_file_path: str):
                     
                 custom_id = json.loads(custom_id_str)
                 plan_id = custom_id.get('plan_id')
-                original_pages = custom_id.get('original_pages')
                 
-                response_body = response_item.get('response', {}).get('body', {})
-                
-                # Check for errors in the individual request
                 if response_item.get('error'):
                     logger.error(f"Error in batch item for plan {plan_id}: {response_item['error']}")
                     continue
                     
                 plan_results[plan_id].append({
-                    "original_pages": original_pages,
-                    "ocr_response": response_body
+                    "original_pages": custom_id.get('original_pages'),
+                    "ocr_response": response_item.get('response', {}).get('body', {})
                 })
-                
             except Exception as e:
                 logger.error(f"Failed to parse batch output line: {e}")
+                
+    logger.info(f"Starting CONCURRENT processing for {len(plan_results)} plans...")
     
-    # Process each plan's aggregated results
-    for plan_id, chunks in plan_results.items():
-        # CREATE TRANSACTION FOR THIS PLAN
-        import uuid
-        transaction_id = str(uuid.uuid4())
-        create_transaction(
-            transaction_id=transaction_id,
-            job_type="batch_process_plan",
-            plan_id=plan_id,
-            status="in_progress"
-            # payer_id and file_name filled in after plan_data is fetched below
-        )
+    # Process DB inserts and ML checks concurrently for all returned plans
+    with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_OCR_WORKERS) as executor:
+        futures =[
+            executor.submit(process_plan_batch_result, plan_id, chunks)
+            for plan_id, chunks in plan_results.items()
+        ]
         
-        logger.info(f"Processing results for plan {plan_id} ({len(chunks)} chunks)... [Transaction: {transaction_id}]")
-        
-        try:
-            all_drugs = []
-            all_acronyms = []
-            
-            # Get plan info for DB insertion
-            # We need to fetch plan details again or pass them through. 
-            # Since we are in a different phase, let's fetch from DB.
-            with get_db_connection() as conn:
-                cursor = conn.cursor()
-                cursor.execute("""
-                    SELECT p.plan_name, p.payer_id, p.state_name, pa.payer_name, p.formulary_url
-                    FROM plan_details p
-                    LEFT JOIN payer_details pa ON p.payer_id = pa.payer_id
-                    WHERE p.plan_id = %s
-                """, (plan_id,))
-                plan_data = cursor.fetchone()
-                cursor.close()
-                
-            if not plan_data:
-                logger.error(f"Plan {plan_id} not found in DB, skipping insertion.")
-                
-                # Log error and update transaction
-                log_audit_event(
-                    transaction_id=transaction_id,
-                    event_type="batch.plan_not_found",
-                    service="batch_processing",
-                    error_message=f"Plan {plan_id} not found in database",
-                    payload={"plan_id": plan_id}
-                )
-                
-                update_transaction(
-                    transaction_id=transaction_id,
-                    status="failed",
-                    completed_at=time.strftime('%Y-%m-%d %H:%M:%S'),
-                    response_summary={"error": "Plan not found in database"}
-                )
-                continue
-                
-            plan_name, payer_id, state_name, payer_name, formulary_url = plan_data
-            payer_name = payer_name or plan_name
-            state_name = state_name or 'Unknown'
-            
-            # ✅ Backfill payer_id and file_name now that we have plan data
-            update_transaction(
-                transaction_id=transaction_id,
-                file_name=f"{plan_name}.pdf"
-            )
-            
-            for chunk in chunks:
-                original_pages = chunk['original_pages']
-                ocr_response_dict = chunk['ocr_response']
-                
-                # Convert dict back to object-like structure if needed by _process_ocr_response
-                # Actually _process_ocr_response expects an object with .pages or .document_annotation
-                # Let's mock it or adjust _process_ocr_response. 
-                # _process_ocr_response uses: ocr_response.pages, ocr_response.document_annotation
-                
-                class MockResponse:
-                    def __init__(self, data):
-                        self.pages = data.get('pages', [])
-                        self.document_annotation = data.get('document_annotation')
-                
-                mock_response = MockResponse(ocr_response_dict)
-                
-                chunk_drugs, chunk_acronyms, _ = _process_ocr_response(mock_response, original_pages)
-                all_drugs.extend(chunk_drugs)
-                all_acronyms.extend(chunk_acronyms)
-                
-            # Track costs
-            all_pages_processed = set()
-            for chunk in chunks:
-                all_pages_processed.update(chunk['original_pages'])
-            
-            track_mistral_cost(payer_name, len(all_pages_processed))
-                
-            # Consolidate and Clean
-            all_drugs = _consolidate_and_clean_drug_table(all_drugs)
-            
-            # Filter Index Pages (Post-processing check)
-            if _is_extracted_data_from_index_page(all_drugs):
-                logger.warning(f"Plan {plan_id}: Detected index page data after merge, discarding.")
-                all_drugs = []
-                
-                # Log index page detection
-                log_audit_event(
-                    transaction_id=transaction_id,
-                    event_type="validation.index_page_detected",
-                    service="batch_processing",
-                    payload={"plan_id": plan_id}
-                )
-                
-            # Insert into DB
-            delete_drug_formulary_records_for_plan(plan_id)
-            
-            enriched_drug_records = []
-            with get_db_connection() as conn:
-                for drug in all_drugs:
-                    requirements_text = str(drug.get('drug_requirements', '') or '').strip()
-                    requirements_text_norm = normalize_requirement_code(requirements_text)
-                    drug_tier = drug.get('drug_tier')
-                    drug_tier_normalized = drug_tier or infer_drug_tier_from_text(requirements_text_norm)
-                    combined_acronym_parts = []
-                    if drug_tier_normalized:
-                        combined_acronym_parts.append(str(drug_tier_normalized))
-                    if requirements_text_norm:
-                        combined_acronym_parts.append(str(requirements_text_norm))
-                    combined_acronym = ", ".join(combined_acronym_parts) if combined_acronym_parts else None
-                    # ✅ ML coverage status prediction
-                    coverage_status, confidence_score, _ = det_coverage_status(
-                        acronym=combined_acronym,
-                        expansion=None,
-                        explanation=None,
-                        requirements_text=requirements_text_norm,
-                        tier_text=drug_tier_normalized,
-                        conn=conn,
-                        state_name=state_name,
-                        payer_name=payer_name,
-                        ml_predict_fn=ml_predict_coverage_status,
-                        drug_name=drug.get('drug_name')
-                    )
-                    enriched_record = {
-                        "id": str(uuid.uuid4()),
-                        "plan_id": plan_id,
-                        "payer_id": payer_id,
-                        "plan_name": plan_name,
-                        "payer_name": payer_name,
-                        "drug_name": drug.get("drug_name"),
-                        "drug_tier": drug_tier_normalized,
-                        "drug_cost": drug.get("drug_cost"),
-                        "drug_requirements": requirements_text or None,
-                        "page_number": drug.get("page_number"),
-                        "state_name": state_name,
-                        "coverage_status": coverage_status,  # ✅ ML predicted
-                        "ndc_code": None,
-                        "jcode": None,
-                        "is_prior_authorization_required": detect_prior_authorization(requirements_text),
-                        "is_step_therapy_required": detect_step_therapy(requirements_text),
-                        "is_quantity_limit_applied": False,
-                        "coverage_details": None,
-                        "confidence_score": confidence_score,
-                        "source_url": formulary_url,
-                        "file_name": f"{plan_name}.pdf"
-                    }
-                    enriched_drug_records.append(enriched_record)
-                
-            if enriched_drug_records:
-                insert_drug_formulary_data(enriched_drug_records)
-                logger.info(f"Inserted {len(enriched_drug_records)} records with ML coverage status for plan {plan_id}")
-                
-            # Insert Acronyms with coverage status
-            if all_acronyms:
-                from database import insert_acronyms_to_ref_table
-                with get_db_connection() as conn:
-                    for acronym in all_acronyms:
-                        acr_coverage_status, _, _ = det_coverage_status(
-                            acronym=acronym.get('acronym'),
-                            expansion=acronym.get('expansion'),
-                            explanation=acronym.get('explanation'),
-                            requirements_text=None,
-                            tier_text=None,
-                            conn=conn,
-                            state_name=state_name,
-                            payer_name=payer_name,
-                            ml_predict_fn=ml_predict_coverage_status,
-                            drug_name=None
-                        )
-                        acronym['coverage_status'] = acr_coverage_status  # ✅ ML predicted
-                insert_acronyms_to_ref_table(all_acronyms, state_name, payer_name, plan_name, "pp_formulary_names")
-                logger.info(f"Inserted {len(all_acronyms)} acronyms with ML coverage status for plan {plan_id}")
-            
-            # Log database insertion
-            log_audit_event(
-                transaction_id=transaction_id,
-                event_type="database.insert",
-                service="batch_processing",
-                payload={
-                    "plan_id": plan_id,
-                    "records_inserted": len(enriched_drug_records),
-                    "acronyms_inserted": len(all_acronyms)
-                }
-            )
-                 
-            file_hash = None
-            with get_db_connection() as conn:
-                cursor = conn.cursor()
-                cursor.execute("SELECT file_hash FROM plan_details WHERE plan_id = %s", (plan_id,))
-                res = cursor.fetchone()
-                if res and res[0]:
-                    file_hash = res[0]
-                    
-            if file_hash:
-                result_for_cache = {
-                    "drug_table": all_drugs,
-                    "acronyms": all_acronyms,
-                    "method": "MISTRAL_BATCH",
-                    "drug_count": len(all_drugs)
-                }
-                cache_result(file_hash, result_for_cache, None)
-                logger.info(f"Updated cache for plan {plan_id} (Hash: {file_hash})")
-            else:
-                logger.warning(f"No file_hash found for plan {plan_id}, skipping cache update.")
- 
-            from database import update_drug_formulary_status, update_plan_and_payer_statuses
-            
+        for future in concurrent.futures.as_completed(futures):
             try:
-                update_drug_formulary_status([plan_id])
-                update_plan_and_payer_statuses([plan_id], finalize_run=False) # Don't kill other processing plans
-                logger.info(f"✅ Updated statuses for plan {plan_id}")
+                future.result()  # Catch any unhandled thread exceptions
             except Exception as e:
-                logger.error(f"Failed to update statuses for plan {plan_id}: {e}")
-            
-            # Update transaction as completed
-            update_transaction(
-                transaction_id=transaction_id,
-                status="completed",
-                completed_at=time.strftime('%Y-%m-%d %H:%M:%S'),
-                rows_inserted=len(enriched_drug_records),
-                ocr_pages_processed=len(all_pages_processed),
-                file_hash=file_hash,
-                response_summary={
-                    "drugs": len(all_drugs),
-                    "acronyms": len(all_acronyms),
-                    "chunks_processed": len(chunks)
-                }
-            )
-            
-            # Add audit logging for successful completion
-            log_audit_event(
-                transaction_id=transaction_id,
-                event_type="batch.plan_completed",
-                service="batch_processing",
-                payload={
-                    "plan_id": plan_id,
-                    "chunks_processed": len(chunks),
-                    "drugs_extracted": len(all_drugs),
-                    "records_inserted": len(enriched_drug_records)
-                }
-            )
-            
-        except Exception as e:
-            # Log error audit event
-            log_audit_event(
-                transaction_id=transaction_id,
-                event_type="batch.plan_failed",
-                service="batch_processing",
-                error_message=str(e),
-                error_stack=traceback.format_exc(),
-                payload={"plan_id": plan_id}
-            )
-            
-            # Update transaction as failed
-            update_transaction(
-                transaction_id=transaction_id,
-                status="failed",
-                completed_at=time.strftime('%Y-%m-%d %H:%M:%S'),
-                response_summary={"error": str(e)}
-            )
-            
-            logger.error(f"Failed to process plan {plan_id}: {e}")
-            traceback.print_exc()
-            continue
+                logger.error(f"Exception raised in parallel plan worker: {e}")
 
 
 

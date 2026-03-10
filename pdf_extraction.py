@@ -55,206 +55,208 @@ except ImportError:
 # FORMAT 3 (PDL): B,G,O | Comment | P,N,R,NR | Therapeutic Category
 # FORMAT 4 (Tier Designation): Drug Name | Tier Designation | dot-marked columns
 # =============================================================================
-OCR_ANNOTATION_SCHEMA = {
-    "type": "json_schema",
-    "json_schema": {
-        "name": "drug_extraction_schema",
-        "schema": {
-            "type": "object",
-            "title": "StructuredData",
-            "properties": {
-                "DrugInformation": {
-                    "type": "array",
-                    "description": """Extract ALL drugs from the page.
+from ocr_schema import O_A_S
+OCR_ANNOTATION_SCHEMA = O_A_S
+# OCR_ANNOTATION_SCHEMA = {
+#     "type": "json_schema",
+#     "json_schema": {
+#         "name": "drug_extraction_schema",
+#         "schema": {
+#             "type": "object",
+#             "title": "StructuredData",
+#             "properties": {
+#                 "DrugInformation": {
+#                     "type": "array",
+#                     "description": """Extract ALL drugs from the page.
 
-🎨 CRITICAL COLOR DETECTION INSTRUCTION:
-IF you see COLORED BADGES or COLORED TEXT for requirements (QL, PA, ST, etc.), you MUST extract the colors in the 'badge_colors' field.
-Look for: purple badges, brown/orange badges, red badges, green badges, blue badges, etc.
-Example: If "QL" appears in a purple pill-shaped badge, and "PA" in a brown badge → badge_colors: {"QL": "purple", "PA": "brown"}
-If ALL text is standard BLACK with NO colored badges → leave badge_colors as NULL.
+# 🎨 CRITICAL COLOR DETECTION INSTRUCTION:
+# IF you see COLORED BADGES or COLORED TEXT for requirements (QL, PA, ST, etc.), you MUST extract the colors in the 'badge_colors' field.
+# Look for: purple badges, brown/orange badges, red badges, green badges, blue badges, etc.
+# Example: If "QL" appears in a purple pill-shaped badge, and "PA" in a brown badge → badge_colors: {"QL": "purple", "PA": "brown"}
+# If ALL text is standard BLACK with NO colored badges → leave badge_colors as NULL.
 
-KEY INSTRUCTION: This page contains a list of drugs, tiers, and requirements. 
-IT MAY NOT LOOK LIKE A TRADITIONAL TABLE.
-IT MAY NOT HAVE HEADERS.
-IT MAY LOOK LIKE A VERTICAL LIST.
+# KEY INSTRUCTION: This page contains a list of drugs, tiers, and requirements. 
+# IT MAY NOT LOOK LIKE A TRADITIONAL TABLE.
+# IT MAY NOT HAVE HEADERS.
+# IT MAY LOOK LIKE A VERTICAL LIST.
 
-YOU MUST EXTRACT EVERY DRUG ENTRY YOU SEE.
+# YOU MUST EXTRACT EVERY DRUG ENTRY YOU SEE.
 
-RECOGNITION PATTERNS:
-1. Standard Table: "Drug Name" | "Tier" | "Restrictions"
-2. List Format: Drug Name on one line, Tier/Requirements on next line.
-3. Compact List: Drug Name followed by Tier (e.g. "5") and Requirements (e.g. "QL")
+# RECOGNITION PATTERNS:
+# 1. Standard Table: "Drug Name" | "Tier" | "Restrictions"
+# 2. List Format: Drug Name on one line, Tier/Requirements on next line.
+# 3. Compact List: Drug Name followed by Tier (e.g. "5") and Requirements (e.g. "QL")
 
-EXAMPLE OF LIST FORMAT (Common in this document):
-  TREMFYA SOSY 100mg/ml
-  QL (1 syringe / 28 days)
-  5
-  QL NM PA
-  ==> Extract as: Drug Name="TREMFYA SOSY 100mg/ml", Tier="5", Requirements="QL (1 syringe / 28 days); QL NM PA"
-CRITICAL: Look for tables with these column headers:
-- "Drug Name" | "Tier" | "Restrictions/Limits"
-- OR "Drug Name" | "Drug Tier" | "Requirements"
-- OR "Drug Name" | "Dosage" | "Strength/Package Size" | "Billing Unit" | "UM Type" | "Code 1"
-- OR "HCPCS/CPT Code" | "Drug Name" | "HCPCS/CPT Code Description" | "Coverage Level" | "Notes & Restrictions"
-- OR "Drug Class/Drug Name" | "Reference Brand Name" | "Brand Only/Generic Notes" | "Preferred Drug Status" | "PA Status" | "Step Therapy Requirements" | "Quantity Limit (QL)" | "QL Days"
-- OR "Drug name" | "Brand or Generic" | "Drug tier" | "Coverage rules or limits on use"
-- OR "Drug Name" | "Special Code" | "Tier Category"
+# EXAMPLE OF LIST FORMAT (Common in this document):
+#   TREMFYA SOSY 100mg/ml
+#   QL (1 syringe / 28 days)
+#   5
+#   QL NM PA
+#   ==> Extract as: Drug Name="TREMFYA SOSY 100mg/ml", Tier="5", Requirements="QL (1 syringe / 28 days); QL NM PA"
+# CRITICAL: Look for tables with these column headers:
+# - "Drug Name" | "Tier" | "Restrictions/Limits"
+# - OR "Drug Name" | "Drug Tier" | "Requirements"
+# - OR "Drug Name" | "Dosage" | "Strength/Package Size" | "Billing Unit" | "UM Type" | "Code 1"
+# - OR "HCPCS/CPT Code" | "Drug Name" | "HCPCS/CPT Code Description" | "Coverage Level" | "Notes & Restrictions"
+# - OR "Drug Class/Drug Name" | "Reference Brand Name" | "Brand Only/Generic Notes" | "Preferred Drug Status" | "PA Status" | "Step Therapy Requirements" | "Quantity Limit (QL)" | "QL Days"
+# - OR "Drug name" | "Brand or Generic" | "Drug tier" | "Coverage rules or limits on use"
+# - OR "Drug Name" | "Special Code" | "Tier Category"
 
-TABLE STRUCTURE RECOGNITION:
-- The table has 3 columns: Drug Name (left), Tier (middle), Restrictions/Limits (right)
-- CATEGORY HEADERS appear as gray/shaded rows spanning all columns (e.g., "FIRST GENERATION ANTIHISTAMINES", "PHENOTHIAZINE DERIVATIVES")
-- Drug rows contain: full drug name with dosage in column 1, tier value in column 2, restrictions in column 3
-- SPECIAL TEMPLATE 1: If headers are "Drug Name", "Dosage", "Strength", "Billing Unit", "UM Type", "Code 1":
-    - This template has NO Tier column.
-    - "UM Type" and "Code 1" are Requirements columns.
-- SPECIAL TEMPLATE 2: If headers are "HCPCS/CPT Code", "Drug Name", "HCPCS/CPT Code Description", "Coverage Level", "Notes & Restrictions":
-    - "Coverage Level" maps to Tier.
-    - "Notes & Restrictions" maps to Requirements.
-    - "HCPCS/CPT Code Description" provides additional drug details.
-- SPECIAL TEMPLATE 3 (AHCCCS): If headers are "Drug Class/Drug Name", "Reference Brand Name", "Brand Only/Generic Notes", "Preferred Drug Status", "PA Status", "Step Therapy Requirements", "Quantity Limit (QL)", "QL Days":
-    - Drug Name = "Drug Class/Drug Name" + "Reference Brand Name"
-    - This template has no "Drug tier" column.
-    - Requirements = "PA Status" + "Step Therapy Requirements" + "Quantity Limit (QL)" + "QL Days"
-- SPECIAL TEMPLATE 4: If headers are "Drug name", "Brand or Generic", "Drug tier", "Coverage rules or limits on use":
-    - Tier = "Drug tier" ONLY. Ignore "Brand or Generic". If "Drug tier" column is missing, set Tier to NULL.
-    - Requirements = "Coverage rules or limits on use"
-- SPECIAL TEMPLATE 5: If headers are "Drug Name", "Special Code", "Tier Category":
-    - "Special Code" maps to 'requirements'.
-    - "Tier Category" maps to 'drug tier'. Extract ONLY the tier value (e.g., "3", "NC", "4") and IGNORE the category text (e.g., "ANTIVIRALS").
+# TABLE STRUCTURE RECOGNITION:
+# - The table has 3 columns: Drug Name (left), Tier (middle), Restrictions/Limits (right)
+# - CATEGORY HEADERS appear as gray/shaded rows spanning all columns (e.g., "FIRST GENERATION ANTIHISTAMINES", "PHENOTHIAZINE DERIVATIVES")
+# - Drug rows contain: full drug name with dosage in column 1, tier value in column 2, restrictions in column 3
+# - SPECIAL TEMPLATE 1: If headers are "Drug Name", "Dosage", "Strength", "Billing Unit", "UM Type", "Code 1":
+#     - This template has NO Tier column.
+#     - "UM Type" and "Code 1" are Requirements columns.
+# - SPECIAL TEMPLATE 2: If headers are "HCPCS/CPT Code", "Drug Name", "HCPCS/CPT Code Description", "Coverage Level", "Notes & Restrictions":
+#     - "Coverage Level" maps to Tier.
+#     - "Notes & Restrictions" maps to Requirements.
+#     - "HCPCS/CPT Code Description" provides additional drug details.
+# - SPECIAL TEMPLATE 3 (AHCCCS): If headers are "Drug Class/Drug Name", "Reference Brand Name", "Brand Only/Generic Notes", "Preferred Drug Status", "PA Status", "Step Therapy Requirements", "Quantity Limit (QL)", "QL Days":
+#     - Drug Name = "Drug Class/Drug Name" + "Reference Brand Name"
+#     - This template has no "Drug tier" column.
+#     - Requirements = "PA Status" + "Step Therapy Requirements" + "Quantity Limit (QL)" + "QL Days"
+# - SPECIAL TEMPLATE 4: If headers are "Drug name", "Brand or Generic", "Drug tier", "Coverage rules or limits on use":
+#     - Tier = "Drug tier" ONLY. Ignore "Brand or Generic". If "Drug tier" column is missing, set Tier to NULL.
+#     - Requirements = "Coverage rules or limits on use"
+# - SPECIAL TEMPLATE 5: If headers are "Drug Name", "Special Code", "Tier Category":
+#     - "Special Code" maps to 'requirements'.
+#     - "Tier Category" maps to 'drug tier'. Extract ONLY the tier value (e.g., "3", "NC", "4") and IGNORE the category text (e.g., "ANTIVIRALS").
 
-EXTRACTION RULES:
-1. Extract EVERY drug row - do NOT skip any.
-2. Category headers go in the 'category' field.
-3. Tier values: Look for "Tier 1", "Tier 2" OR just numbers "1", "2", "3", "4", "5".
-4. Restrictions: Look for "QL", "PA", "ST", "NM", "LA", "B/D".
-5. DO NOT SKIP PAGES. Extract whatever looks like a drug list.
-6. ALWAYS check for colored badges/text and extract colors if present.""",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "Drug Name": {
-                                "type": "string", 
-                                "description": """The complete drug name from the first/left-most column. This column may contain EITHER:
-1. Just the drug name (e.g., 'AMOXICILLIN', 'AMPICILLIN')
-2. Drug name WITH dosage form inline (e.g., 'carbinoxamine maleate oral liquid', 'carbinoxamine maleate oral tablet 4 mg', 'azelastine nasal spray non-aerosol 137 mcg (0.1 %)')
+# EXTRACTION RULES:
+# 1. Extract EVERY drug row - do NOT skip any.
+# 2. Category headers go in the 'category' field.
+# 3. Tier values: Look for "Tier 1", "Tier 2" OR just numbers "1", "2", "3", "4", "5".
+# 4. Restrictions: Look for "QL", "PA", "ST", "NM", "LA", "B/D".
+# 5. DO NOT SKIP PAGES. Extract whatever looks like a drug list.
+# 6. ALWAYS check for colored badges/text and extract colors if present.""",
+#                     "items": {
+#                         "type": "object",
+#                         "properties": {
+#                             "Drug Name": {
+#                                 "type": "string", 
+#                                 "description": """The complete drug name from the first/left-most column. This column may contain EITHER:
+# 1. Just the drug name (e.g., 'AMOXICILLIN', 'AMPICILLIN')
+# 2. Drug name WITH dosage form inline (e.g., 'carbinoxamine maleate oral liquid', 'carbinoxamine maleate oral tablet 4 mg', 'azelastine nasal spray non-aerosol 137 mcg (0.1 %)')
 
-CRITICAL EXCLUSIONS:
-- DO NOT include "QL", "PA", "ST", "Limits", or "(... per ... days)" in the Drug Name field, even if they appear in the first column or directly below the drug name.
-- Example: If text is "TREMFYA SOSY 100mg/ml\nQL (1 syringe / 28 days)", extract ONLY "TREMFYA SOSY 100mg/ml" as Drug Name. The "QL..." part goes to 'requirements'.
-- Example: If text is "XYZAL\nQL", extract ONLY "XYZAL".
-- EXTRACT THE FULL TEXT from the first column, including any dosage information, BUT STOP before any coverage restrictions.
-- IF THE COLUMN HEADER IS "pub drug name", EXTRACT DATA FROM THAT COLUMN.
-- IF THERE IS A SEPARATE COLUMN FOR DOSAGE/STRENGTH (e.g. "pub strength", "strength"), AND IT IS NOT EXTRACTED IN THE 'Dosage Form/Strength' FIELD, APPEND IT TO THIS FIELD.
-EXTRACT THE FULL TEXT from the first column, including any dosage information. Copy EXACTLY as shown.
-SPECIAL CASE 1: If table has "HCPCS/CPT Code Description" column, you MUST concatenate "Drug Name" column value AND "HCPCS/CPT Code Description" column value here.
-SPECIAL CASE 2: If table has "Reference Brand Name" column, you MUST concatenate "Drug Class/Drug Name" column value AND "Reference Brand Name" column value here (e.g. "AMPHETAMINE... (ADDERALL XR)")."""
-                            },
-                            "Dosage Form/Strength": {
-                                "type": ["string", "null"],
-                                "description": "The dosage form and strength IF it appears in a SEPARATE second column (between Drug Name and Tier). Examples: 'TAB 250MG', 'CAP 500MG', 'SUS 200/5ML'. In many PDFs, this information is ALREADY included in the Drug Name column, so this field will be null. Only fill this if there's a distinct second column. IF THE COLUMN HEADER IS 'pub strength' OR 'pub dosage', EXTRACT DATA FROM THAT COLUMN."
-                            },
-                            "BrandOrGeneric": {
-                                "type": ["string", "null"],
-                                "description": "The value from the 'Brand or Generic' column if present (often the 2nd column). Values like 'B', 'G', 'Brand', 'Generic'. EXTRACT THIS SEPARATELY so it does not get mixed into Drug Name or Tier."
-                            },
-                            "drug tier": {
-                                "type": ["string", "null"], 
-                                "description": "The tier/drug type value. Copy exactly as shown. Can be: 'Tier 1', 'Tier 2', 'Tier 3', 'Tier 4', 'Tier 5', OR 'Generic', 'Brand', 'Specialty'. IF THE COLUMN CONTAINS COSTS (e.g., '$0 (Tier 1)', '$0/$1.60'), EXTRACT THE FULL TEXT INCLUDING THE COST. Do not strip the cost. Example: extract '$0 (Tier 1)' exactly as is. IF THE COLUMN HEADER IS 'pub tier', EXTRACT DATA FROM THAT COLUMN. Leave null ONLY for category header rows. DO NOT INCLUDE 'B' or 'G' from the Brand/Generic column here."
-                            },
-                            "requirements": {
-                                "type": ["string", "null"], 
-                                "description": "The restrictions from the Restrictions/Limits column (right column). Copy EXACTLY as shown. Examples: 'ST' (Step Therapy), 'PA' (Prior Authorization), 'QL (60 ML per 30 days)' (Quantity Limit with details), 'PA, QL', empty cells should be null. ALSO INCLUDE any limits (QL, PA, ST) that appear in the first column under the drug name. IF THE COLUMN HEADER IS 'drug edit', EXTRACT DATA FROM THAT COLUMN. DO NOT INCLUDE 'B' or 'G' here. For PREFERRED/NON-PREFERRED tables: set to 'PA' if the drug is in the 'PA Required' or 'Non-preferred Agents' column, set to null if the drug is in the 'No PA Required' or 'Preferred Agents' column."
-                            },
-                            "preferred_agent": {
-                                "type": ["string", "null"],
-                                "enum": ["yes", "no", None],
-                                "description": "ONLY USE VALUES: 'yes', 'no', or null. NO OTHER VALUES ALLOWED. For PREFERRED/NON-PREFERRED format tables: Set to 'yes' if the drug is in the PREFERRED or 'No PA Required' column. Set to 'no' if the drug is in the NON-PREFERRED or 'PA Required' column. Leave null for standard tier-based tables. NEVER use '[default]' or any other placeholder text."
-                            },
-                            "non_preferred_agent": {
-                                "type": ["string", "null"],
-                                "enum": ["yes", "no", None],
-                                "description": "ONLY USE VALUES: 'yes', 'no', or null. NO OTHER VALUES ALLOWED. For PREFERRED/NON-PREFERRED format tables: Set to 'yes' if the drug is in the NON-PREFERRED or 'PA Required' column. Set to 'no' if the drug is in the PREFERRED or 'No PA Required' column. Leave null for standard tier-based tables. NEVER use '[default]' or any other placeholder text."
-                            },
-                            "BGO": {"type": ["string", "null"], "description": "PDL format only: B=Brand, G=Generic, O=OTC. Leave null for standard formulary tables."},
-                            "PNRNR": {"type": ["string", "null"], "description": "PDL format only: P=Preferred, N=Non-Preferred, R/NR. Leave null for standard formulary tables."},
-                            "Specialty": {"type": ["boolean", "null"], "description": "True if marked as Specialty drug. Leave null if not indicated."},
-                            "PriorAuthorization": {"type": ["boolean", "null"], "description": "True if 'PA' appears in requirements column."},
-                            "StepTherapy": {"type": ["boolean", "null"], "description": "True if 'ST' appears in requirements column."},
-                            "DispensingLimits": {"type": ["boolean", "null"], "description": "True if 'QL' appears in requirements column."},
-                            "category": {
-                                "type": ["string", "null"], 
-                                "description": "Category header text from gray/shaded rows that span all columns. Examples: '*ADHD/ANTI-NARCOLEPSY...', '*AMPHETAMINE MIXTURES*'. These are NOT drug names."
-                            },
-                            "page_number": {"type": ["integer", "null"], "description": "Page number in the PDF where this drug is found."},
-                            "pa_form_link": {"type": ["string", "null"], "description": "PA Form Link URL if present in the table."},
-                            "badge_colors": {
-                                "type": ["object", "null"], 
-                                "description": """🎨 LOOK FOR COLORS! Extract colors of requirement badges (QL, PA, ST, etc.) if they are NOT black.
-Examples: {"QL": "purple"}, {"PA": "brown"}, {"ST": "olive"}, {"HYB": "green"}, {"HNB": "red"}
-NULL if all text is black.""",
-                                "properties": {},
-                                "additionalProperties": {"type": "string"}
-                            }
-                        },
-                        "required": ["Drug Name"]
-                    }
-                },
+# CRITICAL EXCLUSIONS:
+# - DO NOT include "QL", "PA", "ST", "Limits", or "(... per ... days)" in the Drug Name field, even if they appear in the first column or directly below the drug name.
+# - Example: If text is "TREMFYA SOSY 100mg/ml\nQL (1 syringe / 28 days)", extract ONLY "TREMFYA SOSY 100mg/ml" as Drug Name. The "QL..." part goes to 'requirements'.
+# - Example: If text is "XYZAL\nQL", extract ONLY "XYZAL".
+# - EXTRACT THE FULL TEXT from the first column, including any dosage information, BUT STOP before any coverage restrictions.
+# - IF THE COLUMN HEADER IS "pub drug name", EXTRACT DATA FROM THAT COLUMN.
+# - IF THERE IS A SEPARATE COLUMN FOR DOSAGE/STRENGTH (e.g. "pub strength", "strength"), AND IT IS NOT EXTRACTED IN THE 'Dosage Form/Strength' FIELD, APPEND IT TO THIS FIELD.
+# EXTRACT THE FULL TEXT from the first column, including any dosage information. Copy EXACTLY as shown.
+# SPECIAL CASE 1: If table has "HCPCS/CPT Code Description" column, you MUST concatenate "Drug Name" column value AND "HCPCS/CPT Code Description" column value here.
+# SPECIAL CASE 2: If table has "Reference Brand Name" column, you MUST concatenate "Drug Class/Drug Name" column value AND "Reference Brand Name" column value here (e.g. "AMPHETAMINE... (ADDERALL XR)")."""
+#                             },
+#                             "Dosage Form/Strength": {
+#                                 "type": ["string", "null"],
+#                                 "description": "The dosage form and strength IF it appears in a SEPARATE second column (between Drug Name and Tier). Examples: 'TAB 250MG', 'CAP 500MG', 'SUS 200/5ML'. In many PDFs, this information is ALREADY included in the Drug Name column, so this field will be null. Only fill this if there's a distinct second column. IF THE COLUMN HEADER IS 'pub strength' OR 'pub dosage', EXTRACT DATA FROM THAT COLUMN."
+#                             },
+#                             "BrandOrGeneric": {
+#                                 "type": ["string", "null"],
+#                                 "description": "The value from the 'Brand or Generic' column if present (often the 2nd column). Values like 'B', 'G', 'Brand', 'Generic'. EXTRACT THIS SEPARATELY so it does not get mixed into Drug Name or Tier."
+#                             },
+#                             "drug tier": {
+#                                 "type": ["string", "null"], 
+#                                 "description": "The tier/drug type value. Copy exactly as shown. Can be: 'Tier 1', 'Tier 2', 'Tier 3', 'Tier 4', 'Tier 5', OR 'Generic', 'Brand', 'Specialty'. IF THE COLUMN CONTAINS COSTS (e.g., '$0 (Tier 1)', '$0/$1.60'), EXTRACT THE FULL TEXT INCLUDING THE COST. Do not strip the cost. Example: extract '$0 (Tier 1)' exactly as is. IF THE COLUMN HEADER IS 'pub tier', EXTRACT DATA FROM THAT COLUMN. Leave null ONLY for category header rows. DO NOT INCLUDE 'B' or 'G' from the Brand/Generic column here."
+#                             },
+#                             "requirements": {
+#                                 "type": ["string", "null"], 
+#                                 "description": "The restrictions from the Restrictions/Limits column (right column). Copy EXACTLY as shown. Examples: 'ST' (Step Therapy), 'PA' (Prior Authorization), 'QL (60 ML per 30 days)' (Quantity Limit with details), 'PA, QL', empty cells should be null. ALSO INCLUDE any limits (QL, PA, ST) that appear in the first column under the drug name. IF THE COLUMN HEADER IS 'drug edit', EXTRACT DATA FROM THAT COLUMN. DO NOT INCLUDE 'B' or 'G' here. For PREFERRED/NON-PREFERRED tables: set to 'PA' if the drug is in the 'PA Required' or 'Non-preferred Agents' column, set to null if the drug is in the 'No PA Required' or 'Preferred Agents' column."
+#                             },
+#                             "preferred_agent": {
+#                                 "type": ["string", "null"],
+#                                 "enum": ["yes", "no", None],
+#                                 "description": "ONLY USE VALUES: 'yes', 'no', or null. NO OTHER VALUES ALLOWED. For PREFERRED/NON-PREFERRED format tables: Set to 'yes' if the drug is in the PREFERRED or 'No PA Required' column. Set to 'no' if the drug is in the NON-PREFERRED or 'PA Required' column. Leave null for standard tier-based tables. NEVER use '[default]' or any other placeholder text."
+#                             },
+#                             "non_preferred_agent": {
+#                                 "type": ["string", "null"],
+#                                 "enum": ["yes", "no", None],
+#                                 "description": "ONLY USE VALUES: 'yes', 'no', or null. NO OTHER VALUES ALLOWED. For PREFERRED/NON-PREFERRED format tables: Set to 'yes' if the drug is in the NON-PREFERRED or 'PA Required' column. Set to 'no' if the drug is in the PREFERRED or 'No PA Required' column. Leave null for standard tier-based tables. NEVER use '[default]' or any other placeholder text."
+#                             },
+#                             "BGO": {"type": ["string", "null"], "description": "PDL format only: B=Brand, G=Generic, O=OTC. Leave null for standard formulary tables."},
+#                             "PNRNR": {"type": ["string", "null"], "description": "PDL format only: P=Preferred, N=Non-Preferred, R/NR. Leave null for standard formulary tables."},
+#                             "Specialty": {"type": ["boolean", "null"], "description": "True if marked as Specialty drug. Leave null if not indicated."},
+#                             "PriorAuthorization": {"type": ["boolean", "null"], "description": "True if 'PA' appears in requirements column."},
+#                             "StepTherapy": {"type": ["boolean", "null"], "description": "True if 'ST' appears in requirements column."},
+#                             "DispensingLimits": {"type": ["boolean", "null"], "description": "True if 'QL' appears in requirements column."},
+#                             "category": {
+#                                 "type": ["string", "null"], 
+#                                 "description": "Category header text from gray/shaded rows that span all columns. Examples: '*ADHD/ANTI-NARCOLEPSY...', '*AMPHETAMINE MIXTURES*'. These are NOT drug names."
+#                             },
+#                             "page_number": {"type": ["integer", "null"], "description": "Page number in the PDF where this drug is found."},
+#                             "pa_form_link": {"type": ["string", "null"], "description": "PA Form Link URL if present in the table."},
+#                             "badge_colors": {
+#                                 "type": ["object", "null"], 
+#                                 "description": """🎨 LOOK FOR COLORS! Extract colors of requirement badges (QL, PA, ST, etc.) if they are NOT black.
+# Examples: {"QL": "purple"}, {"PA": "brown"}, {"ST": "olive"}, {"HYB": "green"}, {"HNB": "red"}
+# NULL if all text is black.""",
+#                                 "properties": {},
+#                                 "additionalProperties": {"type": "string"}
+#                             }
+#                         },
+#                         "required": ["Drug Name"]
+#                     }
+#                 },
 
-                "FormularyAbbreviations": {
-                    "type": "array",
-                    "description": """Extract ALL abbreviation/legend definitions AND tier definitions from ANYWHERE in the document.
+#                 "FormularyAbbreviations": {
+#                     "type": "array",
+#                     "description": """Extract ALL abbreviation/legend definitions AND tier definitions from ANYWHERE in the document.
 
-🎨 CRITICAL COLOR DETECTION INSTRUCTION:
-When extracting acronyms/abbreviations, LOOK AT THE VISUAL APPEARANCE:
-- If the acronym appears in a COLORED BADGE (purple, brown, green, red, orange, blue, etc.), extract that color in 'badge_color'
-- If the acronym text has COLOR (not black), extract that color in 'badge_color'
-- Example: "QL" in purple pill badge → badge_color: "purple"
-- Example: "PA" in brown/orange badge → badge_color: "brown"
-- Example: "HYB" in green badge → badge_color: "green"  
-- Example: "HNB" in red badge → badge_color: "red"
-- If text is standard BLACK with no colored badge → badge_color: NULL
+# 🎨 CRITICAL COLOR DETECTION INSTRUCTION:
+# When extracting acronyms/abbreviations, LOOK AT THE VISUAL APPEARANCE:
+# - If the acronym appears in a COLORED BADGE (purple, brown, green, red, orange, blue, etc.), extract that color in 'badge_color'
+# - If the acronym text has COLOR (not black), extract that color in 'badge_color'
+# - Example: "QL" in purple pill badge → badge_color: "purple"
+# - Example: "PA" in brown/orange badge → badge_color: "brown"
+# - Example: "HYB" in green badge → badge_color: "green"  
+# - Example: "HNB" in red badge → badge_color: "red"
+# - If text is standard BLACK with no colored badge → badge_color: NULL
 
-THIS IS VERY IMPORTANT: Two acronyms may be the SAME text but DIFFERENT colors mean DIFFERENT things!
-Example: "HYB" (green) = Preferred, "HNB" (red) = Non-Preferred
+# THIS IS VERY IMPORTANT: Two acronyms may be the SAME text but DIFFERENT colors mean DIFFERENT things!
+# Example: "HYB" (green) = Preferred, "HNB" (red) = Non-Preferred
 
-EXTRACT TWO TYPES OF DEFINITIONS:
+# EXTRACT TWO TYPES OF DEFINITIONS:
 
-TYPE 1 - ABBREVIATION CODES:
-Look for legends in: page headers, footers, sidebar text, or dedicated sections.
-Common patterns: 'ST = Step Therapy', 'PA = Prior Authorization', 'QL = Quantity Limit', 'B/D = Brand/Drug'
-Examples: 'NDS' = 'Non-Dispensing Supply', 'LA' = 'Limitation on Age', 'EX' = 'Excluded Drug'
+# TYPE 1 - ABBREVIATION CODES:
+# Look for legends in: page headers, footers, sidebar text, or dedicated sections.
+# Common patterns: 'ST = Step Therapy', 'PA = Prior Authorization', 'QL = Quantity Limit', 'B/D = Brand/Drug'
+# Examples: 'NDS' = 'Non-Dispensing Supply', 'LA' = 'Limitation on Age', 'EX' = 'Excluded Drug'
 
-TYPE 2 - TIER DEFINITIONS (CRITICAL - EXTRACT THESE):
-Look for tier explanation sections with text like:
-- 'Tier 1 - Preferred Generic Drugs: This tier includes commonly prescribed generic drugs...'
-- 'Tier 2 - Generic Drugs: This tier includes generic drugs...'
-- 'Tier 3 - Preferred Brand Drugs: This tier includes preferred brand-name drugs...'
-- 'Tier 4 - Non-Preferred Drugs: This tier includes higher-priced brand name drugs...'
-- 'Tier 5 - Specialty Tier drugs: This tier includes high-cost drugs...'
-- 'Tier 6 - Select Care Diabetic Drugs: This tier includes...'
+# TYPE 2 - TIER DEFINITIONS (CRITICAL - EXTRACT THESE):
+# Look for tier explanation sections with text like:
+# - 'Tier 1 - Preferred Generic Drugs: This tier includes commonly prescribed generic drugs...'
+# - 'Tier 2 - Generic Drugs: This tier includes generic drugs...'
+# - 'Tier 3 - Preferred Brand Drugs: This tier includes preferred brand-name drugs...'
+# - 'Tier 4 - Non-Preferred Drugs: This tier includes higher-priced brand name drugs...'
+# - 'Tier 5 - Specialty Tier drugs: This tier includes high-cost drugs...'
+# - 'Tier 6 - Select Care Diabetic Drugs: This tier includes...'
 
-For TIER DEFINITIONS:
-- Acronym = 'Tier 1', 'Tier 2', 'Tier 3', etc.
-- Expansion = The tier name like 'Preferred Generic Drugs', 'Generic Drugs', etc. 
-- Explanation = The full description text 'This tier includes commonly prescribed generic drugs...'
+# For TIER DEFINITIONS:
+# - Acronym = 'Tier 1', 'Tier 2', 'Tier 3', etc.
+# - Expansion = The tier name like 'Preferred Generic Drugs', 'Generic Drugs', etc. 
+# - Explanation = The full description text 'This tier includes commonly prescribed generic drugs...'
 
-Extract EVERY abbreviation definition AND tier definition found WITH THEIR COLORS IF PRESENT.""",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "Acronym": {"type": "string", "description": "The abbreviation code OR tier identifier. Examples: 'ST', 'PA', 'QL', 'SP', 'Tier 1', 'Tier 2', 'Tier 3', 'Tier 4', 'Tier 5', 'Tier 6'. EXTRACT ONLY THE CODE/IDENTIFIER HERE."},
-                            "Expansion": {"type": "string", "description": "What the abbreviation stands for OR the tier name. Examples: 'Step Therapy', 'Prior Authorization', 'Preferred Generic Drugs', 'Non-Preferred Drugs'. EXTRACT THE NAME HERE."},
-                            "Explanation": {"type": ["string", "null"], "description": "Additional explanation if provided. For tier definitions, this is the full description like 'This tier includes commonly prescribed generic drugs. Drugs in Tier 1 will typically be your most affordable option.'"},
-                            "badge_color": {"type": ["string", "null"], "description": "CONDITIONAL - Extract ONLY if the acronym/abbreviation appears in COLORED text or badge (NOT black). Specify color name: 'purple', 'brown', 'green', 'red', 'orange', 'blue', etc. NULL if black text."}
-                        },
-                        "required": ["Acronym", "Expansion"]
-                    }
-                }
-            },
-            "required": ["DrugInformation"]
-        }
-    }
-}
+# Extract EVERY abbreviation definition AND tier definition found WITH THEIR COLORS IF PRESENT.""",
+#                     "items": {
+#                         "type": "object",
+#                         "properties": {
+#                             "Acronym": {"type": "string", "description": "The abbreviation code OR tier identifier. Examples: 'ST', 'PA', 'QL', 'SP', 'Tier 1', 'Tier 2', 'Tier 3', 'Tier 4', 'Tier 5', 'Tier 6'. EXTRACT ONLY THE CODE/IDENTIFIER HERE."},
+#                             "Expansion": {"type": "string", "description": "What the abbreviation stands for OR the tier name. Examples: 'Step Therapy', 'Prior Authorization', 'Preferred Generic Drugs', 'Non-Preferred Drugs'. EXTRACT THE NAME HERE."},
+#                             "Explanation": {"type": ["string", "null"], "description": "Additional explanation if provided. For tier definitions, this is the full description like 'This tier includes commonly prescribed generic drugs. Drugs in Tier 1 will typically be your most affordable option.'"},
+#                             "badge_color": {"type": ["string", "null"], "description": "CONDITIONAL - Extract ONLY if the acronym/abbreviation appears in COLORED text or badge (NOT black). Specify color name: 'purple', 'brown', 'green', 'red', 'orange', 'blue', etc. NULL if black text."}
+#                         },
+#                         "required": ["Acronym", "Expansion"]
+#                     }
+#                 }
+#             },
+#             "required": ["DrugInformation"]
+#         }
+#     }
+# }
 
 
 def _build_requirements_from_item(item):
@@ -764,11 +766,21 @@ def _is_extracted_data_from_index_page(drug_table: List[dict]) -> bool:
         logger.info(f"🚫 INDEX PAGE DETECTED (Rule 1): {index_entries}/{total} ({index_entries/total*100:.1f}%) entries are index entries")
         return True
     
-    # RULE 1.5: If majority have valid tier formats, this is NOT an index page
+    # RULE 1.5: If majority have valid tier formats (1-6), this is NOT an index page
     if total > 0 and valid_tier_format_count / total >= 0.50:
         logger.info(f"✅ VALID DRUG PAGE: {valid_tier_format_count}/{total} ({valid_tier_format_count/total*100:.1f}%) entries have valid tier formats (1-6)")
         return False
     
+    # RULE 1.6: If majority of entries have ANY drug_tier value (including cost-based tiers like
+    # '$0 (4)', '$0 (5^)', 'Tier 1', etc.), this is a valid drug page — NOT an index.
+    # This prevents false positives for plans like Wellcare that use cost-based tier notation
+    # (which bypasses _is_valid_tier_format since those only accept numeric 1-6 tiers).
+    has_any_tier_count = sum(1 for item in drug_table if item.get("drug_tier"))
+    if total > 0 and has_any_tier_count / total >= 0.40:
+        logger.info(f"✅ VALID DRUG PAGE (Rule 1.6 - Any Tier): {has_any_tier_count}/{total} ({has_any_tier_count/total*100:.1f}%) entries have a drug_tier value. NOT an index page.")
+        return False
+    
+
     # RULE 2: STATISTICAL VARIANCE ANALYSIS
     # Real drug tiers: [1, 1, 2, 1, 3, 2, 1] → low variance, mean ~1.5
     # Page numbers: [301, 115, 143, 180, 214] → high variance, mean ~190

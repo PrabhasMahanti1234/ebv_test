@@ -1,0 +1,4 @@
+2026-03-06 12:18:22,639 [INFO] {"event": "ocr.completed", "plan_id": "f8b2d526-0af6-41dd-bc48-1985821b6389", "method": "[PARALLEL CHUNKED OCR EXTRACTION]", "drugs_extracted": 54, "acronyms_extracted": 15}
+2026-03-06 12:19:13,581 [INFO] {"event": "ocr.completed", "plan_id": "353c6952-cf8b-4f6e-bede-3f047ff2e7c7", "method": "[PARALLEL CHUNKED OCR EXTRACTION]", "drugs_extracted": 474, "acronyms_extracted": 17}
+2026-03-09 13:17:26,973 [INFO] {"event": "ocr.completed", "plan_id": "5f0c5404-9dac-41e0-8ab5-a88797597032", "method": "[PARALLEL CHUNKED OCR EXTRACTION]", "drugs_extracted": 0, "acronyms_extracted": 0}
+2026-03-09 13:17:51,982 [INFO] {"event": "ocr.completed", "plan_id": "a2c2e0af-0236-4281-a673-010c6c3cffb4", "method": "[PARALLEL CHUNKED OCR EXTRACTION]", "drugs_extracted": 0, "acronyms_extracted": 0}

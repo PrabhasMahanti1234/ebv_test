@@ -3,12 +3,14 @@ from psycopg2.extras import execute_values
 from psycopg2 import IntegrityError
 from contextlib import contextmanager
 import logging
+from logger_setup import setup_logger
 import json
 import pandas as pd
 from io import StringIO
 from config import DB_CONFIG
 
 logger = logging.getLogger(__name__)
+db_logger = setup_logger("database", "logs/database.log")
 
 @contextmanager
 def get_db_connection():
@@ -32,6 +34,82 @@ def get_db_connection():
                 conn.close()
             except:
                 pass  # Connection might already be closed
+
+#Updated Codebase
+def fetch_existing_coverage_by_file_hash(file_hash):
+    """
+    Fetch existing coverage results for a given file_hash.
+    Returns a dictionary with 'drugs' and 'acronyms' keys.
+    """
+
+    drug_coverage = {}
+    acronym_coverage = {}
+
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        try:
+            # Fetch drug coverage
+            cursor.execute("""
+                SELECT 
+                    LOWER(d.drug_name),
+                    d.drug_tier,
+                    d.drug_requirements,
+                    d.coverage_status,
+                    d.confidence_score,
+                    d.manual_review
+                FROM drug_formulary_details d
+                JOIN plan_details p ON d.plan_id = p.plan_id
+                WHERE p.file_hash = %s
+                AND d.coverage_status IS NOT NULL
+            """, (file_hash,))
+
+            rows = cursor.fetchall()
+            for row in rows:
+                key = (
+                    row[0],  # drug_name lower
+                    row[1],  # tier
+                    row[2]   # requirements
+                )
+                drug_coverage[key] = {
+                    "coverage_status": row[3],
+                    "confidence_score": row[4],
+                    "manual_review": row[5]
+                }
+
+            # Fetch acronym coverage
+            # We join with plan_details to find plans that have this file_hash,
+            # then join with pp_formulary_names on plan/payer/state.
+            cursor.execute("""
+                SELECT DISTINCT
+                    a.acronym,
+                    a.expansion,
+                    a.explanation,
+                    a.coverage_status
+                FROM pp_formulary_names a
+                JOIN plan_details p ON a.plan_name = p.plan_name 
+                    AND a.payer_name = p.payer_name 
+                    AND a.state_name = p.state_name
+                WHERE p.file_hash = %s
+                AND a.coverage_status IS NOT NULL
+            """, (file_hash,))
+
+            a_rows = cursor.fetchall()
+            for row in a_rows:
+                # Key for acronym lookup: (acronym, expansion, explanation)
+                key = (
+                    row[0],  # acronym
+                    row[1],  # expansion
+                    row[2]   # explanation
+                )
+                acronym_coverage[key] = row[3]
+
+            if drug_coverage or acronym_coverage:
+                logger.info(f"[REUSE] Found {len(drug_coverage)} drugs and {len(acronym_coverage)} acronyms for hash {file_hash}")
+
+        except Exception as e:
+            logger.error(f"Error fetching coverage by file_hash: {e}")
+
+    return {"drugs": drug_coverage, "acronyms": acronym_coverage}
 
 def ensure_database_schema():
     """Ensure all required tables exist with proper constraints, partitioning, and indexing"""
@@ -67,7 +145,7 @@ def ensure_database_schema():
         try:
             cursor.execute("""
                 ALTER TABLE payer_details
-                ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'processing'
+                ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active'
             """)
             conn.commit()
         except Exception as e:
@@ -91,6 +169,7 @@ def ensure_database_schema():
                     plan_name VARCHAR(1000) NOT NULL,
                     state_name VARCHAR(100) NOT NULL,
                     formulary_url TEXT,
+                    s3_frozen_pdf_url TEXT,
                     source_link TEXT,
                     formulary_date DATE,
                     status VARCHAR(20) DEFAULT 'active',
@@ -108,7 +187,7 @@ def ensure_database_schema():
         try:
             cursor.execute("""
                 ALTER TABLE plan_details
-                ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'processing'
+                ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active'
             """)
             conn.commit()
         except Exception as e:
@@ -125,6 +204,20 @@ def ensure_database_schema():
         except Exception as e:
             logger.debug(f"file_hash column may already exist in plan_details: {e}")
             conn.rollback()
+
+        # Ensure s3_frozen_pdf_url exists for S3-based processing
+        try:
+            cursor.execute("""
+                ALTER TABLE plan_details
+                ADD COLUMN IF NOT EXISTS s3_frozen_pdf_url TEXT
+            """)
+            conn.commit()
+        except Exception as e:
+            logger.debug(f"s3_frozen_pdf_url column may already exist in plan_details: {e}")
+            conn.rollback()
+
+        # Index for faster selection of S3 URLs
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_plan_s3_url ON plan_details(s3_frozen_pdf_url)", "idx_plan_s3_url")
 
 
         # Create processed_file_cache table
@@ -255,14 +348,14 @@ def ensure_database_schema():
                     is_prior_authorization_required VARCHAR(10) DEFAULT 'No',
                     is_step_therapy_required VARCHAR(10) DEFAULT 'No',
                     coverage_details VARCHAR(10000),
-                    confidence_score DECIMAL(3,2),
+                    confidence_score DECIMAL(5,2),
                     source_url TEXT,
                     file_name VARCHAR(1000),
                     status VARCHAR(20) DEFAULT 'processing',
                      
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     last_updated_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                            review_needed Boolean,
+                    manual_review BOOLEAN DEFAULT FALSE,
  
                     PRIMARY KEY (id, plan_id)
                 ) PARTITION BY HASH (plan_id);
@@ -273,7 +366,7 @@ def ensure_database_schema():
         except Exception as e:
             logger.debug(f"Drug table creation issue (may already exist): {e}")
             conn.rollback()
-            
+
         # Create pp_formulary_names table for all acronyms and tier definitions
         try:
             cursor.execute("""
@@ -318,6 +411,27 @@ def ensure_database_schema():
         """, "uq_formulary_names")
 
         # Add new columns to existing drug_formulary_details if not exists
+        try:
+            cursor.execute("""
+                ALTER TABLE drug_formulary_details
+                ALTER COLUMN confidence_score TYPE DECIMAL(5,2)
+            """)
+            conn.commit()
+            logger.info("Updated confidence_score column type to DECIMAL(5,2).")
+        except Exception as e:
+            logger.debug(f"confidence_score column type update issue: {e}")
+            conn.rollback()
+
+        try:
+            cursor.execute("""
+                ALTER TABLE drug_formulary_details
+                ADD COLUMN IF NOT EXISTS manual_review BOOLEAN DEFAULT FALSE
+            """)
+            conn.commit()
+        except Exception as e:
+            logger.debug(f"manual_review column may already exist: {e}")
+            conn.rollback()
+
         try:
             cursor.execute("""
                 ALTER TABLE drug_formulary_details
@@ -695,9 +809,11 @@ def cache_result(file_hash, structured_data_dict, raw_content, formulary_url=Non
             )
             conn.commit()
             logger.info(f"Successfully cached result for hash: {file_hash} (URL: {formulary_url[:80] if formulary_url else 'N/A'}...)")
+            db_logger.info(f"cache.store hash={file_hash} url={formulary_url} size_drugs={len(structured_data_dict.get('drug_table', []))} size_acronyms={len(structured_data_dict.get('acronyms', []))}")
         except Exception as e:
             conn.rollback()
             logger.error(f"Failed to cache result for hash {file_hash}: {e}")
+            db_logger.error(f"cache.error hash={file_hash} error={e}")
 
 
 # In database.py
@@ -712,15 +828,14 @@ def insert_drug_formulary_data(processed_data):
         logger.warning("No processed data provided to insert.")
         return
 
-    # DEDUPLICATION: Remove duplicates based on conflict key (plan_id, drug_name, drug_tier, drug_requirements)
+    # DEDUPLICATION: Remove duplicates based on conflict key (plan_id, drug_name, drug_tier)
     # Keep the last occurrence (which may have more complete data)
     seen_keys = {}
     for record in processed_data:
         key = (
             record.get("plan_id"),
             record.get("drug_name", "").strip().lower() if record.get("drug_name") else "",
-            record.get("drug_tier", "").strip() if record.get("drug_tier") else None,
-            record.get("drug_requirements", "").strip() if record.get("drug_requirements") else None
+            record.get("drug_tier", "").strip() if record.get("drug_tier") else None
         )
         seen_keys[key] = record  # Later records overwrite earlier ones
     
@@ -740,7 +855,7 @@ def insert_drug_formulary_data(processed_data):
             "state_name", "coverage_status", "drug_tier", "drug_requirements", "page_number", "badge_colors",
             "preferred_agent", "non_preferred_agent",
             "is_prior_authorization_required", "is_step_therapy_required", "is_quantity_limit_applied",
-            "coverage_details", "confidence_score", "source_url", "plan_name", "payer_name", "file_name", "status"
+            "coverage_details", "confidence_score", "manual_review", "source_url", "plan_name", "payer_name", "file_name", "status"
         ]
 
         data_tuples = []
@@ -792,6 +907,7 @@ def insert_drug_formulary_data(processed_data):
                 record.get("is_quantity_limit_applied"),
                 record.get("coverage_details"),
                 record.get("confidence_score"),
+                record.get("manual_review", False),
                 record.get("source_url"),
                 record.get("plan_name"),
                 record.get("payer_name"),
@@ -799,24 +915,10 @@ def insert_drug_formulary_data(processed_data):
                 'processing'  # Set initial status for new records
             ))
 
-        # Using ON CONFLICT to prevent duplicates and update existing records
+        # Using standard INSERT since previous records are deleted prior to this step
         insert_query = f"""
             INSERT INTO drug_formulary_details ({', '.join(cols)})
             VALUES %s
-            ON CONFLICT (plan_id, drug_name, drug_tier, drug_requirements)
-            DO UPDATE SET
-                coverage_status = EXCLUDED.coverage_status,
-                page_number = EXCLUDED.page_number,
-                badge_colors = EXCLUDED.badge_colors,
-                preferred_agent = EXCLUDED.preferred_agent,
-                non_preferred_agent = EXCLUDED.non_preferred_agent,
-                is_prior_authorization_required = EXCLUDED.is_prior_authorization_required,
-                is_step_therapy_required = EXCLUDED.is_step_therapy_required,
-                is_quantity_limit_applied = EXCLUDED.is_quantity_limit_applied,
-                source_url = EXCLUDED.source_url,
-                file_name = EXCLUDED.file_name,
-                status = 'completed',
-                last_updated_date = CURRENT_TIMESTAMP;
         """
 
         try:
@@ -830,14 +932,17 @@ def insert_drug_formulary_data(processed_data):
             )
             conn.commit()
             logger.info(f"Successfully inserted or updated {len(data_tuples)} records.")
+            db_logger.info(f"db.insert drug_formulary_details count={len(data_tuples)}")
 
         except IntegrityError as e:
             conn.rollback()
             logger.error(f"Database integrity error during insertion: {e}")
+            db_logger.error(f"db.integrity_error table=drug_formulary_details error={e}")
             raise
         except Exception as e:
             conn.rollback()
             logger.error(f"An unexpected error occurred during data insertion: {e}")
+            db_logger.error(f"db.insert_error table=drug_formulary_details error={e}")
             raise
 
 def update_drug_formulary_status(processed_plan_ids):
@@ -858,9 +963,11 @@ def update_drug_formulary_status(processed_plan_ids):
             cursor.execute(query, (processed_plan_ids,))
             conn.commit()
             logger.info(f"Successfully updated status for {cursor.rowcount} drug formulary records.")
+            db_logger.info(f"db.update drug_formulary_details set=status='completed' plans={len(processed_plan_ids)} rows={cursor.rowcount}")
         except Exception as e:
             conn.rollback()
             logger.error(f"Failed to update drug formulary statuses: {e}")
+            db_logger.error(f"db.update_error table=drug_formulary_details error={e}")
             raise
 
 def update_plan_and_payer_statuses(processed_plan_ids, finalize_run=True):
@@ -880,6 +987,7 @@ def update_plan_and_payer_statuses(processed_plan_ids, finalize_run=True):
                 active_query = "UPDATE plan_details SET status = 'active', last_updated_date = CURRENT_TIMESTAMP WHERE plan_id = ANY(%s)"
                 cursor.execute(active_query, (processed_plan_ids,))
                 logger.info(f"Set {cursor.rowcount} plans to 'active'.")
+                db_logger.info(f"db.update plan_details set=status='active' rows={cursor.rowcount}")
 
             # Update any plans that were 'processing' but did not complete successfully to 'inactive'.
             # This correctly marks failed plans without affecting existing 'active' or 'inactive' plans.
@@ -887,6 +995,7 @@ def update_plan_and_payer_statuses(processed_plan_ids, finalize_run=True):
                 inactive_query = "UPDATE plan_details SET status = 'inactive', last_updated_date = CURRENT_TIMESTAMP WHERE status = 'processing'"
                 cursor.execute(inactive_query)
                 logger.info(f"Set {cursor.rowcount} failed or unprocessed plans to 'inactive'.")
+                db_logger.info(f"db.update plan_details set=status='inactive' rows={cursor.rowcount}")
 
             # Update payers with at least one active plan to 'active'
             update_payers_to_active_query = """
@@ -898,6 +1007,7 @@ def update_plan_and_payer_statuses(processed_plan_ids, finalize_run=True):
             """
             cursor.execute(update_payers_to_active_query)
             logger.info(f"Set {cursor.rowcount} payers to 'active'.")
+            db_logger.info(f"db.update payer_details set=status='active' rows={cursor.rowcount}")
 
             # Update payers with no active plans to 'inactive'
             update_payers_to_inactive_query = """
@@ -909,13 +1019,16 @@ def update_plan_and_payer_statuses(processed_plan_ids, finalize_run=True):
             """
             cursor.execute(update_payers_to_inactive_query)
             logger.info(f"Set {cursor.rowcount} payers to 'inactive'.")
+            db_logger.info(f"db.update payer_details set=status='inactive' rows={cursor.rowcount}")
 
             conn.commit()
             logger.info("Successfully updated all plan and payer statuses.")
+            db_logger.info("db.update statuses committed")
 
         except Exception as e:
             conn.rollback()
             logger.error(f"Failed to update plan and payer statuses: {e}")
+            db_logger.error(f"db.update_error statuses error={e}")
             raise
 
 def get_all_processed_plan_ids():
@@ -1020,6 +1133,14 @@ def insert_acronyms_to_ref_table(acronyms, state_name, payer_name, plan_name, ta
             logger.warning(f"No valid, non-blank acronyms to insert into {table_name}.")
             return
 
+        # Deduplicate by conflict key (state_name, payer_name, plan_name, acronym) — keep last occurrence
+        dedup_map = {}
+        for tup in data_tuples:
+            key = (tup[0], tup[1], tup[2], tup[3])  # state, payer, plan, acronym
+            dedup_map[key] = tup
+        data_tuples = list(dedup_map.values())
+        logger.debug(f"Deduplicated acronyms to {len(data_tuples)} unique entries before insert.")
+
         insert_query = f"""
             INSERT INTO {table_name} (
                 state_name, payer_name, plan_name, acronym, expansion, explanation, coverage_status
@@ -1049,7 +1170,7 @@ def batch_determine_coverage_status(requirement_tier_pairs, conn, state_name, pa
     from coverage import det_coverage_status  # Import here to avoid circular import
     mapping = {}
     for req_code, tier in requirement_tier_pairs:
-        status, confidence, source = det_coverage_status(
+        status, confidence, source, _ = det_coverage_status(
             acronym=req_code,
             expansion=None,
             explanation=None,
@@ -1079,11 +1200,58 @@ def delete_drug_formulary_records_for_plan(plan_id: str):
         try:
             query = "DELETE FROM drug_formulary_details WHERE plan_id = %s"
             cursor.execute(query, (plan_id,))
-            deleted_count = cursor.rowcount
             conn.commit()
-            logger.info(f"Successfully deleted {deleted_count} records for plan_id: {plan_id}")
-            return deleted_count
+            count = cursor.rowcount
+            logger.info(f"Successfully deleted {count} records for plan_id: {plan_id}")
+            return count
         except Exception as e:
             conn.rollback()
-            logger.error(f"Failed to delete records for plan_id {plan_id}: {e}")
+            logger.error(f"Failed to delete records for plan_id: {plan_id}: {e}")
             raise
+
+def fetch_acronym_cache(payer_name, state_name):
+    """
+    Fetch all acronym definitions for a specific payer and state once.
+    This cache will be used to avoid redundant DB lookups for every drug entry.
+    Returns a dictionary mapping acronym -> (expansion, explanation, coverage_status)
+    """
+    cache = {}
+    
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        
+        # 1. Fetch from the master table (tier_requirement_expansion)
+        # Order by specificity: (state, payer) > (state) > (payer) > (global)
+        cursor.execute("""
+            SELECT acronym, expansion, explanation, coverage_status, state_name, payer_name
+            FROM tier_requirement_expansion
+            WHERE (state_name IS NULL OR UPPER(state_name) = UPPER(%s))
+              AND (payer_name IS NULL OR UPPER(payer_name) = UPPER(%s))
+            ORDER BY (state_name IS NOT NULL)::int DESC, (payer_name IS NOT NULL)::int DESC
+        """, (state_name, payer_name))
+        
+        rows = cursor.fetchall()
+        for row in rows:
+            acr = str(row[0]) # Don't strip as per existing logic
+            # Since we ordered by specificity, the first time we see an acronym, it's the most specific one
+            if acr not in cache:
+                cache[acr] = (row[1], row[2], row[3])
+
+        # 2. Fetch from the plan-specific table (pp_formulary_names)
+        # These might overwrite or supplement the master table for this specific payer/state
+        cursor.execute("""
+            SELECT acronym, expansion, explanation, coverage_status
+            FROM pp_formulary_names
+            WHERE (state_name IS NULL OR UPPER(state_name) = UPPER(%s))
+              AND (payer_name IS NULL OR UPPER(payer_name) = UPPER(%s))
+        """, (state_name, payer_name))
+        
+        rows = cursor.fetchall()
+        for row in rows:
+            acr = str(row[0])
+            # Plan-specific definitions usually take precedence or fill gaps
+            if acr not in cache or (row[1] or row[2] or row[3]):
+                cache[acr] = (row[1], row[2], row[3])
+                
+    logger.info(f"Loaded {len(cache)} acronyms into memory cache for {payer_name} ({state_name})")
+    return cache

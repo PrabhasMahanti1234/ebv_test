@@ -8,7 +8,6 @@ from database import (
     ensure_database_schema, update_drug_formulary_status, 
     update_plan_and_payer_statuses, create_transaction, update_transaction
 )
-from excel_processing import populate_payer_and_plan_tables
 from pdf_processing import (
     process_pdfs_from_urls_in_parallel, 
     get_all_plans_with_formulary_url, 
@@ -83,7 +82,6 @@ def run_realtime_pipeline():
     
     try:
         ensure_database_schema()
-        populate_payer_and_plan_tables()
         
         processed_plan_ids, all_processed_data = process_pdfs_from_urls_in_parallel()
 
@@ -155,7 +153,6 @@ def run_batch_submit_pipeline(output_jsonl="batch_requests.jsonl"):
 
     try:
         ensure_database_schema()
-        populate_payer_and_plan_tables()
         
         plans = get_all_plans_with_formulary_url()
         if not plans:
@@ -243,9 +240,135 @@ def run_batch_process_pipeline(input_jsonl):
         raise
 
 
+def run_batch_auto_pipeline(output_jsonl="batch_requests.jsonl", result_jsonl="batch_results.jsonl"):
+    transaction_id = str(uuid.uuid4())
+    logger.info(f"Starting pipeline (BATCH AUTO MODE) Transaction ID: {transaction_id}")
+    
+    create_transaction(
+        transaction_id=transaction_id,
+        job_type="batch_auto",
+        status="running",
+        request_summary={"mode": "batch_auto"}
+    )
+
+    try:
+        ensure_database_schema()
+        
+        # Step 1: Prepare batch requests
+        plans = get_all_plans_with_formulary_url()
+        if not plans:
+            logger.warning("No plans processing.")
+            update_transaction(transaction_id=transaction_id, status="completed", response_summary={"message": "No plans found"})
+            return
+            
+        requests_payload, file_ids = prepare_batch_requests(plans)
+        
+        if not requests_payload:
+            logger.warning("No batch requests generated.")
+            update_transaction(transaction_id=transaction_id, status="completed", response_summary={"message": "No requests generated"})
+            return
+
+        with open(output_jsonl, 'w', encoding='utf-8') as f:
+            for req in requests_payload:
+                f.write(json.dumps(req) + '\n')
+        logger.info(f"Successfully wrote {len(requests_payload)} requests to {output_jsonl}")
+        logger.info(f"Uploaded {len(file_ids)} files to Mistral.")
+
+        # Step 2: Upload batch file
+        from pdf_processing import create_resilient_mistral_client
+        mistral_client = create_resilient_mistral_client()
+        logger.info(f"Uploading batch file {output_jsonl} to Mistral...")
+        batch_data = mistral_client.files.upload(
+            file={
+                "file_name": output_jsonl,
+                "content": open(output_jsonl, "rb")
+            },
+            purpose="batch"
+        )
+
+        # Step 3: Create batch job
+        logger.info("Creating Mistral batch job...")
+        created_job = mistral_client.batch.jobs.create(
+            input_files=[batch_data.id],
+            model="mistral-ocr-latest",
+            endpoint="/v1/ocr",
+            metadata={"job_type": "automated_batch"}
+        )
+
+        # Step 4: Wait for job completion
+        logger.info(f"Batch job {created_job.id} created. Waiting for completion...")
+        while True:
+            retrieved_job = mistral_client.batch.jobs.get(job_id=created_job.id)
+            status = retrieved_job.status
+            logger.info(f"Job Status: {status} | Total: {retrieved_job.total_requests} | Success: {retrieved_job.succeeded_requests} | Failed: {retrieved_job.failed_requests}")
+            
+            if status not in ["QUEUED", "RUNNING"]:
+                break
+                
+            time.sleep(10)
+
+        if status != "SUCCESS":
+            logger.error(f"Batch job {created_job.id} finished with status: {status}")
+            if status == "FAILED" or retrieved_job.failed_requests == retrieved_job.total_requests:
+                 raise Exception(f"Batch job failed. Check mistral dashboard for details.")
+
+        # Step 5: Download results
+        logger.info("Downloading batch results...")
+        file_response = mistral_client.files.download(file_id=retrieved_job.output_file)
+        
+        # Save content to file (handle both bytes and objects that have .content depending on the mistralai client version)
+        with open(result_jsonl, "wb") as f:
+            if hasattr(file_response, 'read'):
+                f.write(file_response.read())
+            elif hasattr(file_response, 'content'):
+                f.write(file_response.content)
+            elif isinstance(file_response, bytes):
+                f.write(file_response)
+            else:
+                f.write(str(file_response).encode('utf-8'))
+                
+        logger.info(f"Saved results to {result_jsonl}")
+
+        # Step 6: Process output
+        logger.info(f"Processing output file {result_jsonl}...")
+        process_batch_output(result_jsonl)
+        
+        # Step 7: Map products to formulary
+        logger.info("STEP 7: Mapping products to formulary")
+        try:
+            records_mapped = map_products_to_formulary()
+            logger.info(f"Successfully mapped {records_mapped:,} drug records to product master data.")
+        except Exception as e:
+            logger.error(f"Product mapping failed, but continuing: {e}")
+            
+        update_transaction(
+            transaction_id=transaction_id,
+            status="completed",
+            completed_at=time.strftime('%Y-%m-%d %H:%M:%S'),
+            response_summary={
+                "requests_count": len(requests_payload),
+                "files_uploaded": len(file_ids),
+                "job_status": status,
+                "succeeded_requests": retrieved_job.succeeded_requests,
+                "failed_requests": retrieved_job.failed_requests
+            }
+        )
+        logger.info("Automated batch pipeline finished successfully.")
+
+    except Exception as e:
+        logger.error(f"Batch auto pipeline failed: {e}")
+        update_transaction(
+            transaction_id=transaction_id,
+            status="failed",
+            error=str(e),
+            completed_at=time.strftime('%Y-%m-%d %H:%M:%S')
+        )
+        raise
+
+
 def main():
     parser = argparse.ArgumentParser(description="PDF Processing Pipeline")
-    parser.add_argument('--mode', type=str, choices=['realtime', 'batch_submit', 'batch_process'], default='realtime', help='Pipeline mode')
+    parser.add_argument('--mode', type=str, choices=['realtime', 'batch_submit', 'batch_process', 'batch_auto'], default='batch_auto', help='Pipeline mode')
     parser.add_argument('--output', type=str, default='batch_requests.jsonl', help='Output JSONL file for batch submit')
     parser.add_argument('--input', type=str, help='Input JSONL file for batch process (output from Mistral)', required=False)
     
@@ -253,6 +376,8 @@ def main():
     
     if args.mode == 'realtime':
         run_realtime_pipeline()
+    elif args.mode == 'batch_auto':
+        run_batch_auto_pipeline()
     elif args.mode == 'batch_submit':
         run_batch_submit_pipeline(args.output)
     elif args.mode == 'batch_process':
