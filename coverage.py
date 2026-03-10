@@ -192,70 +192,57 @@ def det_coverage_status(
     db_source = None
     db_conf = 0.0
 
-    if acronym:
-        acronym_str = str(acronym).strip()
+    # Source for acronym lookup: Use explicit 'acronym' if provided, else use 'tier_text'
+    acronym_source = acronym or tier_text
+    
+    if acronym_source:
+        acronym_str = str(acronym_source).strip()
         
         # 1. Tier & Requirement Extraction Logic
         raw_parts = []
         
-        # a. Extract Tier tokens (1B, 5^, Tier 1-6)
-        # Note: We keep them intact as requested. Use whitespace/separator boundaries.
-        tier_regex = r'(?:^|[,\s;])(Tier\s*[1-6]|[1-6][A-Z\^]?|[1-6])(?=$|[,\s;])'
-        found_tiers = re.findall(tier_regex, acronym_str, flags=re.IGNORECASE)
-        for t in found_tiers:
+        # a. Extract Tier tokens (1B, 5^, Tier 1-6, etc.)
+        # Handle "5^" -> "Tier 5" and "^"
+        tier_tokens = re.findall(r'(Tier\s*[1-6]|[1-6][A-Z\^]?|[1-6]|\^)', acronym_str, flags=re.IGNORECASE)
+        for t in tier_tokens:
             t_clean = t.strip().upper()
-            # Handle "5^" -> "Tier 5" and "^"
             if re.match(r'^[1-6]\^$', t_clean):
                 raw_parts.append(f"Tier {t_clean[0]}")
                 raw_parts.append("^")
-            # Handle "1B" -> "1B"
             elif re.match(r'^[1-6][A-Z]$', t_clean):
                 raw_parts.append(t_clean)
-            # Handle "Tier 1" -> "Tier 1"
             elif t_clean.startswith("TIER"):
                 digit_match = re.search(r'\d+', t_clean)
                 if digit_match:
                     raw_parts.append(f"Tier {digit_match.group()}")
-            # Handle bare digit "2" -> "Tier 2"
             elif re.match(r'^[1-6]$', t_clean):
                 raw_parts.append(f"Tier {t_clean}")
+            elif t_clean == "^":
+                raw_parts.append("^")
             else:
                 raw_parts.append(t_clean)
 
         # b. Requirement Parsing: Remove everything inside parentheses
-        # QL(20 EA per fill retail; 20 per fill mail) -> QL
         cleaned_reqs = re.sub(r'\(.*?\)', ' ', acronym_str)
         
         # c. Token Cleaning: Remove commas, split by ; or whitespace
         split_parts = re.split(r'[,\s;]+', cleaned_reqs)
         
         # d. Valid Acronym Filter
-        # Allowed patterns: 
-        # 1. Tier tokens: ^[0-9][A-Z]$ (e.g. 1B)
-        # 2. Requirement acronyms: PA, QL, ST, SP, AL, NM, B/D, ^
-        # 3. Tier names: Tier 1-6
-        # Reject: spaces, lowercase, >4 chars, English words, standalone digits (unless Tier prefix), parentheses content
         valid_req_acronyms = {"PA", "QL", "ST", "SP", "AL", "NM", "B/D", "^"}
         
         for part in split_parts:
             part = part.strip()
-            # Reject if empty, contains spaces, or contains lowercase
             if not part or " " in part or any(c.islower() for c in part):
                 continue
             
-            # Special case: QL= parts
             if part.startswith("QL="):
                 if "QL" not in raw_parts:
                     raw_parts.append("QL")
                 continue
                 
-            # Pattern 1: Tier tokens (e.g., 1B). Note: Standalone digits handled by tier_regex above
-            is_tier_token = bool(re.match(r'^[0-9][A-Z]$', part))
-            
-            # Pattern 2: Requirement acronyms
+            is_tier_token = bool(re.match(r'^[0-9][A-Z\^]$', part))
             is_req_acronym = part in valid_req_acronyms
-            
-            # Pattern 3: Tier names (Note: already handled by regex split if Tier 1)
             is_tier_name = bool(re.match(r'^Tier[0-9]$', part, re.IGNORECASE))
             
             if (is_tier_token or is_req_acronym or is_tier_name) and len(part) <= 4:
@@ -268,12 +255,13 @@ def det_coverage_status(
         
         # Try full lookup first if no parentheses
         if (conn or acronym_cache) and '(' not in acronym_str:
-            _, _, cvg = lookup_expansion(acronym, state_name, payer_name, conn, acronym_cache=acronym_cache)
+            _, _, cvg = lookup_expansion(acronym_source, state_name, payer_name, conn, acronym_cache=acronym_cache)
             if cvg:
                 db_cvg_status = cvg
-                db_source = f"DB Lookup - {acronym}"
+                db_source = f"DB Lookup - {acronym_source}"
                 db_conf = 85.0
 
+        # Try sub-acronyms if no full match
         # Try sub-acronyms if no full match
         if not db_cvg_status:
             res = determine_db_coverage(sub_acronyms, conn, state_name, payer_name, acronym_cache=acronym_cache)
@@ -281,8 +269,6 @@ def det_coverage_status(
                 db_cvg_status, db_conf, db_source = res
 
         if db_cvg_status:
-            # Map DB status to priority status if necessary
-            # Note: determine_db_coverage already returns standard statuses
             detected_results.append((db_cvg_status, db_conf, db_source))
             logger.info(f"[{log_id}] Detected '{db_cvg_status}' ({db_conf}) from {db_source}")
 

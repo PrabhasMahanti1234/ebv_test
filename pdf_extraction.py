@@ -321,17 +321,29 @@ def _extract_drug_from_item(item: dict, page_number: int) -> dict:
     if combined_name:
         combined_name = combined_name.rstrip('*').strip()
     
+    def sanitize_field(val):
+        if val is None:
+            return None
+        # Remove "$0"
+        cleaned = str(val).replace("$0", "")
+        # Remove extra whitespace (multiple spaces -> single space)
+        cleaned = re.sub(r'\s+', ' ', cleaned).strip()
+        # Return None if string became empty
+        return cleaned if cleaned else None
+
     # Extract tier - check multiple possible field names
-    drug_tier = (item.get("Tier") or 
-                 item.get("drug tier") or 
-                 item.get("drug_tier") or 
-                 item.get("Tier Designation"))
+    raw_tier = (item.get("Tier") or 
+                item.get("drug tier") or 
+                item.get("drug_tier") or 
+                item.get("Tier Designation"))
+    drug_tier = sanitize_field(raw_tier)
     
     # Extract requirements - check multiple possible field names
-    drug_requirements = (item.get("Requirements") or 
-                        item.get("requirements") or 
-                        item.get("drug_requirements") or
-                        _build_requirements_from_item(item))
+    raw_requirements = (item.get("Requirements") or 
+                       item.get("requirements") or 
+                       item.get("drug_requirements") or
+                       _build_requirements_from_item(item))
+    drug_requirements = sanitize_field(raw_requirements)
     
     # Sanitize preferred_agent and non_preferred_agent - ONLY allow "yes" or "no"
     # Convert any other values (like "[default]", "default", etc.) to None
