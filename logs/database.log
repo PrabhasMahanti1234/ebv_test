@@ -820,3 +820,443 @@ HINT:  Ensure that no rows proposed for insertion within the same command have d
 2026-03-10 10:40:05,797 [INFO] db.update payer_details set=status='inactive' rows=0
 2026-03-10 10:40:05,798 [INFO] Successfully updated all plan and payer statuses.
 2026-03-10 10:40:05,798 [INFO] db.update statuses committed
+2026-03-10 11:29:27,282 [INFO] Transaction ba5eea70-b6f3-4239-9792-9e0a8ef63318 created.
+2026-03-10 11:29:27,284 [INFO] Ensuring database schema exists...
+2026-03-10 11:29:27,567 [INFO] Created/ensured processed_file_cache table
+2026-03-10 11:29:27,569 [INFO] Created/ensured transaction table
+2026-03-10 11:29:27,571 [INFO] Created/ensured audit table
+2026-03-10 11:29:27,571 [INFO] Created partitioned drug_formulary_details table
+2026-03-10 11:29:27,571 [INFO] Created/ensured pp_formulary_names table
+2026-03-10 11:29:27,579 [INFO] Ensured coverage_status column exists in pp_formulary_names.
+2026-03-10 11:29:27,581 [INFO] Updated confidence_score column type to DECIMAL(5,2).
+2026-03-10 11:29:27,586 [INFO] Ensured product mapping columns exist in drug_formulary_details.
+2026-03-10 11:29:27,589 [INFO] Added preferred_agent column to drug_formulary_details.
+2026-03-10 11:29:27,590 [INFO] Added non_preferred_agent column to drug_formulary_details.
+2026-03-10 11:29:27,597 [INFO] Database schema ensured successfully with partitioning and comprehensive indexing
+2026-03-10 11:33:13,918 [INFO] Transaction bb9482c9-5ef8-447b-90a9-9451911303fa created.
+2026-03-10 11:33:13,918 [INFO] Ensuring database schema exists...
+2026-03-10 11:33:13,984 [INFO] Created/ensured processed_file_cache table
+2026-03-10 11:33:13,985 [INFO] Created/ensured transaction table
+2026-03-10 11:33:13,987 [INFO] Created/ensured audit table
+2026-03-10 11:33:13,990 [INFO] Created partitioned drug_formulary_details table
+2026-03-10 11:33:13,991 [INFO] Created/ensured pp_formulary_names table
+2026-03-10 11:33:13,993 [INFO] Ensured coverage_status column exists in pp_formulary_names.
+2026-03-10 11:33:13,993 [INFO] Updated confidence_score column type to DECIMAL(5,2).
+2026-03-10 11:33:14,001 [INFO] Ensured product mapping columns exist in drug_formulary_details.
+2026-03-10 11:33:14,002 [INFO] Added preferred_agent column to drug_formulary_details.
+2026-03-10 11:33:14,004 [INFO] Added non_preferred_agent column to drug_formulary_details.
+2026-03-10 11:33:14,015 [INFO] Database schema ensured successfully with partitioning and comprehensive indexing
+2026-03-10 11:33:18,952 [INFO] Updated file_hash for plan_id: b9c12772-a7f2-4d59-aebb-e8234e625dae
+2026-03-10 11:33:19,019 [INFO] Cache MISS for hash: 9840b612c9636e68639143814368a89df30d14d24459e361cb3aadef22fd05ce
+2026-03-10 11:34:52,736 [INFO] Transaction 5757f7aa-e4c0-4f06-8d19-09653c31c297 created.
+2026-03-10 11:34:52,896 [INFO] Loaded 0 acronyms into memory cache for US Health Group (Indiana)
+2026-03-10 11:34:53,065 [INFO] Preparing to delete all existing drug records for plan_id: b9c12772-a7f2-4d59-aebb-e8234e625dae
+2026-03-10 11:34:53,151 [INFO] Successfully deleted 0 records for plan_id: b9c12772-a7f2-4d59-aebb-e8234e625dae
+2026-03-10 11:35:00,844 [INFO] Preparing to insert 3250 records into the database.
+2026-03-10 11:35:01,278 [INFO] Successfully inserted or updated 3250 records.
+2026-03-10 11:35:01,278 [INFO] db.insert drug_formulary_details count=3250
+2026-03-10 11:35:01,511 [INFO] Successfully inserted or updated 13 records into pp_formulary_names.
+2026-03-10 11:35:01,674 [INFO] Successfully cached result for hash: 9840b612c9636e68639143814368a89df30d14d24459e361cb3aadef22fd05ce (URL: https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/9840b612...)
+2026-03-10 11:35:01,675 [INFO] cache.store hash=9840b612c9636e68639143814368a89df30d14d24459e361cb3aadef22fd05ce url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/9840b612c9636e68639143814368a89df30d14d24459e361cb3aadef22fd05ce.pdf size_drugs=3250 size_acronyms=128
+2026-03-10 11:35:01,675 [INFO] Updating status to 'completed' for drugs in 1 plans.
+2026-03-10 11:35:02,018 [INFO] Successfully updated status for 3250 drug formulary records.
+2026-03-10 11:35:02,019 [INFO] db.update drug_formulary_details set=status='completed' plans=1 rows=3250
+2026-03-10 11:35:02,019 [INFO] Updating final status for all payers and plans...
+2026-03-10 11:35:02,082 [INFO] Set 1 plans to 'active'.
+2026-03-10 11:35:02,084 [INFO] db.update plan_details set=status='active' rows=1
+2026-03-10 11:35:02,084 [INFO] Set 1 payers to 'active'.
+2026-03-10 11:35:02,087 [INFO] db.update payer_details set=status='active' rows=1
+2026-03-10 11:35:02,087 [INFO] Set 1 payers to 'inactive'.
+2026-03-10 11:35:02,087 [INFO] db.update payer_details set=status='inactive' rows=1
+2026-03-10 11:35:02,089 [INFO] Successfully updated all plan and payer statuses.
+2026-03-10 11:35:02,090 [INFO] db.update statuses committed
+2026-03-10 13:39:16,532 [INFO] Transaction 9574bc1c-86a7-4add-a88b-59dc948cc497 created.
+2026-03-10 13:39:16,533 [INFO] Ensuring database schema exists...
+2026-03-10 13:39:16,670 [INFO] Created/ensured processed_file_cache table
+2026-03-10 13:39:16,673 [INFO] Created/ensured transaction table
+2026-03-10 13:39:16,681 [INFO] Created/ensured audit table
+2026-03-10 13:39:16,683 [INFO] Created partitioned drug_formulary_details table
+2026-03-10 13:39:16,685 [INFO] Created/ensured pp_formulary_names table
+2026-03-10 13:39:16,691 [INFO] Ensured coverage_status column exists in pp_formulary_names.
+2026-03-10 13:39:16,698 [INFO] Updated confidence_score column type to DECIMAL(5,2).
+2026-03-10 13:39:16,701 [INFO] Ensured product mapping columns exist in drug_formulary_details.
+2026-03-10 13:39:16,703 [INFO] Added preferred_agent column to drug_formulary_details.
+2026-03-10 13:39:16,704 [INFO] Added non_preferred_agent column to drug_formulary_details.
+2026-03-10 13:39:16,716 [INFO] Database schema ensured successfully with partitioning and comprehensive indexing
+2026-03-10 13:41:10,521 [INFO] Transaction d0238184-cef5-4c0f-bd23-381d23bbacf9 created.
+2026-03-10 13:41:10,521 [INFO] Ensuring database schema exists...
+2026-03-10 13:41:10,591 [INFO] Created/ensured processed_file_cache table
+2026-03-10 13:41:10,593 [INFO] Created/ensured transaction table
+2026-03-10 13:41:10,594 [INFO] Created/ensured audit table
+2026-03-10 13:41:10,597 [INFO] Created partitioned drug_formulary_details table
+2026-03-10 13:41:10,598 [INFO] Created/ensured pp_formulary_names table
+2026-03-10 13:41:10,602 [INFO] Ensured coverage_status column exists in pp_formulary_names.
+2026-03-10 13:41:10,604 [INFO] Updated confidence_score column type to DECIMAL(5,2).
+2026-03-10 13:41:10,607 [INFO] Ensured product mapping columns exist in drug_formulary_details.
+2026-03-10 13:41:10,610 [INFO] Added preferred_agent column to drug_formulary_details.
+2026-03-10 13:41:10,611 [INFO] Added non_preferred_agent column to drug_formulary_details.
+2026-03-10 13:41:10,619 [INFO] Database schema ensured successfully with partitioning and comprehensive indexing
+2026-03-10 13:41:15,509 [INFO] Updated file_hash for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 13:41:15,573 [INFO] Cache MISS for hash: c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e
+2026-03-10 13:42:49,401 [INFO] Transaction 650ebd8e-5dc8-4fe9-8c2e-aa66f589beaa created.
+2026-03-10 13:42:49,535 [INFO] Loaded 0 acronyms into memory cache for Wellpoint (Arizona)
+2026-03-10 13:42:49,634 [INFO] Preparing to delete all existing drug records for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 13:42:49,704 [INFO] Successfully deleted 0 records for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 13:42:58,475 [INFO] Preparing to insert 2340 records into the database.
+2026-03-10 13:42:58,544 [ERROR] An unexpected error occurred during data insertion: the query contains more than one '%s' placeholder
+2026-03-10 13:42:58,544 [ERROR] db.insert_error table=drug_formulary_details error=the query contains more than one '%s' placeholder
+2026-03-10 13:42:58,544 [ERROR] Database connection error: the query contains more than one '%s' placeholder
+2026-03-10 13:43:53,777 [INFO] Transaction 7dc7014c-7842-4f6b-b26e-cd573b25240c created.
+2026-03-10 13:43:53,778 [INFO] Ensuring database schema exists...
+2026-03-10 13:43:53,838 [INFO] Created/ensured processed_file_cache table
+2026-03-10 13:43:53,845 [INFO] Created/ensured transaction table
+2026-03-10 13:43:53,848 [INFO] Created/ensured audit table
+2026-03-10 13:43:53,849 [INFO] Created partitioned drug_formulary_details table
+2026-03-10 13:43:53,849 [INFO] Created/ensured pp_formulary_names table
+2026-03-10 13:43:53,853 [INFO] Ensured coverage_status column exists in pp_formulary_names.
+2026-03-10 13:43:53,855 [INFO] Updated confidence_score column type to DECIMAL(5,2).
+2026-03-10 13:43:53,857 [INFO] Ensured product mapping columns exist in drug_formulary_details.
+2026-03-10 13:43:53,859 [INFO] Added preferred_agent column to drug_formulary_details.
+2026-03-10 13:43:53,860 [INFO] Added non_preferred_agent column to drug_formulary_details.
+2026-03-10 13:43:53,868 [INFO] Database schema ensured successfully with partitioning and comprehensive indexing
+2026-03-10 13:43:59,232 [INFO] Updated file_hash for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 13:43:59,297 [INFO] Cache MISS for hash: c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e
+2026-03-10 13:45:32,771 [INFO] Transaction fe4f1442-4f1f-425e-a96e-5c5f391919d0 created.
+2026-03-10 13:45:32,914 [INFO] Loaded 0 acronyms into memory cache for Wellpoint (Arizona)
+2026-03-10 13:45:33,030 [INFO] Preparing to delete all existing drug records for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 13:45:33,103 [INFO] Successfully deleted 0 records for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 13:45:42,787 [INFO] Preparing to insert 2346 records into the database.
+2026-03-10 13:45:42,884 [ERROR] An unexpected error occurred during data insertion: there is no unique or exclusion constraint matching the ON CONFLICT specification
+
+2026-03-10 13:45:42,884 [ERROR] db.insert_error table=drug_formulary_details error=there is no unique or exclusion constraint matching the ON CONFLICT specification
+
+2026-03-10 13:45:42,886 [ERROR] Database connection error: there is no unique or exclusion constraint matching the ON CONFLICT specification
+
+2026-03-10 13:47:52,452 [INFO] Transaction 9692c558-0e37-49af-9a7e-5540540cdecb created.
+2026-03-10 13:47:52,452 [INFO] Ensuring database schema exists...
+2026-03-10 13:47:52,520 [INFO] Created/ensured processed_file_cache table
+2026-03-10 13:47:52,521 [INFO] Created/ensured transaction table
+2026-03-10 13:47:52,524 [INFO] Created/ensured audit table
+2026-03-10 13:47:52,525 [INFO] Created partitioned drug_formulary_details table
+2026-03-10 13:47:52,527 [INFO] Created/ensured pp_formulary_names table
+2026-03-10 13:47:52,533 [INFO] Ensured coverage_status column exists in pp_formulary_names.
+2026-03-10 13:47:52,536 [INFO] Updated confidence_score column type to DECIMAL(5,2).
+2026-03-10 13:47:52,538 [INFO] Ensured product mapping columns exist in drug_formulary_details.
+2026-03-10 13:47:52,540 [INFO] Added preferred_agent column to drug_formulary_details.
+2026-03-10 13:47:52,542 [INFO] Added non_preferred_agent column to drug_formulary_details.
+2026-03-10 13:47:52,551 [INFO] Database schema ensured successfully with partitioning and comprehensive indexing
+2026-03-10 13:48:08,850 [INFO] Updated file_hash for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 13:48:08,925 [INFO] Cache MISS for hash: c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e
+2026-03-10 13:49:42,164 [INFO] Transaction cb92250a-bc2a-4773-958a-4a585d17754b created.
+2026-03-10 13:49:42,305 [INFO] Loaded 0 acronyms into memory cache for Wellpoint (Arizona)
+2026-03-10 13:49:42,420 [INFO] Preparing to delete all existing drug records for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 13:49:42,498 [INFO] Successfully deleted 0 records for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 13:49:51,801 [INFO] Preparing to insert 2344 records into the database.
+2026-03-10 13:49:51,901 [ERROR] An unexpected error occurred during data insertion: there is no unique or exclusion constraint matching the ON CONFLICT specification
+
+2026-03-10 13:49:51,902 [ERROR] db.insert_error table=drug_formulary_details error=there is no unique or exclusion constraint matching the ON CONFLICT specification
+
+2026-03-10 13:49:51,902 [ERROR] Database connection error: there is no unique or exclusion constraint matching the ON CONFLICT specification
+
+2026-03-10 13:51:04,230 [INFO] Transaction 5c685cf7-5c97-4d91-905d-2ae98b01af1c created.
+2026-03-10 13:51:04,230 [INFO] Ensuring database schema exists...
+2026-03-10 13:51:04,467 [INFO] Created/ensured processed_file_cache table
+2026-03-10 13:51:04,472 [INFO] Created/ensured transaction table
+2026-03-10 13:51:04,476 [INFO] Created/ensured audit table
+2026-03-10 13:51:04,479 [INFO] Created partitioned drug_formulary_details table
+2026-03-10 13:51:04,480 [INFO] Created/ensured pp_formulary_names table
+2026-03-10 13:51:04,483 [INFO] Ensured coverage_status column exists in pp_formulary_names.
+2026-03-10 13:51:04,486 [INFO] Updated confidence_score column type to DECIMAL(5,2).
+2026-03-10 13:51:04,492 [INFO] Ensured product mapping columns exist in drug_formulary_details.
+2026-03-10 13:51:04,495 [INFO] Added preferred_agent column to drug_formulary_details.
+2026-03-10 13:51:04,495 [INFO] Added non_preferred_agent column to drug_formulary_details.
+2026-03-10 13:51:04,511 [INFO] Database schema ensured successfully with partitioning and comprehensive indexing
+2026-03-10 13:51:10,226 [INFO] Updated file_hash for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 13:51:10,306 [INFO] Cache MISS for hash: c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e
+2026-03-10 13:52:22,346 [INFO] Transaction 5f750dc2-1673-4d40-a86b-a2cbba80548b created.
+2026-03-10 13:52:22,475 [INFO] Loaded 0 acronyms into memory cache for Wellpoint (Arizona)
+2026-03-10 13:52:22,576 [INFO] Preparing to delete all existing drug records for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 13:52:22,645 [INFO] Successfully deleted 0 records for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 13:52:31,574 [INFO] Preparing to insert 2341 records into the database.
+2026-03-10 13:52:32,017 [INFO] Successfully inserted or updated 2341 records.
+2026-03-10 13:52:32,017 [INFO] db.insert drug_formulary_details count=2341
+2026-03-10 13:52:32,440 [INFO] Successfully inserted or updated 18 records into pp_formulary_names.
+2026-03-10 13:52:32,595 [INFO] Successfully cached result for hash: c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e (URL: https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe...)
+2026-03-10 13:52:32,596 [INFO] cache.store hash=c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf size_drugs=2341 size_acronyms=113
+2026-03-10 13:52:32,597 [INFO] Updating status to 'completed' for drugs in 1 plans.
+2026-03-10 13:52:32,882 [INFO] Successfully updated status for 2341 drug formulary records.
+2026-03-10 13:52:32,883 [INFO] db.update drug_formulary_details set=status='completed' plans=1 rows=2341
+2026-03-10 13:52:32,885 [INFO] Updating final status for all payers and plans...
+2026-03-10 13:52:32,952 [INFO] Set 1 plans to 'active'.
+2026-03-10 13:52:32,952 [INFO] db.update plan_details set=status='active' rows=1
+2026-03-10 13:52:32,956 [INFO] Set 1 payers to 'active'.
+2026-03-10 13:52:32,956 [INFO] db.update payer_details set=status='active' rows=1
+2026-03-10 13:52:32,958 [INFO] Set 0 payers to 'inactive'.
+2026-03-10 13:52:32,959 [INFO] db.update payer_details set=status='inactive' rows=0
+2026-03-10 13:52:32,959 [INFO] Successfully updated all plan and payer statuses.
+2026-03-10 13:52:32,960 [INFO] db.update statuses committed
+2026-03-10 14:02:09,778 [INFO] Transaction 518c19ae-eaf9-4a77-9ab1-ef2b3250bdff created.
+2026-03-10 14:02:09,778 [INFO] Ensuring database schema exists...
+2026-03-10 14:02:09,975 [INFO] Created/ensured processed_file_cache table
+2026-03-10 14:02:09,980 [INFO] Created/ensured transaction table
+2026-03-10 14:02:09,984 [INFO] Created/ensured audit table
+2026-03-10 14:02:09,987 [INFO] Created partitioned drug_formulary_details table
+2026-03-10 14:02:09,987 [INFO] Created/ensured pp_formulary_names table
+2026-03-10 14:02:09,990 [INFO] Ensured coverage_status column exists in pp_formulary_names.
+2026-03-10 14:02:09,997 [INFO] Updated confidence_score column type to DECIMAL(5,2).
+2026-03-10 14:02:10,001 [INFO] Ensured product mapping columns exist in drug_formulary_details.
+2026-03-10 14:02:10,005 [INFO] Added preferred_agent column to drug_formulary_details.
+2026-03-10 14:02:10,006 [INFO] Added non_preferred_agent column to drug_formulary_details.
+2026-03-10 14:02:10,015 [INFO] Database schema ensured successfully with partitioning and comprehensive indexing
+2026-03-10 14:02:15,216 [INFO] Updated file_hash for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 14:02:15,287 [INFO] Cache HIT for hash: c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e
+2026-03-10 14:02:15,290 [INFO] Preparing to delete all existing drug records for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 14:02:15,364 [INFO] Successfully deleted 2341 records for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 14:02:23,081 [INFO] Preparing to insert 2341 records into the database.
+2026-03-10 14:02:23,439 [INFO] Successfully inserted or updated 2341 records.
+2026-03-10 14:02:23,440 [INFO] db.insert drug_formulary_details count=2341
+2026-03-10 14:08:34,919 [INFO] Transaction 26b5f4fb-2181-40ae-b6f1-15d527f18ca8 created.
+2026-03-10 14:08:34,920 [INFO] Ensuring database schema exists...
+2026-03-10 14:08:34,988 [INFO] Created/ensured processed_file_cache table
+2026-03-10 14:08:34,990 [INFO] Created/ensured transaction table
+2026-03-10 14:08:34,993 [INFO] Created/ensured audit table
+2026-03-10 14:08:34,994 [INFO] Created partitioned drug_formulary_details table
+2026-03-10 14:08:34,995 [INFO] Created/ensured pp_formulary_names table
+2026-03-10 14:08:34,999 [INFO] Ensured coverage_status column exists in pp_formulary_names.
+2026-03-10 14:08:35,002 [INFO] Updated confidence_score column type to DECIMAL(5,2).
+2026-03-10 14:08:35,006 [INFO] Ensured product mapping columns exist in drug_formulary_details.
+2026-03-10 14:08:35,009 [INFO] Added preferred_agent column to drug_formulary_details.
+2026-03-10 14:08:35,009 [INFO] Added non_preferred_agent column to drug_formulary_details.
+2026-03-10 14:08:35,016 [INFO] Database schema ensured successfully with partitioning and comprehensive indexing
+2026-03-10 14:08:40,073 [INFO] Updated file_hash for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 14:08:40,144 [INFO] Cache HIT for hash: c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e
+2026-03-10 14:08:40,146 [INFO] Preparing to delete all existing drug records for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 14:08:40,218 [INFO] Successfully deleted 2341 records for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 14:08:47,338 [INFO] Preparing to insert 2341 records into the database.
+2026-03-10 14:08:47,734 [INFO] Successfully inserted or updated 2341 records.
+2026-03-10 14:08:47,735 [INFO] db.insert drug_formulary_details count=2341
+2026-03-10 14:10:41,257 [INFO] Transaction ed8ac992-ce6c-4353-b218-a32d1d6e9515 created.
+2026-03-10 14:10:41,258 [INFO] Ensuring database schema exists...
+2026-03-10 14:10:41,323 [INFO] Created/ensured processed_file_cache table
+2026-03-10 14:10:41,325 [INFO] Created/ensured transaction table
+2026-03-10 14:10:41,328 [INFO] Created/ensured audit table
+2026-03-10 14:10:41,329 [INFO] Created partitioned drug_formulary_details table
+2026-03-10 14:10:41,330 [INFO] Created/ensured pp_formulary_names table
+2026-03-10 14:10:41,335 [INFO] Ensured coverage_status column exists in pp_formulary_names.
+2026-03-10 14:10:41,338 [INFO] Updated confidence_score column type to DECIMAL(5,2).
+2026-03-10 14:10:41,342 [INFO] Ensured product mapping columns exist in drug_formulary_details.
+2026-03-10 14:10:41,342 [INFO] Added preferred_agent column to drug_formulary_details.
+2026-03-10 14:10:41,346 [INFO] Added non_preferred_agent column to drug_formulary_details.
+2026-03-10 14:10:41,352 [INFO] Database schema ensured successfully with partitioning and comprehensive indexing
+2026-03-10 14:10:46,314 [INFO] Updated file_hash for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 14:10:46,430 [INFO] Cache HIT for hash: c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e
+2026-03-10 14:10:46,431 [INFO] Preparing to delete all existing drug records for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 14:10:46,502 [INFO] Successfully deleted 2341 records for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 14:10:54,798 [INFO] Preparing to insert 2341 records into the database.
+2026-03-10 14:10:55,133 [INFO] Successfully inserted or updated 2341 records.
+2026-03-10 14:10:55,135 [INFO] db.insert drug_formulary_details count=2341
+2026-03-10 14:12:07,390 [INFO] Transaction 5f8303aa-1baf-4eed-8483-e0f54fc1f2db created.
+2026-03-10 14:12:07,391 [INFO] Ensuring database schema exists...
+2026-03-10 14:12:07,454 [INFO] Created/ensured processed_file_cache table
+2026-03-10 14:12:07,459 [INFO] Created/ensured transaction table
+2026-03-10 14:12:07,463 [INFO] Created/ensured audit table
+2026-03-10 14:12:07,464 [INFO] Created partitioned drug_formulary_details table
+2026-03-10 14:12:07,465 [INFO] Created/ensured pp_formulary_names table
+2026-03-10 14:12:07,466 [INFO] Ensured coverage_status column exists in pp_formulary_names.
+2026-03-10 14:12:07,470 [INFO] Updated confidence_score column type to DECIMAL(5,2).
+2026-03-10 14:12:07,473 [INFO] Ensured product mapping columns exist in drug_formulary_details.
+2026-03-10 14:12:07,473 [INFO] Added preferred_agent column to drug_formulary_details.
+2026-03-10 14:12:07,475 [INFO] Added non_preferred_agent column to drug_formulary_details.
+2026-03-10 14:12:07,482 [INFO] Database schema ensured successfully with partitioning and comprehensive indexing
+2026-03-10 14:12:13,516 [INFO] Updated file_hash for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 14:12:13,586 [INFO] Cache HIT for hash: c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e
+2026-03-10 14:12:13,589 [INFO] Preparing to delete all existing drug records for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 14:12:13,659 [INFO] Successfully deleted 2341 records for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 14:12:20,220 [INFO] Preparing to insert 2341 records into the database.
+2026-03-10 14:12:20,551 [INFO] Successfully inserted or updated 2341 records.
+2026-03-10 14:12:20,552 [INFO] db.insert drug_formulary_details count=2341
+2026-03-10 14:13:27,306 [INFO] Transaction 5b54e87e-358a-436c-8beb-e90513333e9f created.
+2026-03-10 14:13:27,308 [INFO] Ensuring database schema exists...
+2026-03-10 14:13:27,468 [INFO] Created/ensured processed_file_cache table
+2026-03-10 14:13:27,472 [INFO] Created/ensured transaction table
+2026-03-10 14:13:27,474 [INFO] Created/ensured audit table
+2026-03-10 14:13:27,477 [INFO] Created partitioned drug_formulary_details table
+2026-03-10 14:13:27,477 [INFO] Created/ensured pp_formulary_names table
+2026-03-10 14:13:27,482 [INFO] Ensured coverage_status column exists in pp_formulary_names.
+2026-03-10 14:13:27,484 [INFO] Updated confidence_score column type to DECIMAL(5,2).
+2026-03-10 14:13:27,486 [INFO] Ensured product mapping columns exist in drug_formulary_details.
+2026-03-10 14:13:27,488 [INFO] Added preferred_agent column to drug_formulary_details.
+2026-03-10 14:13:27,488 [INFO] Added non_preferred_agent column to drug_formulary_details.
+2026-03-10 14:13:27,495 [INFO] Database schema ensured successfully with partitioning and comprehensive indexing
+2026-03-10 14:13:32,522 [INFO] Updated file_hash for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 14:13:32,590 [INFO] Cache MISS for hash: c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e
+2026-03-10 14:15:02,674 [INFO] Transaction 325ffc43-9437-4277-b3c7-fc5c5d8a74d9 created.
+2026-03-10 14:15:02,820 [INFO] Loaded 0 acronyms into memory cache for Wellpoint (Arizona)
+2026-03-10 14:15:02,935 [INFO] Preparing to delete all existing drug records for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 14:15:03,011 [INFO] Successfully deleted 2341 records for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 14:15:11,359 [INFO] Preparing to insert 2342 records into the database.
+2026-03-10 14:15:11,758 [INFO] Successfully inserted or updated 2342 records.
+2026-03-10 14:15:11,759 [INFO] db.insert drug_formulary_details count=2342
+2026-03-10 14:15:12,343 [INFO] Successfully inserted or updated 18 records into pp_formulary_names.
+2026-03-10 14:15:12,505 [INFO] Successfully cached result for hash: c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e (URL: https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe...)
+2026-03-10 14:15:12,507 [INFO] cache.store hash=c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf size_drugs=2342 size_acronyms=124
+2026-03-10 14:15:12,507 [INFO] Updating status to 'completed' for drugs in 1 plans.
+2026-03-10 14:15:12,806 [INFO] Successfully updated status for 2342 drug formulary records.
+2026-03-10 14:15:12,807 [INFO] db.update drug_formulary_details set=status='completed' plans=1 rows=2342
+2026-03-10 14:15:12,808 [INFO] Updating final status for all payers and plans...
+2026-03-10 14:15:12,889 [INFO] Set 1 plans to 'active'.
+2026-03-10 14:15:12,891 [INFO] db.update plan_details set=status='active' rows=1
+2026-03-10 14:15:12,893 [INFO] Set 1 payers to 'active'.
+2026-03-10 14:15:12,894 [INFO] db.update payer_details set=status='active' rows=1
+2026-03-10 14:15:12,895 [INFO] Set 0 payers to 'inactive'.
+2026-03-10 14:15:12,895 [INFO] db.update payer_details set=status='inactive' rows=0
+2026-03-10 14:15:12,899 [INFO] Successfully updated all plan and payer statuses.
+2026-03-10 14:15:12,899 [INFO] db.update statuses committed
+2026-03-10 14:18:45,285 [INFO] Transaction 9d453492-a24d-4da1-ba6e-a1b37a0e6e72 created.
+2026-03-10 14:18:45,286 [INFO] Ensuring database schema exists...
+2026-03-10 14:18:45,355 [INFO] Created/ensured processed_file_cache table
+2026-03-10 14:18:45,359 [INFO] Created/ensured transaction table
+2026-03-10 14:18:45,362 [INFO] Created/ensured audit table
+2026-03-10 14:18:45,363 [INFO] Created partitioned drug_formulary_details table
+2026-03-10 14:18:45,364 [INFO] Created/ensured pp_formulary_names table
+2026-03-10 14:18:45,369 [INFO] Ensured coverage_status column exists in pp_formulary_names.
+2026-03-10 14:18:45,370 [INFO] Updated confidence_score column type to DECIMAL(5,2).
+2026-03-10 14:18:45,376 [INFO] Ensured product mapping columns exist in drug_formulary_details.
+2026-03-10 14:18:45,378 [INFO] Added preferred_agent column to drug_formulary_details.
+2026-03-10 14:18:45,380 [INFO] Added non_preferred_agent column to drug_formulary_details.
+2026-03-10 14:18:45,386 [INFO] Database schema ensured successfully with partitioning and comprehensive indexing
+2026-03-10 14:18:53,702 [INFO] Updated file_hash for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 14:18:53,769 [INFO] Cache MISS for hash: c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e
+2026-03-10 14:20:18,255 [INFO] Transaction f5b47475-4c83-4fee-b1d4-63004e96ad7a created.
+2026-03-10 14:20:18,384 [INFO] Loaded 0 acronyms into memory cache for Wellpoint (Arizona)
+2026-03-10 14:20:18,474 [INFO] Preparing to delete all existing drug records for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 14:20:18,547 [INFO] Successfully deleted 2342 records for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 14:20:24,840 [INFO] Preparing to insert 2343 records into the database.
+2026-03-10 14:20:25,161 [INFO] Successfully inserted or updated 2343 records.
+2026-03-10 14:20:25,161 [INFO] db.insert drug_formulary_details count=2343
+2026-03-10 14:20:25,613 [INFO] Successfully inserted or updated 18 records into pp_formulary_names.
+2026-03-10 14:20:25,768 [INFO] Successfully cached result for hash: c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e (URL: https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe...)
+2026-03-10 14:20:25,768 [INFO] cache.store hash=c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf size_drugs=2343 size_acronyms=110
+2026-03-10 14:20:25,769 [INFO] Updating status to 'completed' for drugs in 1 plans.
+2026-03-10 14:20:26,037 [INFO] Successfully updated status for 2343 drug formulary records.
+2026-03-10 14:20:26,039 [INFO] db.update drug_formulary_details set=status='completed' plans=1 rows=2343
+2026-03-10 14:20:26,040 [INFO] Updating final status for all payers and plans...
+2026-03-10 14:20:26,107 [INFO] Set 1 plans to 'active'.
+2026-03-10 14:20:26,107 [INFO] db.update plan_details set=status='active' rows=1
+2026-03-10 14:20:26,110 [INFO] Set 1 payers to 'active'.
+2026-03-10 14:20:26,110 [INFO] db.update payer_details set=status='active' rows=1
+2026-03-10 14:20:26,111 [INFO] Set 0 payers to 'inactive'.
+2026-03-10 14:20:26,112 [INFO] db.update payer_details set=status='inactive' rows=0
+2026-03-10 14:20:26,113 [INFO] Successfully updated all plan and payer statuses.
+2026-03-10 14:20:26,114 [INFO] db.update statuses committed
+2026-03-10 15:22:00,850 [INFO] Transaction f841a38b-22f8-4685-a7b7-410b7cd68db5 created.
+2026-03-10 15:22:00,852 [INFO] Ensuring database schema exists...
+2026-03-10 15:22:00,942 [INFO] Created/ensured processed_file_cache table
+2026-03-10 15:22:00,944 [INFO] Created/ensured transaction table
+2026-03-10 15:22:00,946 [INFO] Created/ensured audit table
+2026-03-10 15:22:00,946 [INFO] Created partitioned drug_formulary_details table
+2026-03-10 15:22:00,948 [INFO] Created/ensured pp_formulary_names table
+2026-03-10 15:22:00,953 [INFO] Ensured coverage_status column exists in pp_formulary_names.
+2026-03-10 15:22:00,956 [INFO] Updated confidence_score column type to DECIMAL(5,2).
+2026-03-10 15:22:00,958 [INFO] Ensured product mapping columns exist in drug_formulary_details.
+2026-03-10 15:22:00,961 [INFO] Added preferred_agent column to drug_formulary_details.
+2026-03-10 15:22:00,962 [INFO] Added non_preferred_agent column to drug_formulary_details.
+2026-03-10 15:22:00,971 [INFO] Database schema ensured successfully with partitioning and comprehensive indexing
+2026-03-10 15:22:07,772 [INFO] Updated file_hash for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 15:22:07,906 [INFO] Cache MISS for hash: c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e
+2026-03-10 15:23:30,494 [INFO] Transaction b494707d-00dc-4a1b-a525-2da9e53d870e created.
+2026-03-10 15:23:30,621 [INFO] Loaded 0 acronyms into memory cache for Wellpoint (Arizona)
+2026-03-10 15:23:30,712 [INFO] Preparing to delete all existing drug records for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 15:23:30,792 [INFO] Successfully deleted 2343 records for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 15:23:37,309 [INFO] Preparing to insert 2340 records into the database.
+2026-03-10 15:23:37,665 [INFO] Successfully inserted or updated 2340 records.
+2026-03-10 15:23:37,667 [INFO] db.insert drug_formulary_details count=2340
+2026-03-10 15:23:38,015 [INFO] Successfully inserted or updated 18 records into pp_formulary_names.
+2026-03-10 15:23:38,161 [INFO] Successfully cached result for hash: c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e (URL: https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe...)
+2026-03-10 15:23:38,161 [INFO] cache.store hash=c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf size_drugs=2340 size_acronyms=123
+2026-03-10 15:23:38,162 [INFO] Updating status to 'completed' for drugs in 1 plans.
+2026-03-10 15:23:38,399 [INFO] Successfully updated status for 2340 drug formulary records.
+2026-03-10 15:23:38,399 [INFO] db.update drug_formulary_details set=status='completed' plans=1 rows=2340
+2026-03-10 15:23:38,401 [INFO] Updating final status for all payers and plans...
+2026-03-10 15:23:38,464 [INFO] Set 1 plans to 'active'.
+2026-03-10 15:23:38,464 [INFO] db.update plan_details set=status='active' rows=1
+2026-03-10 15:23:38,466 [INFO] Set 1 payers to 'active'.
+2026-03-10 15:23:38,466 [INFO] db.update payer_details set=status='active' rows=1
+2026-03-10 15:23:38,467 [INFO] Set 0 payers to 'inactive'.
+2026-03-10 15:23:38,467 [INFO] db.update payer_details set=status='inactive' rows=0
+2026-03-10 15:23:38,469 [INFO] Successfully updated all plan and payer statuses.
+2026-03-10 15:23:38,469 [INFO] db.update statuses committed
+2026-03-10 15:36:36,968 [INFO] Transaction 1f72e72a-a9e7-4535-bd6c-d3c58f69a418 created.
+2026-03-10 15:36:36,971 [INFO] Ensuring database schema exists...
+2026-03-10 15:36:37,045 [INFO] Created/ensured processed_file_cache table
+2026-03-10 15:36:37,055 [INFO] Created/ensured transaction table
+2026-03-10 15:36:37,058 [INFO] Created/ensured audit table
+2026-03-10 15:36:37,060 [INFO] Created partitioned drug_formulary_details table
+2026-03-10 15:36:37,061 [INFO] Created/ensured pp_formulary_names table
+2026-03-10 15:36:37,068 [INFO] Ensured coverage_status column exists in pp_formulary_names.
+2026-03-10 15:36:37,073 [INFO] Updated confidence_score column type to DECIMAL(5,2).
+2026-03-10 15:36:37,075 [INFO] Ensured product mapping columns exist in drug_formulary_details.
+2026-03-10 15:36:37,078 [INFO] Added preferred_agent column to drug_formulary_details.
+2026-03-10 15:36:37,079 [INFO] Added non_preferred_agent column to drug_formulary_details.
+2026-03-10 15:36:37,091 [INFO] Database schema ensured successfully with partitioning and comprehensive indexing
+2026-03-10 15:36:44,782 [INFO] Updated file_hash for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 15:36:44,857 [INFO] Cache MISS for hash: c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e
+2026-03-10 15:38:18,731 [INFO] Transaction eeb88d77-8c23-475a-80f5-e0167f5b2a94 created.
+2026-03-10 15:38:18,912 [INFO] Loaded 0 acronyms into memory cache for Wellpoint (Arizona)
+2026-03-10 15:38:19,045 [INFO] Preparing to delete all existing drug records for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 15:38:19,145 [INFO] Successfully deleted 2340 records for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 15:38:29,380 [INFO] Preparing to insert 2301 records into the database.
+2026-03-10 15:38:29,711 [INFO] Successfully inserted or updated 2301 records.
+2026-03-10 15:38:29,713 [INFO] db.insert drug_formulary_details count=2301
+2026-03-10 15:38:30,135 [INFO] Successfully inserted or updated 18 records into pp_formulary_names.
+2026-03-10 15:38:30,294 [INFO] Successfully cached result for hash: c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e (URL: https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe...)
+2026-03-10 15:38:30,296 [INFO] cache.store hash=c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf size_drugs=2302 size_acronyms=116
+2026-03-10 15:38:30,296 [INFO] Updating status to 'completed' for drugs in 1 plans.
+2026-03-10 15:38:30,536 [INFO] Successfully updated status for 2301 drug formulary records.
+2026-03-10 15:38:30,537 [INFO] db.update drug_formulary_details set=status='completed' plans=1 rows=2301
+2026-03-10 15:38:30,538 [INFO] Updating final status for all payers and plans...
+2026-03-10 15:38:30,613 [INFO] Set 1 plans to 'active'.
+2026-03-10 15:38:30,614 [INFO] db.update plan_details set=status='active' rows=1
+2026-03-10 15:38:30,617 [INFO] Set 1 payers to 'active'.
+2026-03-10 15:38:30,618 [INFO] db.update payer_details set=status='active' rows=1
+2026-03-10 15:38:30,622 [INFO] Set 0 payers to 'inactive'.
+2026-03-10 15:38:30,623 [INFO] db.update payer_details set=status='inactive' rows=0
+2026-03-10 15:38:30,624 [INFO] Successfully updated all plan and payer statuses.
+2026-03-10 15:38:30,624 [INFO] db.update statuses committed
+2026-03-10 15:52:26,653 [INFO] Transaction dc0a42f9-5c90-4a29-a087-86f42ba22e25 created.
+2026-03-10 15:52:26,654 [INFO] Ensuring database schema exists...
+2026-03-10 15:52:26,732 [INFO] Created/ensured processed_file_cache table
+2026-03-10 15:52:26,735 [INFO] Created/ensured transaction table
+2026-03-10 15:52:26,738 [INFO] Created/ensured audit table
+2026-03-10 15:52:26,739 [INFO] Created partitioned drug_formulary_details table
+2026-03-10 15:52:26,740 [INFO] Created/ensured pp_formulary_names table
+2026-03-10 15:52:26,748 [INFO] Ensured coverage_status column exists in pp_formulary_names.
+2026-03-10 15:52:26,751 [INFO] Updated confidence_score column type to DECIMAL(5,2).
+2026-03-10 15:52:26,754 [INFO] Ensured product mapping columns exist in drug_formulary_details.
+2026-03-10 15:52:26,754 [INFO] Added preferred_agent column to drug_formulary_details.
+2026-03-10 15:52:26,754 [INFO] Added non_preferred_agent column to drug_formulary_details.
+2026-03-10 15:52:26,765 [INFO] Database schema ensured successfully with partitioning and comprehensive indexing
+2026-03-10 15:52:40,561 [INFO] Updated file_hash for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 15:52:40,623 [INFO] Cache MISS for hash: c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e
+2026-03-10 15:54:03,038 [INFO] Transaction 4999dd0a-8bb0-4f7b-9f54-81950264ce66 created.
+2026-03-10 15:54:03,185 [INFO] Loaded 12 acronyms into memory cache for Wellpoint (Arizona)
+2026-03-10 15:54:03,273 [INFO] Preparing to delete all existing drug records for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 15:54:03,337 [INFO] Successfully deleted 0 records for plan_id: 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5
+2026-03-10 15:54:07,464 [INFO] Preparing to insert 2346 records into the database.
+2026-03-10 15:54:07,848 [INFO] Successfully inserted or updated 2346 records.
+2026-03-10 15:54:07,848 [INFO] db.insert drug_formulary_details count=2346
+2026-03-10 15:54:08,159 [INFO] Successfully inserted or updated 18 records into pp_formulary_names.
+2026-03-10 15:54:08,312 [INFO] Successfully cached result for hash: c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e (URL: https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe...)
+2026-03-10 15:54:08,313 [INFO] cache.store hash=c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf size_drugs=2348 size_acronyms=117
+2026-03-10 15:54:08,313 [INFO] Updating status to 'completed' for drugs in 1 plans.
+2026-03-10 15:54:08,588 [INFO] Successfully updated status for 2346 drug formulary records.
+2026-03-10 15:54:08,588 [INFO] db.update drug_formulary_details set=status='completed' plans=1 rows=2346
+2026-03-10 15:54:08,588 [INFO] Updating final status for all payers and plans...
+2026-03-10 15:54:08,662 [INFO] Set 1 plans to 'active'.
+2026-03-10 15:54:08,663 [INFO] db.update plan_details set=status='active' rows=1
+2026-03-10 15:54:08,665 [INFO] Set 1 payers to 'active'.
+2026-03-10 15:54:08,666 [INFO] db.update payer_details set=status='active' rows=1
+2026-03-10 15:54:08,667 [INFO] Set 0 payers to 'inactive'.
+2026-03-10 15:54:08,668 [INFO] db.update payer_details set=status='inactive' rows=0
+2026-03-10 15:54:08,669 [INFO] Successfully updated all plan and payer statuses.
+2026-03-10 15:54:08,669 [INFO] db.update statuses committed

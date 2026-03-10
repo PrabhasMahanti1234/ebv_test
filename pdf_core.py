@@ -216,10 +216,11 @@ def _process_ocr_response(ocr_response, original_pages: list) -> tuple:
         original_pages: List of original PDF page numbers
 
     Returns:
-        Tuple of (all_structured_data, all_acronyms, pages_processed)
+        Tuple of (all_structured_data, all_acronyms, pages_processed, raw_text)
     """
     all_structured_data = []
     all_acronyms = []
+    raw_text_parts = []
 
     # Try document-level annotation first
     if hasattr(ocr_response, 'document_annotation') and ocr_response.document_annotation:
@@ -253,6 +254,10 @@ def _process_ocr_response(ocr_response, original_pages: list) -> tuple:
     # Also check page-level annotations
     for page_idx, page in enumerate(ocr_response.pages):
         page_num = original_pages[page_idx] if page_idx < len(original_pages) else page_idx + 1
+        
+        # Extract raw text (markdown) if available
+        if hasattr(page, 'markdown') and page.markdown:
+            raw_text_parts.append(page.markdown)
 
         if hasattr(page, 'document_annotation') and page.document_annotation:
             try:
@@ -275,8 +280,9 @@ def _process_ocr_response(ocr_response, original_pages: list) -> tuple:
             except Exception as e:
                 logger.debug(f"Could not parse page annotation: {e}")
 
+    raw_text = "\n\n".join(raw_text_parts)
     logger.info(f"📋 OCR extracted {len(all_structured_data)} drugs and {len(all_acronyms)} acronyms (raw, before cleaning)")
-    return all_structured_data, all_acronyms, len(ocr_response.pages)
+    return all_structured_data, all_acronyms, len(ocr_response.pages), raw_text
 
 
 def prefilter_pages_with_pymupdf(pdf_input: BytesIO, page_indices: List[int]) -> List[int]:
@@ -325,7 +331,7 @@ def prefilter_pages_with_pymupdf(pdf_input: BytesIO, page_indices: List[int]) ->
                 header_text = text_lower[:800]  # Check more of the header
                 footer_text = text_lower[-300:] if len(text_lower) > 300 else text_lower
                 
-                # NEW: Skip index detection if page contains tier definitions
+                # NEW: Skip index detection if page contains tier definitions or legend/abbreviations
                 # These pages have valuable content that should be processed
                 tier_definition_indicators = [
                     "tier 1", "tier 2", "tier 3", "tier 4", "tier 5", "tier 6",
@@ -333,11 +339,20 @@ def prefilter_pages_with_pymupdf(pdf_input: BytesIO, page_indices: List[int]) ->
                     "generic drugs", "brand drugs", "specialty tier",
                     "this tier includes", "drugs in tier", "cost-sharing"
                 ]
-                has_tier_definitions = any(ind in text_lower for ind in tier_definition_indicators)
                 
-                if has_tier_definitions:
-                    # This page has tier definitions - DO NOT skip it
-                    logger.info(f"   ✅ Page {page_num}: Contains tier definitions - keeping for OCR")
+                legend_indicators = [
+                    "abbreviation", "abbreviations", "requirement", "requirements",
+                    "requirement/limits", "limits", "tier definitions", 
+                    "tier abbreviation", "drug list abbreviations"
+                ]
+                
+                has_tier_definitions = any(ind in text_lower for ind in tier_definition_indicators)
+                has_legend_content = any(ind in text_lower for ind in legend_indicators)
+                
+                if has_tier_definitions or has_legend_content:
+                    # This page has valuable legend or tier content - DO NOT skip it
+                    # reason = "tier definitions" if has_tier_definitions else "legend/abbreviation definitions"
+                    # logger.info(f"   ✅ Page {page_num}: Contains {reason} - keeping for OCR")
                     filtered_pages.append(page_num)
                     continue
                 

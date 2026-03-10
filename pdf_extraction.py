@@ -775,7 +775,15 @@ def _is_extracted_data_from_index_page(drug_table: List[dict]) -> bool:
     # '$0 (4)', '$0 (5^)', 'Tier 1', etc.), this is a valid drug page — NOT an index.
     # This prevents false positives for plans like Wellcare that use cost-based tier notation
     # (which bypasses _is_valid_tier_format since those only accept numeric 1-6 tiers).
-    has_any_tier_count = sum(1 for item in drug_table if item.get("drug_tier"))
+    has_any_tier_count = 0
+    for item in drug_table:
+        tier = item.get("drug_tier")
+        if tier:
+            # If it's a bare number but > 6, it's likely a page number, don't count it as a valid tier for Rule 1.6
+            if str(tier).strip().isdigit() and int(str(tier).strip()) > 6:
+                continue
+            has_any_tier_count += 1
+            
     if total > 0 and has_any_tier_count / total >= 0.40:
         logger.info(f"✅ VALID DRUG PAGE (Rule 1.6 - Any Tier): {has_any_tier_count}/{total} ({has_any_tier_count/total*100:.1f}%) entries have a drug_tier value. NOT an index page.")
         return False

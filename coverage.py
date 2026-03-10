@@ -29,6 +29,15 @@ logger = logging.getLogger(__name__)
 NC_INDICATORS = ["NC", "NF", "NOT COVERED", "EXCLUDED", "NON-FORMULARY", "NOT-COVERED"]
 RE_NC = re.compile(r'\b(?:' + '|'.join(map(re.escape, NC_INDICATORS)) + r')\b', re.IGNORECASE)
 
+# --- COVERAGE PRIORITY MAPPING (MOST RESTRICTIVE -> LEAST) ---
+COVERAGE_PRIORITY = {
+    "Not Covered": 1,
+    "Covered with PA": 2,
+    "Covered with ST": 3,
+    "Covered with Conditions": 4,
+    "Covered": 5
+}
+
 PA_KEYWORDS = [
     'prior authorization', 'prior auth', 'pa required', 'pa needed',
     'pa', 
@@ -113,7 +122,7 @@ def det_coverage_status(
 ):
     """
     Main orchestrator for coverage status determination.
-    Consolidated logic: Tier NC > Python Logic (PA/ST/QL) > ML Model > Default
+    Consolidated logic: Tier NC > Python Logic (PA/ST/QL) > DB Lookup > Default
     """
     # Identifier for logging
     log_id = drug_name or acronym or "Unknown Drug"
@@ -125,188 +134,156 @@ def det_coverage_status(
     tier_text_clean = str(tier_text or "").upper().strip()
     req_text_clean = str(requirements_text or "").upper().strip()
 
-    # nc_indicators removed - using RE_NC
-
-    # 1. Both Null Fallback: If both are null, return Covered/Unknown immediately
-    if not tier_text_clean and not req_text_clean:
-        logger.info(f"Coverage for '{log_id}': Covered/Unknown (Source: Default Fallback - Both Tier and Req null)")
-        return "Covered with Conditions", 50.0, "Default", True
-
-    # 2. Tier NC Priority: if tier has nc indicators it is not covered
-    # Use regex word boundaries to avoid false positives (e.g., "NC" in "CONC")
+    # --- NEW: DETERMINISTIC PRIORITY RESOLUTION ---
+    # Collect all potential coverage results and resolve by priority (Most Restrictive -> Least)
+    # Each entry is a tuple: (status, confidence, source)
+    detected_results = []
+    
+    # 1. Check Tier NC Priority
     if tier_text_clean and RE_NC.search(tier_text_clean):
-        logger.info(f"Coverage for '{log_id}': Not Covered (Source: Python Logic - NC Tier '{tier_text_clean}')")
-        return "Not Covered", 100.0, "Python Logic (NC Tier)", False
+        detected_results.append(("Not Covered", 100.0, "Python Logic (NC Tier)"))
+        logger.info(f"[{log_id}] Detected 'Not Covered' (100.0) from Tier NC")
 
-    # 3. Python Rule Logic: Check for PA, ST, QL, AL, LA, BVD, etc.
+    # 2. Check Requirement NC Priority
+    is_nc_req = bool(RE_NC.search(req_text_clean))
+    if is_nc_req:
+        detected_results.append(("Not Covered", 90.0, "Python Logic (NC Req)"))
+        logger.info(f"[{log_id}] Detected 'Not Covered' (90.0) from Req NC")
+
+    # 3. Check Python Rule Logic: PA, ST, QL, AL, LA, BVD, etc.
     is_pa = detect_prior_authorization(req_text_clean)
     is_st = detect_step_therapy(req_text_clean)
     is_other_cond = bool(RE_OTHER_CONDITIONS.search(req_text_clean))
     is_specialty = "SP" in tier_text_clean or "SPECIALTY" in tier_text_clean
-    is_nc_req = bool(RE_NC.search(req_text_clean))
 
-    if is_nc_req:
-        logger.info(f"Coverage for '{log_id}': Not Covered (Source: Python Logic - NC Requirement '{req_text_clean}')")
-        return "Not Covered", 90.0, "Python Logic (NC Req)", False
-    
-    if is_pa:
-        reason = ["PA"]
-        if is_st: reason.append("ST")
-        if is_other_cond: reason.append("Other Conditions")
-        if is_specialty: reason.append("Specialty Tier")
-        logger.info(f"Coverage for '{log_id}': Covered with PA (Source: Python Logic - {', '.join(reason)})")
-        return "Covered with PA", 85.0, "Python Logic", False
-    
     if is_st:
-        reason = ["ST"]
-        if is_other_cond: reason.append("Other Conditions")
-        if is_specialty: reason.append("Specialty Tier")
-        logger.info(f"Coverage for '{log_id}': Covered with ST (Source: Python Logic - {', '.join(reason)})")
-        return "Covered with ST", 85.0, "Python Logic", False
-
+        detected_results.append(("Covered with ST", 85.0, "Python Logic"))
+        logger.info(f"[{log_id}] Detected 'Covered with ST' (85.0) from Python Logic")
+    if is_pa:
+        detected_results.append(("Covered with PA", 85.0, "Python Logic"))
+        logger.info(f"[{log_id}] Detected 'Covered with PA' (85.0) from Python Logic")
     if is_other_cond or is_specialty:
-        reason = []
-        if is_other_cond: reason.append("Other Conditions")
-        if is_specialty: reason.append("Specialty Tier")
-        logger.info(f"Coverage for '{log_id}': Covered with Conditions (Source: Python Logic - {', '.join(reason)})")
-        return "Covered with Conditions", 85.0, "Python Logic", False
-    # 4. ML Model Logic (Requirement and Tier)
-    # if acronym:
-    #     # Split acronyms by common separators (comma, hyphen, slash, whitespace)
-    #     raw_parts = [a for a in re.split(r'[,\s\-/]+', str(acronym)) if a]
-    #     sub_acronyms = []
-    #     for part in raw_parts:
-    #         token = part.strip()
-            
-    #         # Special case: If QL is followed by "=", treat the acronym as just "QL"
-    #         if token.upper().startswith("QL="):
-    #             sub_acronyms.append("QL")
-    #             continue
+        detected_results.append(("Covered with Conditions", 85.0, "Python Logic"))
+        logger.info(f"[{log_id}] Detected 'Covered with Conditions' (85.0) from Python Logic")
 
-    #         # Handle digit + symbol format (e.g., 5^, 3*)
-    #         # Only split if no letters are present (avoids splitting 5ST, 4PA)
-    #         if not re.search(r'[A-Z]', token, re.IGNORECASE):
-    #             match = re.match(r'^(\d+)([^\w\s]+)$', token)
-    #             if match:
-    #                 digit, symbol = match.groups()
-    #                 sub_acronyms.append(f"Tier {digit}")
-    #                 sub_acronyms.append(symbol)
-    #                 continue
-            
-    #         sub_acronyms.append(token)
+    # 4. Check DB Lookup (Full and Sub-acronyms)
+    db_cvg_status = None
+    db_source = None
+    db_conf = 0.0
 
-        
-    #     ml_predictions = []
-        
-    #     # Ensure we can look up expansion
-    #     from utils import lookup_expansion
-
-    #     for sub_acronym in sub_acronyms:
-    #         # Determine initial expansion/explanation for this part
-    #         # If there's only one acronym, use the provided arguments as base
-    #         sub_expansion = expansion if len(sub_acronyms) == 1 else None
-    #         sub_explanation = explanation if len(sub_acronyms) == 1 else None
-            
-    #         # DB Lookup to enrich or fill missing info
-    #         if conn:
-    #             db_exp, db_expl, _ = lookup_expansion(sub_acronym, state_name, payer_name, conn)
-    #             sub_expansion = sub_expansion or db_exp
-    #             sub_explanation = sub_explanation or db_expl
-            
-    #         # Predict
-    #         pred_label, pred_conf = ml_predict_fn(
-    #             payer_name, 
-    #             state_name, 
-    #             sub_acronym, 
-    #             sub_expansion, 
-    #             sub_explanation
-    #         )
-            
-    #         # Log individual prediction to ml_output.log
-    #         ml_logger.info(f"Drug: {log_id} | Input: {sub_acronym} | Expansion: {sub_expansion} | Explanation: {sub_explanation} | Prediction: {pred_label} | Confidence: {pred_conf} | Payer: {payer_name} | State: {state_name}")
-
-    #         if pred_label:
-    #             ml_predictions.append((pred_label, pred_conf))
-        
-    #     if ml_predictions:
-    #         # ml_predictions is a list of (prediction_label, prediction_confidence) tuples
-    #         statuses = [prediction_label for prediction_label, _ in ml_predictions]
-    #         final_status = determine_ml_coverage_status(statuses)
-    #         manual_verification_required = False
-            
-    #         # Determine confidence based on the winning status
-    #         final_conf = 0.0
-    #         normalized_target = final_status.lower().replace("conditions", "condition")
-            
-    #         for label, conf in ml_predictions:
-    #              normalized_label = label.lower().replace("conditions", "condition")
-    #              if normalized_label == normalized_target:
-    #                  final_conf = max(final_conf, conf)
-            
-    #         # Log final decision to ml_output.log
-    #         ml_logger.info(f"Drug: {log_id} | Final ML Status: {final_status} | Final Confidence: {final_conf}")
-
-    #         # Convert to percentage with 2 decimal places without rounding
-    #         final_conf_pct = float(int(final_conf * 10000) / 100.0)
-
-    #         logger.info(f"Coverage for '{log_id}': {final_status} (Source: ML Model - {acronym})")
-    #         if final_conf_pct < 80.0:
-    #             manual_verification_required = True
-    #         return final_status, final_conf_pct, "ML Model", manual_verification_required
-
-    #4. Cvg status look up using lookup_expansion()
     if acronym:
-        # Split acronyms by common separators (comma, hyphen, slash, whitespace)
-        raw_parts = [a for a in re.split(r'[,\s\-/]+', str(acronym)) if a]
-        sub_acronyms = []
-        for part in raw_parts:
-            token = part.strip()
-            
-            # Special case: If QL is followed by "=", treat the acronym as just "QL"
-            if token.upper().startswith("QL="):
-                sub_acronyms.append("QL")
-                continue
-
-            # Handle variants like "Tier 5^", "5^", "Tier-1", "1"
-            # Regex to handle optional prefix (Tier, tier-, etc.), then digit, then trailing symbols
-            match = re.match(r'^(?:TIER\s*|tier\s*|tier\-)?(\d+)\s*([^\w\s]*)$', token, re.IGNORECASE)
-            if match:
-                digit, symbol = match.groups()
-                # Normalize digit to "Tier X"
-                sub_acronyms.append(f"Tier {digit}")
-                if symbol:
-                    # Extract individual symbols if multiple are present (e.g., "^*")
-                    for char in symbol:
-                        if char.strip():
-                            sub_acronyms.append(char)
-                continue
-            
-            sub_acronyms.append(token)
-                
-        from utils import lookup_expansion, determine_db_coverage
-
-        # 1. Try lookup with the full original acronym string first (most specific)
-        if conn or acronym_cache:
-            _, _, cvg_status = lookup_expansion(acronym, state_name, payer_name, conn, acronym_cache=acronym_cache)
-            if cvg_status:
-                conf = 85.0
-                manual_review = bool(conf < 80.0)
-                logger.info(f"Coverage for '{log_id}': {cvg_status} (Source: DB Lookup - {acronym})")
-                return cvg_status, conf, "DB Lookup", manual_review
+        acronym_str = str(acronym).strip()
         
-        # 2. Check sub-acronyms individually if no full-string match was found
-        res = determine_db_coverage(sub_acronyms, conn, state_name, payer_name, acronym_cache=acronym_cache)
-        if res:
-            db_cvg_status, db_conf, db_status_msg = res
-            manual_review = bool(db_conf < 80.0)
-            logger.info(f"Coverage for '{log_id}': {db_cvg_status} (Source: {db_status_msg} - {acronym})")
-            return db_cvg_status, db_conf, "DB Lookup", manual_review
+        # 1. Tier & Requirement Extraction Logic
+        raw_parts = []
+        
+        # a. Extract Tier tokens (1B, 5^, Tier 1-6)
+        # Note: We keep them intact as requested. Use whitespace/separator boundaries.
+        tier_regex = r'(?:^|[,\s;])(Tier\s*[1-6]|[1-6][A-Z\^]?|[1-6])(?=$|[,\s;])'
+        found_tiers = re.findall(tier_regex, acronym_str, flags=re.IGNORECASE)
+        for t in found_tiers:
+            t_clean = t.strip().upper()
+            # Handle "5^" -> "Tier 5" and "^"
+            if re.match(r'^[1-6]\^$', t_clean):
+                raw_parts.append(f"Tier {t_clean[0]}")
+                raw_parts.append("^")
+            # Handle "1B" -> "1B"
+            elif re.match(r'^[1-6][A-Z]$', t_clean):
+                raw_parts.append(t_clean)
+            # Handle "Tier 1" -> "Tier 1"
+            elif t_clean.startswith("TIER"):
+                digit_match = re.search(r'\d+', t_clean)
+                if digit_match:
+                    raw_parts.append(f"Tier {digit_match.group()}")
+            # Handle bare digit "2" -> "Tier 2"
+            elif re.match(r'^[1-6]$', t_clean):
+                raw_parts.append(f"Tier {t_clean}")
+            else:
+                raw_parts.append(t_clean)
 
- 
+        # b. Requirement Parsing: Remove everything inside parentheses
+        # QL(20 EA per fill retail; 20 per fill mail) -> QL
+        cleaned_reqs = re.sub(r'\(.*?\)', ' ', acronym_str)
+        
+        # c. Token Cleaning: Remove commas, split by ; or whitespace
+        split_parts = re.split(r'[,\s;]+', cleaned_reqs)
+        
+        # d. Valid Acronym Filter
+        # Allowed patterns: 
+        # 1. Tier tokens: ^[0-9][A-Z]$ (e.g. 1B)
+        # 2. Requirement acronyms: PA, QL, ST, SP, AL, NM, B/D, ^
+        # 3. Tier names: Tier 1-6
+        # Reject: spaces, lowercase, >4 chars, English words, standalone digits (unless Tier prefix), parentheses content
+        valid_req_acronyms = {"PA", "QL", "ST", "SP", "AL", "NM", "B/D", "^"}
+        
+        for part in split_parts:
+            part = part.strip()
+            # Reject if empty, contains spaces, or contains lowercase
+            if not part or " " in part or any(c.islower() for c in part):
+                continue
+            
+            # Special case: QL= parts
+            if part.startswith("QL="):
+                if "QL" not in raw_parts:
+                    raw_parts.append("QL")
+                continue
+                
+            # Pattern 1: Tier tokens (e.g., 1B). Note: Standalone digits handled by tier_regex above
+            is_tier_token = bool(re.match(r'^[0-9][A-Z]$', part))
+            
+            # Pattern 2: Requirement acronyms
+            is_req_acronym = part in valid_req_acronyms
+            
+            # Pattern 3: Tier names (Note: already handled by regex split if Tier 1)
+            is_tier_name = bool(re.match(r'^Tier[0-9]$', part, re.IGNORECASE))
+            
+            if (is_tier_token or is_req_acronym or is_tier_name) and len(part) <= 4:
+                if part not in raw_parts:
+                    raw_parts.append(part)
 
-    # 5. Final Fallback (Should be rare)
-    logger.info(f"Coverage for '{log_id}': Covered with Conditions/Unknown parameters (Source: Final Default Fallback)")
-    return "Covered with Conditions", 50.0, "Default", True
+        sub_acronyms = list(dict.fromkeys(raw_parts)) # Deduplicate preserving order
+
+        from utils import lookup_expansion, determine_db_coverage
+        
+        # Try full lookup first if no parentheses
+        if (conn or acronym_cache) and '(' not in acronym_str:
+            _, _, cvg = lookup_expansion(acronym, state_name, payer_name, conn, acronym_cache=acronym_cache)
+            if cvg:
+                db_cvg_status = cvg
+                db_source = f"DB Lookup - {acronym}"
+                db_conf = 85.0
+
+        # Try sub-acronyms if no full match
+        if not db_cvg_status:
+            res = determine_db_coverage(sub_acronyms, conn, state_name, payer_name, acronym_cache=acronym_cache)
+            if res:
+                db_cvg_status, db_conf, db_source = res
+
+        if db_cvg_status:
+            # Map DB status to priority status if necessary
+            # Note: determine_db_coverage already returns standard statuses
+            detected_results.append((db_cvg_status, db_conf, db_source))
+            logger.info(f"[{log_id}] Detected '{db_cvg_status}' ({db_conf}) from {db_source}")
+
+    # Resolve Final Status by Priority
+    if detected_results:
+        # Filter for valid statuses that exist in our priority map
+        valid_results = [r for r in detected_results if r[0] in COVERAGE_PRIORITY]
+        
+        if valid_results:
+            # Select the most restrictive result (lowest priority number)
+            # This ensures status, confidence, and source stay together
+            best_result = min(valid_results, key=lambda r: COVERAGE_PRIORITY.get(r[0], 999))
+            
+            final_status, conf, source = best_result
+            manual_review = bool(conf < 80.0)
+            
+            logger.info(f"Coverage for '{log_id}': {final_status} (Source: {source}, Confidence: {conf}, Priority Resolution of {[r[0] for r in detected_results]})")
+            return final_status, conf, source, manual_review
+
+    # 5. Final Fallback - Default to Covered if nothing else detected
+    logger.info(f"Coverage for '{log_id}': Covered (Source: Final Default Fallback)")
+    return "Covered", 50.0, "Default", True
 
 
 def normalize_drug_tier(raw_tier):

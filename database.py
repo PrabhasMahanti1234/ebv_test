@@ -835,7 +835,8 @@ def insert_drug_formulary_data(processed_data):
         key = (
             record.get("plan_id"),
             record.get("drug_name", "").strip().lower() if record.get("drug_name") else "",
-            record.get("drug_tier", "").strip() if record.get("drug_tier") else None
+            record.get("drug_tier", "").strip() if record.get("drug_tier") else None,
+            record.get("drug_requirements", "").strip() if record.get("drug_requirements") else None
         )
         seen_keys[key] = record  # Later records overwrite earlier ones
     
@@ -916,9 +917,27 @@ def insert_drug_formulary_data(processed_data):
             ))
 
         # Using standard INSERT since previous records are deleted prior to this step
+         
         insert_query = f"""
             INSERT INTO drug_formulary_details ({', '.join(cols)})
             VALUES %s
+            ON CONFLICT (plan_id, drug_name, drug_tier, drug_requirements)
+            DO UPDATE SET
+                drug_requirements = EXCLUDED.drug_requirements,
+                coverage_status = EXCLUDED.coverage_status,
+                page_number = EXCLUDED.page_number,
+                badge_colors = EXCLUDED.badge_colors,
+                preferred_agent = EXCLUDED.preferred_agent,
+                non_preferred_agent = EXCLUDED.non_preferred_agent,
+                is_prior_authorization_required = EXCLUDED.is_prior_authorization_required,
+                is_step_therapy_required = EXCLUDED.is_step_therapy_required,
+                is_quantity_limit_applied = EXCLUDED.is_quantity_limit_applied,
+                confidence_score = EXCLUDED.confidence_score,
+                manual_review = EXCLUDED.manual_review,
+                source_url = EXCLUDED.source_url,
+                file_name = EXCLUDED.file_name,
+                status = 'completed',
+                last_updated_date = CURRENT_TIMESTAMP;
         """
 
         try:
@@ -1168,6 +1187,9 @@ def batch_determine_coverage_status(requirement_tier_pairs, conn, state_name, pa
     Returns a dict mapping (requirement_code, drug_tier) -> (coverage_status, confidence_score, source).
     """
     from coverage import det_coverage_status  # Import here to avoid circular import
+
+    acronym_cache = fetch_acronym_cache(payer_name, state_name)
+
     mapping = {}
     for req_code, tier in requirement_tier_pairs:
         status, confidence, source, _ = det_coverage_status(
@@ -1179,7 +1201,8 @@ def batch_determine_coverage_status(requirement_tier_pairs, conn, state_name, pa
             conn=conn,
             state_name=state_name,
             payer_name=payer_name,
-            drug_name=None
+            drug_name=None,
+            acronym_cache=acronym_cache
         )
         mapping[(req_code, tier)] = (status, confidence, source)
     return mapping
@@ -1232,7 +1255,8 @@ def fetch_acronym_cache(payer_name, state_name):
         
         rows = cursor.fetchall()
         for row in rows:
-            acr = str(row[0]) # Don't strip as per existing logic
+            # ✅ Normalize cache keys: Strip and Uppercase
+            acr = str(row[0]).strip().upper()
             # Since we ordered by specificity, the first time we see an acronym, it's the most specific one
             if acr not in cache:
                 cache[acr] = (row[1], row[2], row[3])
@@ -1248,7 +1272,8 @@ def fetch_acronym_cache(payer_name, state_name):
         
         rows = cursor.fetchall()
         for row in rows:
-            acr = str(row[0])
+            # ✅ Normalize cache keys: Strip and Uppercase
+            acr = str(row[0]).strip().upper()
             # Plan-specific definitions usually take precedence or fill gaps
             if acr not in cache or (row[1] or row[2] or row[3]):
                 cache[acr] = (row[1], row[2], row[3])

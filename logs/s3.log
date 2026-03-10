@@ -147,3 +147,45 @@
 2026-03-10 10:13:46,607 [INFO] [Plan a2c2e0af-0236-4281-a673-010c6c3cffb4] s3.download.success bytes=7221975
 2026-03-10 10:13:50,118 [INFO] [Plan 5f0c5404-9dac-41e0-8ab5-a88797597032] s3.download.success bytes=10095103
 2026-03-10 10:13:51,584 [INFO] [Plan 7bf0678d-927d-4cc0-89bb-941fd6a1cdf9] s3.download.success bytes=10095103
+2026-03-10 11:33:14,857 [INFO] [Plan b9c12772-a7f2-4d59-aebb-e8234e625dae] s3.header_check url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/9840b612c9636e68639143814368a89df30d14d24459e361cb3aadef22fd05ce.pdf direct=True
+2026-03-10 11:33:14,857 [INFO] [Plan b9c12772-a7f2-4d59-aebb-e8234e625dae] s3.download.start url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/9840b612c9636e68639143814368a89df30d14d24459e361cb3aadef22fd05ce.pdf
+2026-03-10 11:33:18,886 [INFO] [Plan b9c12772-a7f2-4d59-aebb-e8234e625dae] s3.download.success bytes=1866710
+2026-03-10 13:41:11,472 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.header_check url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf direct=True
+2026-03-10 13:41:11,472 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.download.start url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf
+2026-03-10 13:41:15,433 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.download.success bytes=10494289
+2026-03-10 13:43:54,711 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.header_check url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf direct=True
+2026-03-10 13:43:54,711 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.download.start url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf
+2026-03-10 13:43:59,152 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.download.success bytes=10494289
+2026-03-10 13:47:53,426 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.header_check url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf direct=True
+2026-03-10 13:47:53,428 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.download.start url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf
+2026-03-10 13:48:08,769 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.download.success bytes=10494289
+2026-03-10 13:51:05,368 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.header_check url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf direct=True
+2026-03-10 13:51:05,368 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.download.start url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf
+2026-03-10 13:51:10,154 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.download.success bytes=10494289
+2026-03-10 14:02:10,938 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.header_check url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf direct=True
+2026-03-10 14:02:10,939 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.download.start url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf
+2026-03-10 14:02:15,134 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.download.success bytes=10494289
+2026-03-10 14:08:35,866 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.header_check url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf direct=True
+2026-03-10 14:08:35,866 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.download.start url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf
+2026-03-10 14:08:39,975 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.download.success bytes=10494289
+2026-03-10 14:10:42,219 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.header_check url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf direct=True
+2026-03-10 14:10:42,221 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.download.start url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf
+2026-03-10 14:10:46,232 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.download.success bytes=10494289
+2026-03-10 14:12:08,320 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.header_check url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf direct=True
+2026-03-10 14:12:08,321 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.download.start url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf
+2026-03-10 14:12:13,440 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.download.success bytes=10494289
+2026-03-10 14:13:28,334 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.header_check url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf direct=True
+2026-03-10 14:13:28,336 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.download.start url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf
+2026-03-10 14:13:32,444 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.download.success bytes=10494289
+2026-03-10 14:18:46,244 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.header_check url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf direct=True
+2026-03-10 14:18:46,245 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.download.start url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf
+2026-03-10 14:18:53,483 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.download.success bytes=10494289
+2026-03-10 15:22:01,850 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.header_check url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf direct=True
+2026-03-10 15:22:01,851 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.download.start url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf
+2026-03-10 15:22:07,698 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.download.success bytes=10494289
+2026-03-10 15:36:38,103 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.header_check url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf direct=True
+2026-03-10 15:36:38,105 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.download.start url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf
+2026-03-10 15:36:44,706 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.download.success bytes=10494289
+2026-03-10 15:52:27,714 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.header_check url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf direct=True
+2026-03-10 15:52:27,718 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.download.start url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/c2f760fe015aae0ea1edb3835230f84d8a6cb001b1c1cb4e6d6510958e6beb5e.pdf
+2026-03-10 15:52:40,470 [INFO] [Plan 3fb8a4aa-1e4f-4c74-badc-5fb871c886a5] s3.download.success bytes=10494289

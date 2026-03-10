@@ -202,21 +202,37 @@ def lookup_expansion(acronym, state_name, payer_name, conn, acronym_cache=None):
     if not acronym:
         return None, None, None
 
-    # Do NOT strip whitespace as requested by user
-    acronym = str(acronym)
+    # Normalize acronym for cache lookup
+    import re
+    acronym_str = str(acronym).strip().upper()
     
     # Check cache first
     if acronym_cache is not None:
-        if acronym in acronym_cache:
-            # logger.info(f"Memory Cache HIT for acronym: '{acronym}'")
-            return acronym_cache[acronym]
-        # Fallback to DB if not in cache
-        # Note: If cache is provided, it should ideally contain everything, but we fallback just in case
-        
+        # 1. Check normalized full string
+        if acronym_str in acronym_cache:
+            logger.info(
+                f"Using cached result for acronym: '{acronym}' "
+                f"(normalized: '{acronym_str}')"
+            )
+            return acronym_cache[acronym_str]
+            
+        # 2. If it's a combined string (e.g., "Tier 4, PA"), handle components separately
+        if re.search(r'[;,]', acronym_str):
+            tokens = re.split(r'[;,]', acronym_str)
+            for token in tokens:
+                token_norm = token.strip().upper()
+                if token_norm in acronym_cache:
+                    logger.info(
+                        f"Using cached result for acronym: '{acronym}' "
+                        f"(normalized component: '{token_norm}')"
+                    )
+                    return acronym_cache[token_norm]
+
+    # Fallback to DB if not in cache
     state_name = str(state_name).strip() if state_name else None
     payer_name = str(payer_name).strip() if payer_name else None
 
-    logger.info(f"Searching for acronym: '{acronym}' (preserving whitespace), state: '{state_name}', payer: '{payer_name}'")  # Debug
+    logger.info(f"Searching for acronym: '{acronym}' (normalized: '{acronym_str}'), state: '{state_name}', payer: '{payer_name}'")  # Debug
 
     pattern = f'%{acronym}%'
     
@@ -237,7 +253,13 @@ def lookup_expansion(acronym, state_name, payer_name, conn, acronym_cache=None):
         result = cur.fetchone()
         logger.info(f"DB Result for acronym '{acronym}': {result}")
 
-    return (result[0], result[1], result[2]) if result else (None, None, None)
+    db_result = (result[0], result[1], result[2]) if result else (None, None, None)
+    
+    # Store DB lookup result back into cache
+    if acronym_cache is not None and db_result[0] is not None:
+        acronym_cache[acronym_str] = db_result
+
+    return db_result
 
 def parse_requirements(text):
     """
@@ -338,7 +360,7 @@ def determine_coverage_status(requirements_text, tier_text, conn, state_name, pa
     if not statuses:
         return "Covered"
 
-    if "Covered with Condition" in statuses or "Covered with Conditions" in statuses:
+    if "Covered with Conditions" in statuses:
         return "Covered with Conditions"
     if all(status == "Covered" for status in statuses):
         return "Covered"
@@ -614,21 +636,46 @@ def determine_db_coverage(sub_acronyms, conn, state_name, payer_name, acronym_ca
             statuses.append(db_cvg.strip())
 
     if not statuses:
-        return "Covered", 50.0, "No DB Coverage Status Found"
+        return None
 
-    # Prioritize 'Not Covered' (most restrictive)
-    if any(s.lower() == "not covered" for s in statuses):
-        return "Not Covered", 90.0, "At least one DB Coverage Status is 'Not Covered'"
+    # --- NEW: DETERMINISTIC PRIORITY RESOLUTION ---
+    # Coverage priority mapping: Most Restrictive -> Least
+    # Note: Using the same mapping as coverage.py for consistency
+    priority_map = {
+        "not covered": 1,
+        "covered with pa": 2,
+        "covered with st": 3,
+        "covered with conditions": 4,
+        "covered": 5
+    }
 
-    # Then 'Covered with Conditions'
-    if any("Condition" in s or "PA" in s or "ST" in s or "QL" in s for s in statuses):
-        return "Covered with Conditions", 90.0, "At least one DB Coverage Status is 'Covered with Conditions'"
+    # Normalize status values for deterministic priority resolution
+    # Map "covered with condition" to "covered with conditions" and "covered with ql" to "covered with conditions"
+    normalized_list = []
+    for s in statuses:
+        norm = str(s).lower().strip()
+        if norm == "covered with condition" or norm == "covered with ql":
+            norm = "covered with conditions"
+        normalized_list.append(norm)
+
+    # Filter for known statuses and find the most restrictive one
+    valid_statuses = [s for s in normalized_list if s in priority_map]
+    if not valid_statuses:
+        return "Covered with Conditions", 70.0, "Mixed DB Coverage Statuses Found"
+
+    # Determine the final status using priority (minimum value is most restrictive)
+    final_norm = min(valid_statuses, key=lambda s: priority_map.get(s, 999))
     
-    # Finally 'Covered'
-    if any(s == "Covered" for s in statuses):
-        return "Covered", 90.0, "At least one DB Coverage Status is 'Covered'"
+    # Map back to standard casing
+    status_display_map = {
+        "not covered": "Not Covered",
+        "covered with st": "Covered with ST",
+        "covered with pa": "Covered with PA",
+        "covered with conditions": "Covered with Conditions",
+        "covered": "Covered"
+    }
     
-    # Default to "Covered with Conditions" if there are mixed or unknown statuses
-    return "Covered with Conditions", 70.0, "Mixed DB Coverage Statuses Found"
+    final_status = status_display_map.get(final_norm, "Covered with Conditions")
+    return final_status, 90.0, f"At least one DB Coverage Status is '{final_status}'"
 
  

@@ -198,6 +198,7 @@ def process_single_chunk_parallel(chunk_info: dict) -> dict:
         'chunk_idx': chunk_idx,
         'drugs': [],
         'acronyms': [],
+        'raw_text':"",
         'pages_processed': 0,
         'error': None
     }
@@ -257,6 +258,14 @@ def process_single_chunk_parallel(chunk_info: dict) -> dict:
             return result
 
         result['pages_processed'] = len(ocr_response.pages)
+
+        # Collect markdown from pages in this chunk
+        chunk_text_parts = []
+        for page in ocr_response.pages:
+            if hasattr(page, 'markdown') and page.markdown:
+                chunk_text_parts.append(page.markdown)
+        result['raw_text'] = "\n\n".join(chunk_text_parts)
+    
 
         if hasattr(ocr_response, 'document_annotation') and ocr_response.document_annotation:
             chunk_json = ocr_response.document_annotation
@@ -404,6 +413,7 @@ def process_pdf_with_mistral_ocr(pdf_input, payer_name=None, filename: Optional[
 
             all_drugs = []
             all_acronyms = []
+            all_raw_text = []
             
             # Track chunk results
             chunks_completed = 0
@@ -431,6 +441,10 @@ def process_pdf_with_mistral_ocr(pdf_input, payer_name=None, filename: Optional[
                             logger.warning(f"❌ Chunk {chunk_idx + 1}/{total_chunks} FAILED: {result['error']}")
                             logger.warning(f"   Chunk pages: {chunk_pages[0]}-{chunk_pages[-1]} (original: {original_pages[0]}-{original_pages[-1]})")
                         else:
+                            # Add raw text from this chunk
+                            if result.get('raw_text'):
+                                all_raw_text.append(result['raw_text'])
+
                             drugs_in_chunk = len(result.get('drugs', []))
                             acronyms_in_chunk = len(result.get('acronyms', []))
                             total_drugs_extracted += drugs_in_chunk
@@ -479,7 +493,8 @@ def process_pdf_with_mistral_ocr(pdf_input, payer_name=None, filename: Optional[
             return {
                 "drug_table": all_drugs,
                 "acronyms": all_acronyms,
-                "tiers": []
+                "tiers": [],
+                "raw_text": "\n\n".join(all_raw_text)
             }, "[PARALLEL CHUNKED OCR EXTRACTION]", total_costs
 
         else:
@@ -500,7 +515,7 @@ def process_pdf_with_mistral_ocr(pdf_input, payer_name=None, filename: Optional[
             )
 
             # CRITICAL: Pass original_page_numbers for correct page mapping
-            all_structured_data, all_acronyms, pages_processed = _process_ocr_response(ocr_response, original_page_numbers)
+            all_structured_data, all_acronyms, pages_processed, raw_text = _process_ocr_response(ocr_response, original_page_numbers)
             all_structured_data = _consolidate_and_clean_drug_table(all_structured_data)
 
             try:
@@ -511,7 +526,8 @@ def process_pdf_with_mistral_ocr(pdf_input, payer_name=None, filename: Optional[
             return {
                 "drug_table": all_structured_data,
                 "acronyms": all_acronyms,
-                "tiers": []
+                "tiers": [],
+                "raw_text": raw_text
             }, "[NATIVE OCR EXTRACTION]", total_costs
 
     except Exception as e:
@@ -621,7 +637,7 @@ def get_all_plans_with_formulary_url():
         plans = cursor.fetchall()
         cursor.close()
 
-    return [
+    all_plans = [
         {
             "plan_id": p[0],
             "plan_name": p[1],
@@ -633,6 +649,18 @@ def get_all_plans_with_formulary_url():
         }
         for p in plans
     ]
+    
+    from config import PLAN_PROCESSING_LIMIT
+    if str(PLAN_PROCESSING_LIMIT).strip().lower() != "all":
+        try:
+            limit = int(PLAN_PROCESSING_LIMIT)
+            if limit > 0:
+                logger.info(f"Limiting plan processing to first {limit} plans based on PLAN_PROCESSING_LIMIT.")
+                all_plans = all_plans[:limit]
+        except ValueError:
+            pass
+            
+    return all_plans
 
 
 
@@ -644,6 +672,7 @@ def _insert_cached_data_for_plan(cached_data, plan_id, plan_name, payer_id, paye
     """
     drug_table = cached_data.get("drug_table", [])
     acronyms = cached_data.get("acronyms", [])
+    raw_text = cached_data.get("raw_text", "")
 
     # Log the cache hit for this specific plan
     logger.info(f"♻️ Plan {plan_id} ({plan_name}): Using file hash cache (Hash: {file_hash})")
@@ -763,12 +792,12 @@ def _insert_cached_data_for_plan(cached_data, plan_id, plan_name, payer_id, paye
                     if acr_reused_count <= 10:
                         logger.info(f"[ML-REUSE] Reused coverage for acronym '{acr_key[0]}' from hash '{file_hash}'")
                 else:
-                    acr_coverage_status, _, _ = det_coverage_status(
+                    acr_coverage_status, _, _, _ = det_coverage_status(
                         acronym=acronym.get('acronym'),
                         expansion=acronym.get('expansion'),
                         explanation=acronym.get('explanation'),
-                        requirements_text=None,
-                        tier_text=None,
+                        requirements_text=f"{acronym.get('acronym', '')} {acronym.get('expansion', '')}",
+                        tier_text=str(acronym.get('acronym', '')),
                         conn=conn,
                         state_name=state_name,
                         payer_name=payer_name,
@@ -1048,6 +1077,7 @@ def process_single_pdf_url_worker(plan_info):
 
             drug_table = structured_data.get("drug_table", [])
             acronyms = structured_data.get("acronyms", [])
+            raw_text = structured_data.get("raw_text", "")
 
             if _is_extracted_data_from_index_page(drug_table):
                 logger.warning(f"Plan {plan_id}: Detected index page, skipping")
@@ -1223,7 +1253,7 @@ def process_single_pdf_url_worker(plan_info):
                 logger.info(f"Inserted {len(enriched_drug_records)} drug records for plan {plan_id}")
                 log_audit_event(transaction_id=transaction_id, event_type="database.insert.details",
                                 service="pdf_processing",
-                                payload={"plan_id": plan_id, "records": len(enriched_drug_records)})
+                    payload={"plan_id": plan_id, "records": len(enriched_drug_records)})
             
             # Insert Acronyms into pp_formulary_names with coverage status
             if acronyms:
@@ -1235,8 +1265,8 @@ def process_single_pdf_url_worker(plan_info):
                             acronym=acronym.get("acronym"),
                             expansion=acronym.get("expansion"),
                             explanation=acronym.get("explanation"),
-                            requirements_text=None,  # Acronyms don't have requirements
-                            tier_text=None,  # Acronyms don't have tiers
+                            requirements_text=f"{acronym.get('acronym', '')} {acronym.get('expansion', '')}", # Pass acronym and expansion as pseudo requirements
+                            tier_text=str(acronym.get('acronym', '')), # Pass acronym as pseudo tier
                             conn=conn,
                             state_name=state_name,
                             payer_name=payer_name,
@@ -1269,7 +1299,8 @@ def process_single_pdf_url_worker(plan_info):
                 "drug_table": drug_table,
                 "acronyms": acronyms,
                 "method": method,
-                "drug_count": len(drug_table)
+                "drug_count": len(drug_table),
+                "raw_text": raw_text
             }
             cache_result(file_hash, result, None, formulary_url=s3_frozen_pdf_url)
             
@@ -1543,6 +1574,7 @@ def process_single_plan_for_batch(plan: dict, mistral_client) -> Tuple[List[dict
             logger.info(f"Plan {plan_id}: Hash {file_hash} found in cache. Using cached data (Skipping Batch Submission).")
             # Reuse cached data logic (same as your original)
             drug_table = cached_data.get("drug_table",[])
+            raw_text = cached_data.get("raw_text", "")
             delete_drug_formulary_records_for_plan(plan_id)
             
             enriched_drug_records =[]
@@ -1718,7 +1750,8 @@ def process_plan_batch_result(plan_id: str, chunks: list):
     
     try:
         all_drugs = []
-        all_acronyms =[]
+        all_acronyms = []
+        all_raw_text = []
         
         with get_db_connection() as conn:
             cursor = conn.cursor()
@@ -1756,9 +1789,12 @@ def process_plan_batch_result(plan_id: str, chunks: list):
             all_pages_processed.update(original_pages)
             
             mock_response = MockResponse(chunk['ocr_response'])
-            chunk_drugs, chunk_acronyms, _ = _process_ocr_response(mock_response, original_pages)
+            chunk_drugs, chunk_acronyms, _, chunk_raw_text = _process_ocr_response(mock_response, original_pages)
             all_drugs.extend(chunk_drugs)
             all_acronyms.extend(chunk_acronyms)
+            
+            if chunk_raw_text:
+                all_raw_text.append(chunk_raw_text)
             
         track_mistral_cost(payer_name, len(all_pages_processed))
         all_drugs = _consolidate_and_clean_drug_table(all_drugs)
@@ -1808,8 +1844,10 @@ def process_plan_batch_result(plan_id: str, chunks: list):
                 for acronym in all_acronyms:
                     acr_coverage_status, _, _, _ = det_coverage_status(
                         acronym=acronym.get('acronym'), expansion=acronym.get('expansion'),
-                        explanation=acronym.get('explanation'), requirements_text=None,
-                        tier_text=None, conn=conn, state_name=state_name, payer_name=payer_name,
+                        explanation=acronym.get('explanation'),
+                        requirements_text=f"{acronym.get('acronym', '')} {acronym.get('expansion', '')}",
+                        tier_text=str(acronym.get('acronym', '')),
+                        conn=conn, state_name=state_name, payer_name=payer_name,
                         acronym_cache=acronym_cache
                     )
                     acronym['coverage_status'] = acr_coverage_status
@@ -1824,7 +1862,13 @@ def process_plan_batch_result(plan_id: str, chunks: list):
                 file_hash = res[0]
                 
         if file_hash:
-            cache_result(file_hash, {"drug_table": all_drugs, "acronyms": all_acronyms, "method": "MISTRAL_BATCH", "drug_count": len(all_drugs)}, None, formulary_url=s3_frozen_pdf_url)
+            cache_result(file_hash, {
+                "drug_table": all_drugs, 
+                "acronyms": all_acronyms, 
+                "method": "MISTRAL_BATCH", 
+                "drug_count": len(all_drugs),
+                "raw_text": "\n\n".join(all_raw_text) if all_raw_text else ""
+            }, None, formulary_url=s3_frozen_pdf_url)
             
         from database import update_drug_formulary_status, update_plan_and_payer_statuses
         update_drug_formulary_status([plan_id])

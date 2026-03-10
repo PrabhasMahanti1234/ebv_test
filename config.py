@@ -134,3 +134,11 @@ PDF_PAGE_PROCESSING_CONFIG = {
     # "Cigna": "all",
     # "Select": ["1-80"],
 }
+
+# -----------------------------
+# Plan Processing Control
+# -----------------------------
+# Number of plans to process per run.
+# Set to an integer (e.g., 100) or "all" to process all available plans.
+PLAN_PROCESSING_LIMIT = 100
+# PLAN_PROCESSING_LIMIT = "all"
