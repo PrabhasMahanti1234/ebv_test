@@ -78,14 +78,14 @@ def fetch_existing_coverage_by_file_hash(file_hash):
 
             # Fetch acronym coverage
             # We join with ebv_genai.plan_details to find plans that have this file_hash,
-            # then join with ebv_genai.pp_formulary_names on plan/payer/state.
+            # then join with ebv_genai.acronym_expansion on plan/payer/state.
             cursor.execute("""
                 SELECT DISTINCT
                     a.acronym,
                     a.expansion,
                     a.explanation,
                     a.coverage_status
-                FROM ebv_genai.pp_formulary_names a
+                FROM ebv_genai.acronym_expansion a
                 JOIN ebv_genai.plan_details p ON a.plan_name = p.plan_name 
                     AND a.payer_name = p.payer_name 
                     AND a.state_name = p.state_name
@@ -367,10 +367,10 @@ def ensure_database_schema():
             logger.debug(f"Drug table creation issue (may already exist): {e}")
             conn.rollback()
 
-        # Create ebv_genai.pp_formulary_names table for all acronyms and tier definitions
+        # Create ebv_genai.acronym_expansion table for all acronyms and tier definitions
         try:
             cursor.execute("""
-                CREATE TABLE IF NOT EXISTS ebv_genai.pp_formulary_names (
+                CREATE TABLE IF NOT EXISTS ebv_genai.acronym_expansion (
                     id BIGSERIAL PRIMARY KEY,
                     state_name VARCHAR(100),
                     payer_name VARCHAR(1000),
@@ -382,33 +382,33 @@ def ensure_database_schema():
                 );
             """)
             conn.commit()
-            logger.info("Created/ensured ebv_genai.pp_formulary_names table")
+            logger.info("Created/ensured ebv_genai.acronym_expansion table")
             
             # Ensure columns are wide enough if table existed with smaller columns
-            cursor.execute("ALTER TABLE ebv_genai.pp_formulary_names ALTER COLUMN payer_name TYPE VARCHAR(1000);")
-            cursor.execute("ALTER TABLE ebv_genai.pp_formulary_names ALTER COLUMN plan_name TYPE VARCHAR(1000);")
+            cursor.execute("ALTER TABLE ebv_genai.acronym_expansion ALTER COLUMN payer_name TYPE VARCHAR(1000);")
+            cursor.execute("ALTER TABLE ebv_genai.acronym_expansion ALTER COLUMN plan_name TYPE VARCHAR(1000);")
             conn.commit()
         except Exception as e:
-            logger.debug(f"pp_formulary_names table creation/alter issue (may already exist): {e}")
+            logger.debug(f"acronym_expansion table creation/alter issue (may already exist): {e}")
             conn.rollback()
 
-        # Add coverage_status column to existing ebv_genai.pp_formulary_names if not exists
+        # Add coverage_status column to existing ebv_genai.acronym_expansion if not exists
         try:
             cursor.execute("""
-                ALTER TABLE ebv_genai.pp_formulary_names
+                ALTER TABLE ebv_genai.acronym_expansion
                 ADD COLUMN IF NOT EXISTS coverage_status VARCHAR(1000)
             """)
             conn.commit()
-            logger.info("Ensured coverage_status column exists in pp_formulary_names.")
+            logger.info("Ensured coverage_status column exists in acronym_expansion.")
         except Exception as e:
-            logger.debug(f"coverage_status column may already exist in pp_formulary_names: {e}")
+            logger.debug(f"coverage_status column may already exist in acronym_expansion: {e}")
             conn.rollback()
 
         _add_constraint(conn, cursor, """
-            ALTER TABLE ebv_genai.pp_formulary_names
-            ADD CONSTRAINT uq_formulary_names
+            ALTER TABLE ebv_genai.acronym_expansion
+            ADD CONSTRAINT uq_acronym_expansion
             UNIQUE (state_name, payer_name, plan_name, acronym)
-        """, "uq_formulary_names")
+        """, "uq_acronym_expansion")
 
         # Create ebv_genai.tier_requirement_expansion master table
         try:
@@ -1354,11 +1354,11 @@ def fetch_acronym_cache(payer_name, state_name):
             if acr not in cache:
                 cache[acr] = (row[1], row[2], row[3])
 
-        # 2. Fetch from the plan-specific table (ebv_genai.pp_formulary_names)
+        # 2. Fetch from the plan-specific table (ebv_genai.acronym_expansion)
         # These might overwrite or supplement the master table for this specific payer/state
         cursor.execute("""
             SELECT acronym, expansion, explanation, coverage_status
-            FROM ebv_genai.pp_formulary_names
+            FROM ebv_genai.acronym_expansion
             WHERE (state_name IS NULL OR UPPER(state_name) = UPPER(%s))
               AND (payer_name IS NULL OR UPPER(payer_name) = UPPER(%s))
         """, (state_name, payer_name))

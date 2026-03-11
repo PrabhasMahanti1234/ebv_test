@@ -53866,3 +53866,393 @@
 2026-03-11 11:12:59,244 [INFO] Coverage for 'fexofenadine hcl 180 mg tablet 24 hour, non-drowsy (otc)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
 2026-03-11 11:12:59,391 [INFO] [0] Detected 'Covered' (85.0) from DB Lookup - 0
 2026-03-11 11:12:59,394 [INFO] Coverage for '0': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,874 [INFO] [essential man 50+ tablet 0.4-2-250 mg-mg-mcg] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,876 [INFO] Coverage for 'essential man 50+ tablet 0.4-2-250 mg-mg-mcg': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,878 [INFO] [essential man tablet 0.4-2-250 mg-mg-mcg] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,879 [INFO] Coverage for 'essential man tablet 0.4-2-250 mg-mg-mcg': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,879 [INFO] [estroven menopause caplet 400 mcg-40 mg-40 mg-100 mg] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,881 [INFO] Coverage for 'estroven menopause caplet 400 mcg-40 mg-40 mg-100 mg': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,882 [INFO] [evac-u-gen 8.6 mg tablet] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,883 [INFO] Coverage for 'evac-u-gen 8.6 mg tablet': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,883 [INFO] [expiratory mouthpiece] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,885 [INFO] Coverage for 'expiratory mouthpiece': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,885 [INFO] [eye allergy itch-red 0.1% drop] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,885 [INFO] Coverage for 'eye allergy itch-red 0.1% drop': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,885 [INFO] [eye itch relief 0.025% drops 0.025 % (0.035 %)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,887 [INFO] Coverage for 'eye itch relief 0.025% drops 0.025 % (0.035 %)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,888 [INFO] [eye itch relief 0.025% drops 12 hour relief,2x5ml 0.025 % (0.035 %)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,889 [INFO] Coverage for 'eye itch relief 0.025% drops 12 hour relief,2x5ml 0.025 % (0.035 %)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,890 [INFO] [eye itch relief 0.025% drops 12 hours 0.025 % (0.035 %)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,890 [INFO] Coverage for 'eye itch relief 0.025% drops 12 hours 0.025 % (0.035 %)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,890 [INFO] [eye itch relief 0.025% drops up to 12hrs, sterile 0.025 % (0.035 %)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,890 [INFO] Coverage for 'eye itch relief 0.025% drops up to 12hrs, sterile 0.025 % (0.035 %)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,890 [INFO] [eye multivitamin tablet 2,148 mcg-113 mg-45 mg-17.4mg] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,890 [INFO] Coverage for 'eye multivitamin tablet 2,148 mcg-113 mg-45 mg-17.4mg': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,890 [INFO] [eyeprotect tablet 7,160-113-100 unit-mg-unit] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,890 [INFO] Coverage for 'eyeprotect tablet 7,160-113-100 unit-mg-unit': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,896 [INFO] [face mask blue w/ear loops] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,896 [INFO] Coverage for 'face mask blue w/ear loops': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,898 [INFO] [famotidine 10 mg tablet] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,899 [INFO] Coverage for 'famotidine 10 mg tablet': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,899 [INFO] [fenesin dm ir tablet 20-400 mg] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,901 [INFO] Coverage for 'fenesin dm ir tablet 20-400 mg': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,902 [INFO] [fenesin ir 400 mg tablet] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,902 [INFO] Coverage for 'fenesin ir 400 mg tablet': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,903 [INFO] [feosol 65 mg tablet (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,903 [INFO] Coverage for 'feosol 65 mg tablet (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,903 [INFO] [fer-in-sol 15 mg/ml drops 15 mg iron (75 mg)/ml] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,905 [INFO] Coverage for 'fer-in-sol 15 mg/ml drops 15 mg iron (75 mg)/ml': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,906 [INFO] [ferosul 325 mg tablet (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,907 [INFO] Coverage for 'ferosul 325 mg tablet (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,909 [INFO] [ferosul 325 mg tablet f/c,blister pack (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,909 [INFO] Coverage for 'ferosul 325 mg tablet f/c,blister pack (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,909 [INFO] [ferrex 150 capsule 150 mg iron] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,911 [INFO] Coverage for 'ferrex 150 capsule 150 mg iron': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,912 [INFO] [ferrex 150 capsule outer, u-d 150 mg iron] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,912 [INFO] Coverage for 'ferrex 150 capsule outer, u-d 150 mg iron': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,913 [INFO] [ferrex 150 capsule u-d,10x10 150 mg iron] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,913 [INFO] Coverage for 'ferrex 150 capsule u-d,10x10 150 mg iron': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,915 [INFO] [ferric x-150 capsule 150 mg iron] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,915 [INFO] Coverage for 'ferric x-150 capsule 150 mg iron': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,915 [INFO] [ferro-time 325 mg tablet f/c, green 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,915 [INFO] Coverage for 'ferro-time 325 mg tablet f/c, green 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,918 [INFO] [ferro-time 325 mg tablet f/c, red 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,918 [INFO] Coverage for 'ferro-time 325 mg tablet f/c, red 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,919 [INFO] [ferrous sulf 220 mg/5 ml elix (rx) 220 mg (44 mg iron)/5 ml] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,920 [INFO] Coverage for 'ferrous sulf 220 mg/5 ml elix (rx) 220 mg (44 mg iron)/5 ml': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,921 [INFO] [ferrous sulf 220 mg/5 ml elix (rx) 220 mg (44 mg iron)/5 ml] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,921 [INFO] Coverage for 'ferrous sulf 220 mg/5 ml elix (rx) 220 mg (44 mg iron)/5 ml': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,922 [INFO] [ferrous sulf 220 mg/5 ml liq (rx) 220 mg (44 mg iron)/5 ml] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,924 [INFO] Coverage for 'ferrous sulf 220 mg/5 ml liq (rx) 220 mg (44 mg iron)/5 ml': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,924 [INFO] [ferrous sulf 300 mg/6.8 ml soln inner (rx) 220 mg (44 mg iron)/5 ml] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,924 [INFO] Coverage for 'ferrous sulf 300 mg/6.8 ml soln inner (rx) 220 mg (44 mg iron)/5 ml': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,924 [INFO] [ferrous sulf 300 mg/6.8 ml soln outer (rx) 220 mg (44 mg iron)/5 ml] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,929 [INFO] Coverage for 'ferrous sulf 300 mg/6.8 ml soln outer (rx) 220 mg (44 mg iron)/5 ml': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,929 [INFO] [ferrous sulf 44 mg iron/5 ml lq (rx) 220 mg (44 mg iron)/5 ml] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,929 [INFO] Coverage for 'ferrous sulf 44 mg iron/5 ml lq (rx) 220 mg (44 mg iron)/5 ml': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,931 [INFO] [ferrous sulf ec 324 mg tablet 324 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,931 [INFO] Coverage for 'ferrous sulf ec 324 mg tablet 324 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,931 [INFO] [ferrous sulf ec 325 mg tablet (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,931 [INFO] Coverage for 'ferrous sulf ec 325 mg tablet (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,933 [INFO] [ferrous sulf ec 325 mg tablet u-d, inner (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,933 [INFO] Coverage for 'ferrous sulf ec 325 mg tablet u-d, inner (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,935 [INFO] [ferrous sulf ec 325 mg tablet u-d, outer (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,935 [INFO] Coverage for 'ferrous sulf ec 325 mg tablet u-d, outer (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,935 [INFO] [ferrous sulfate 325 mg tablet (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,935 [INFO] Coverage for 'ferrous sulfate 325 mg tablet (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,937 [INFO] [ferrous sulfate 325 mg tablet f/c (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,939 [INFO] Coverage for 'ferrous sulfate 325 mg tablet f/c (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,941 [INFO] [ferrous sulfate 325 mg tablet f/c, green (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,941 [INFO] Coverage for 'ferrous sulfate 325 mg tablet f/c, green (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,943 [INFO] [ferrous sulfate 325 mg tablet f/c, red (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,944 [INFO] Coverage for 'ferrous sulfate 325 mg tablet f/c, red (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,944 [INFO] [ferrous sulfate 325 mg tablet n,p/f (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,945 [INFO] Coverage for 'ferrous sulfate 325 mg tablet n,p/f (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,946 [INFO] [ferrous sulfate 325 mg tablet p/f (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,947 [INFO] Coverage for 'ferrous sulfate 325 mg tablet p/f (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,947 [INFO] [ferrous sulfate 325 mg tablet u-d, 10x10, f/c (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,948 [INFO] Coverage for 'ferrous sulfate 325 mg tablet u-d, 10x10, f/c (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,948 [INFO] [ferrous sulfate 325 mg tablet u-d,10x10, film coat (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,950 [INFO] Coverage for 'ferrous sulfate 325 mg tablet u-d,10x10, film coat (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,950 [INFO] [feverall 325 mg suppository junior str, outer] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,950 [INFO] Coverage for 'feverall 325 mg suppository junior str, outer': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,951 [INFO] [feverall 650 mg suppository adult, outer] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,952 [INFO] Coverage for 'feverall 650 mg suppository adult, outer': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,953 [INFO] [fexofenadine hcl 180 mg tablet (otc)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,953 [INFO] Coverage for 'fexofenadine hcl 180 mg tablet (otc)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:07,954 [INFO] [fexofenadine hcl 180 mg tablet 24 hour, non-drowsy (otc)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:27:07,954 [INFO] Coverage for 'fexofenadine hcl 180 mg tablet 24 hour, non-drowsy (otc)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:27:08,154 [INFO] [03/01/2026] Detected 'Covered with Conditions' (90.0) from At least one DB Coverage Status is 'Covered with Conditions'
+2026-03-11 14:27:08,156 [INFO] Coverage for '03/01/2026': Covered with Conditions (Source: At least one DB Coverage Status is 'Covered with Conditions', Confidence: 90.0, Priority Resolution of ['Covered with Conditions'])
+2026-03-11 14:32:12,785 [INFO] [essential man 50+ tablet 0.4-2-250 mg-mg-mcg] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,786 [INFO] Coverage for 'essential man 50+ tablet 0.4-2-250 mg-mg-mcg': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,786 [INFO] [essential man tablet 0.4-2-250 mg-mg-mcg] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,788 [INFO] Coverage for 'essential man tablet 0.4-2-250 mg-mg-mcg': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,789 [INFO] [estroven menopause caplet 400 mcg-40 mg-40 mg-100 mg] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,789 [INFO] Coverage for 'estroven menopause caplet 400 mcg-40 mg-40 mg-100 mg': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,791 [INFO] [evac-u-gen 8.6 mg tablet] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,791 [INFO] Coverage for 'evac-u-gen 8.6 mg tablet': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,791 [INFO] [expiratory mouthpiece] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,791 [INFO] Coverage for 'expiratory mouthpiece': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,791 [INFO] [eye allergy itch-red 0.1% drop] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,791 [INFO] Coverage for 'eye allergy itch-red 0.1% drop': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,791 [INFO] [eye itch relief 0.025% drops 0.025 % (0.035 %)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,791 [INFO] Coverage for 'eye itch relief 0.025% drops 0.025 % (0.035 %)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,795 [INFO] [eye itch relief 0.025% drops 12 hour relief,2x5ml 0.025 % (0.035 %)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,795 [INFO] Coverage for 'eye itch relief 0.025% drops 12 hour relief,2x5ml 0.025 % (0.035 %)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,795 [INFO] [eye itch relief 0.025% drops 12 hours 0.025 % (0.035 %)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,795 [INFO] Coverage for 'eye itch relief 0.025% drops 12 hours 0.025 % (0.035 %)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,796 [INFO] [eye itch relief 0.025% drops up to 12hrs, sterile 0.025 % (0.035 %)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,796 [INFO] Coverage for 'eye itch relief 0.025% drops up to 12hrs, sterile 0.025 % (0.035 %)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,796 [INFO] [eye multivitamin tablet 2,148 mcg-113 mg-45 mg-17.4mg] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,796 [INFO] Coverage for 'eye multivitamin tablet 2,148 mcg-113 mg-45 mg-17.4mg': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,799 [INFO] [eyeprotect tablet 7,160-113-100 unit-mg-unit] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,799 [INFO] Coverage for 'eyeprotect tablet 7,160-113-100 unit-mg-unit': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,800 [INFO] [face mask blue w/ear loops] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,800 [INFO] Coverage for 'face mask blue w/ear loops': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,801 [INFO] [famotidine 10 mg tablet] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,802 [INFO] Coverage for 'famotidine 10 mg tablet': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,802 [INFO] [fenesin dm ir tablet 20-400 mg] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,803 [INFO] Coverage for 'fenesin dm ir tablet 20-400 mg': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,803 [INFO] [fenesin ir 400 mg tablet] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,803 [INFO] Coverage for 'fenesin ir 400 mg tablet': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,804 [INFO] [feosol 65 mg tablet (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,804 [INFO] Coverage for 'feosol 65 mg tablet (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,805 [INFO] [fer-in-sol 15 mg/ml drops 15 mg iron (75 mg)/ml] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,806 [INFO] Coverage for 'fer-in-sol 15 mg/ml drops 15 mg iron (75 mg)/ml': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,807 [INFO] [ferosul 325 mg tablet (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,808 [INFO] Coverage for 'ferosul 325 mg tablet (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,808 [INFO] [ferosul 325 mg tablet f/c,blister pack (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,809 [INFO] Coverage for 'ferosul 325 mg tablet f/c,blister pack (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,809 [INFO] [ferrex 150 capsule 150 mg iron] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,809 [INFO] Coverage for 'ferrex 150 capsule 150 mg iron': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,810 [INFO] [ferrex 150 capsule outer, u-d 150 mg iron] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,810 [INFO] Coverage for 'ferrex 150 capsule outer, u-d 150 mg iron': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,812 [INFO] [ferrex 150 capsule u-d,10x10 150 mg iron] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,812 [INFO] Coverage for 'ferrex 150 capsule u-d,10x10 150 mg iron': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,813 [INFO] [ferric x-150 capsule 150 mg iron] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,813 [INFO] Coverage for 'ferric x-150 capsule 150 mg iron': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,814 [INFO] [ferro-time 325 mg tablet f/c, green 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,814 [INFO] Coverage for 'ferro-time 325 mg tablet f/c, green 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,815 [INFO] [ferro-time 325 mg tablet f/c, red 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,815 [INFO] Coverage for 'ferro-time 325 mg tablet f/c, red 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,815 [INFO] [ferrous sulf 220 mg/5 ml elix (rx) 220 mg (44 mg iron)/5 ml] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,815 [INFO] Coverage for 'ferrous sulf 220 mg/5 ml elix (rx) 220 mg (44 mg iron)/5 ml': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,817 [INFO] [ferrous sulf 220 mg/5 ml elix (rx) 220 mg (44 mg iron)/5 ml] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,817 [INFO] Coverage for 'ferrous sulf 220 mg/5 ml elix (rx) 220 mg (44 mg iron)/5 ml': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,817 [INFO] [ferrous sulf 220 mg/5 ml liq (rx) 220 mg (44 mg iron)/5 ml] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,818 [INFO] Coverage for 'ferrous sulf 220 mg/5 ml liq (rx) 220 mg (44 mg iron)/5 ml': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,818 [INFO] [ferrous sulf 300 mg/6.8 ml soln inner (rx) 220 mg (44 mg iron)/5 ml] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,819 [INFO] Coverage for 'ferrous sulf 300 mg/6.8 ml soln inner (rx) 220 mg (44 mg iron)/5 ml': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,819 [INFO] [ferrous sulf 300 mg/6.8 ml soln outer (rx) 220 mg (44 mg iron)/5 ml] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,819 [INFO] Coverage for 'ferrous sulf 300 mg/6.8 ml soln outer (rx) 220 mg (44 mg iron)/5 ml': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,821 [INFO] [ferrous sulf 44 mg iron/5 ml lq (rx) 220 mg (44 mg iron)/5 ml] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,821 [INFO] Coverage for 'ferrous sulf 44 mg iron/5 ml lq (rx) 220 mg (44 mg iron)/5 ml': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,823 [INFO] [ferrous sulf ec 324 mg tablet 324 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,824 [INFO] Coverage for 'ferrous sulf ec 324 mg tablet 324 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,825 [INFO] [ferrous sulf ec 325 mg tablet (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,826 [INFO] Coverage for 'ferrous sulf ec 325 mg tablet (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,826 [INFO] [ferrous sulf ec 325 mg tablet u-d, inner (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,827 [INFO] Coverage for 'ferrous sulf ec 325 mg tablet u-d, inner (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,827 [INFO] [ferrous sulf ec 325 mg tablet u-d, outer (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,827 [INFO] Coverage for 'ferrous sulf ec 325 mg tablet u-d, outer (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,827 [INFO] [ferrous sulfate 325 mg tablet (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,829 [INFO] Coverage for 'ferrous sulfate 325 mg tablet (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,829 [INFO] [ferrous sulfate 325 mg tablet f/c (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,830 [INFO] Coverage for 'ferrous sulfate 325 mg tablet f/c (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,830 [INFO] [ferrous sulfate 325 mg tablet f/c, green (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,830 [INFO] Coverage for 'ferrous sulfate 325 mg tablet f/c, green (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,830 [INFO] [ferrous sulfate 325 mg tablet f/c, red (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,830 [INFO] Coverage for 'ferrous sulfate 325 mg tablet f/c, red (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,830 [INFO] [ferrous sulfate 325 mg tablet n,p/f (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,830 [INFO] Coverage for 'ferrous sulfate 325 mg tablet n,p/f (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,830 [INFO] [ferrous sulfate 325 mg tablet p/f (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,830 [INFO] Coverage for 'ferrous sulfate 325 mg tablet p/f (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,834 [INFO] [ferrous sulfate 325 mg tablet u-d, 10x10, f/c (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,835 [INFO] Coverage for 'ferrous sulfate 325 mg tablet u-d, 10x10, f/c (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,836 [INFO] [ferrous sulfate 325 mg tablet u-d,10x10, film coat (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,836 [INFO] Coverage for 'ferrous sulfate 325 mg tablet u-d,10x10, film coat (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,836 [INFO] [feverall 325 mg suppository junior str, outer] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,838 [INFO] Coverage for 'feverall 325 mg suppository junior str, outer': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,839 [INFO] [feverall 650 mg suppository adult, outer] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,839 [INFO] Coverage for 'feverall 650 mg suppository adult, outer': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,840 [INFO] [fexofenadine hcl 180 mg tablet (otc)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,841 [INFO] Coverage for 'fexofenadine hcl 180 mg tablet (otc)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,842 [INFO] [fexofenadine hcl 180 mg tablet 24 hour, non-drowsy (otc)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:12,842 [INFO] Coverage for 'fexofenadine hcl 180 mg tablet 24 hour, non-drowsy (otc)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:12,996 [INFO] [03/01/2026] Detected 'Covered with Conditions' (90.0) from At least one DB Coverage Status is 'Covered with Conditions'
+2026-03-11 14:32:12,996 [INFO] Coverage for '03/01/2026': Covered with Conditions (Source: At least one DB Coverage Status is 'Covered with Conditions', Confidence: 90.0, Priority Resolution of ['Covered with Conditions'])
+2026-03-11 14:32:51,259 [INFO] [essential man 50+ tablet 0.4-2-250 mg-mg-mcg] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,259 [INFO] Coverage for 'essential man 50+ tablet 0.4-2-250 mg-mg-mcg': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,263 [INFO] [essential man tablet 0.4-2-250 mg-mg-mcg] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,267 [INFO] Coverage for 'essential man tablet 0.4-2-250 mg-mg-mcg': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,271 [INFO] [estroven menopause caplet 400 mcg-40 mg-40 mg-100 mg] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,273 [INFO] Coverage for 'estroven menopause caplet 400 mcg-40 mg-40 mg-100 mg': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,278 [INFO] [evac-u-gen 8.6 mg tablet] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,280 [INFO] Coverage for 'evac-u-gen 8.6 mg tablet': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,285 [INFO] [expiratory mouthpiece] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,285 [INFO] Coverage for 'expiratory mouthpiece': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,291 [INFO] [eye allergy itch-red 0.1% drop] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,291 [INFO] Coverage for 'eye allergy itch-red 0.1% drop': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,296 [INFO] [eye itch relief 0.025% drops 0.025 % (0.035 %)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,299 [INFO] Coverage for 'eye itch relief 0.025% drops 0.025 % (0.035 %)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,304 [INFO] [eye itch relief 0.025% drops 12 hour relief,2x5ml 0.025 % (0.035 %)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,305 [INFO] Coverage for 'eye itch relief 0.025% drops 12 hour relief,2x5ml 0.025 % (0.035 %)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,312 [INFO] [eye itch relief 0.025% drops 12 hours 0.025 % (0.035 %)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,313 [INFO] Coverage for 'eye itch relief 0.025% drops 12 hours 0.025 % (0.035 %)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,317 [INFO] [eye itch relief 0.025% drops up to 12hrs, sterile 0.025 % (0.035 %)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,319 [INFO] Coverage for 'eye itch relief 0.025% drops up to 12hrs, sterile 0.025 % (0.035 %)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,323 [INFO] [eye multivitamin tablet 2,148 mcg-113 mg-45 mg-17.4mg] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,325 [INFO] Coverage for 'eye multivitamin tablet 2,148 mcg-113 mg-45 mg-17.4mg': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,330 [INFO] [eyeprotect tablet 7,160-113-100 unit-mg-unit] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,330 [INFO] Coverage for 'eyeprotect tablet 7,160-113-100 unit-mg-unit': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,336 [INFO] [face mask blue w/ear loops] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,336 [INFO] Coverage for 'face mask blue w/ear loops': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,341 [INFO] [famotidine 10 mg tablet] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,341 [INFO] Coverage for 'famotidine 10 mg tablet': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,349 [INFO] [fenesin dm ir tablet 20-400 mg] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,349 [INFO] Coverage for 'fenesin dm ir tablet 20-400 mg': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,355 [INFO] [fenesin ir 400 mg tablet] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,356 [INFO] Coverage for 'fenesin ir 400 mg tablet': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,362 [INFO] [feosol 65 mg tablet (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,362 [INFO] Coverage for 'feosol 65 mg tablet (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,367 [INFO] [fer-in-sol 15 mg/ml drops 15 mg iron (75 mg)/ml] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,368 [INFO] Coverage for 'fer-in-sol 15 mg/ml drops 15 mg iron (75 mg)/ml': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,375 [INFO] [ferosul 325 mg tablet (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,376 [INFO] Coverage for 'ferosul 325 mg tablet (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,379 [INFO] [ferosul 325 mg tablet f/c,blister pack (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,379 [INFO] Coverage for 'ferosul 325 mg tablet f/c,blister pack (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,386 [INFO] [ferrex 150 capsule 150 mg iron] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,387 [INFO] Coverage for 'ferrex 150 capsule 150 mg iron': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,391 [INFO] [ferrex 150 capsule outer, u-d 150 mg iron] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,391 [INFO] Coverage for 'ferrex 150 capsule outer, u-d 150 mg iron': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,400 [INFO] [ferrex 150 capsule u-d,10x10 150 mg iron] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,400 [INFO] Coverage for 'ferrex 150 capsule u-d,10x10 150 mg iron': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,405 [INFO] [ferric x-150 capsule 150 mg iron] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,408 [INFO] Coverage for 'ferric x-150 capsule 150 mg iron': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,413 [INFO] [ferro-time 325 mg tablet f/c, green 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,413 [INFO] Coverage for 'ferro-time 325 mg tablet f/c, green 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,418 [INFO] [ferro-time 325 mg tablet f/c, red 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,418 [INFO] Coverage for 'ferro-time 325 mg tablet f/c, red 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,425 [INFO] [ferrous sulf 220 mg/5 ml elix (rx) 220 mg (44 mg iron)/5 ml] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,426 [INFO] Coverage for 'ferrous sulf 220 mg/5 ml elix (rx) 220 mg (44 mg iron)/5 ml': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,430 [INFO] [ferrous sulf 220 mg/5 ml elix (rx) 220 mg (44 mg iron)/5 ml] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,430 [INFO] Coverage for 'ferrous sulf 220 mg/5 ml elix (rx) 220 mg (44 mg iron)/5 ml': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,438 [INFO] [ferrous sulf 220 mg/5 ml liq (rx) 220 mg (44 mg iron)/5 ml] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,438 [INFO] Coverage for 'ferrous sulf 220 mg/5 ml liq (rx) 220 mg (44 mg iron)/5 ml': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,441 [INFO] [ferrous sulf 300 mg/6.8 ml soln inner (rx) 220 mg (44 mg iron)/5 ml] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,441 [INFO] Coverage for 'ferrous sulf 300 mg/6.8 ml soln inner (rx) 220 mg (44 mg iron)/5 ml': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,451 [INFO] [ferrous sulf 300 mg/6.8 ml soln outer (rx) 220 mg (44 mg iron)/5 ml] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,451 [INFO] Coverage for 'ferrous sulf 300 mg/6.8 ml soln outer (rx) 220 mg (44 mg iron)/5 ml': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,458 [INFO] [ferrous sulf 44 mg iron/5 ml lq (rx) 220 mg (44 mg iron)/5 ml] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,459 [INFO] Coverage for 'ferrous sulf 44 mg iron/5 ml lq (rx) 220 mg (44 mg iron)/5 ml': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,464 [INFO] [ferrous sulf ec 324 mg tablet 324 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,464 [INFO] Coverage for 'ferrous sulf ec 324 mg tablet 324 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,469 [INFO] [ferrous sulf ec 325 mg tablet (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,469 [INFO] Coverage for 'ferrous sulf ec 325 mg tablet (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,476 [INFO] [ferrous sulf ec 325 mg tablet u-d, inner (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,476 [INFO] Coverage for 'ferrous sulf ec 325 mg tablet u-d, inner (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,480 [INFO] [ferrous sulf ec 325 mg tablet u-d, outer (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,480 [INFO] Coverage for 'ferrous sulf ec 325 mg tablet u-d, outer (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,488 [INFO] [ferrous sulfate 325 mg tablet (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,490 [INFO] Coverage for 'ferrous sulfate 325 mg tablet (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,496 [INFO] [ferrous sulfate 325 mg tablet f/c (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,496 [INFO] Coverage for 'ferrous sulfate 325 mg tablet f/c (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,502 [INFO] [ferrous sulfate 325 mg tablet f/c, green (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,502 [INFO] Coverage for 'ferrous sulfate 325 mg tablet f/c, green (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,509 [INFO] [ferrous sulfate 325 mg tablet f/c, red (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,509 [INFO] Coverage for 'ferrous sulfate 325 mg tablet f/c, red (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,513 [INFO] [ferrous sulfate 325 mg tablet n,p/f (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,513 [INFO] Coverage for 'ferrous sulfate 325 mg tablet n,p/f (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,521 [INFO] [ferrous sulfate 325 mg tablet p/f (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,521 [INFO] Coverage for 'ferrous sulfate 325 mg tablet p/f (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,526 [INFO] [ferrous sulfate 325 mg tablet u-d, 10x10, f/c (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,529 [INFO] Coverage for 'ferrous sulfate 325 mg tablet u-d, 10x10, f/c (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,535 [INFO] [ferrous sulfate 325 mg tablet u-d,10x10, film coat (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,535 [INFO] Coverage for 'ferrous sulfate 325 mg tablet u-d,10x10, film coat (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,541 [INFO] [feverall 325 mg suppository junior str, outer] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,541 [INFO] Coverage for 'feverall 325 mg suppository junior str, outer': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,546 [INFO] [feverall 650 mg suppository adult, outer] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,546 [INFO] Coverage for 'feverall 650 mg suppository adult, outer': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,553 [INFO] [fexofenadine hcl 180 mg tablet (otc)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,554 [INFO] Coverage for 'fexofenadine hcl 180 mg tablet (otc)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:32:51,559 [INFO] [fexofenadine hcl 180 mg tablet 24 hour, non-drowsy (otc)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:32:51,561 [INFO] Coverage for 'fexofenadine hcl 180 mg tablet 24 hour, non-drowsy (otc)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:14,963 [INFO] [essential man 50+ tablet 0.4-2-250 mg-mg-mcg] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:14,966 [INFO] Coverage for 'essential man 50+ tablet 0.4-2-250 mg-mg-mcg': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:14,966 [INFO] [essential man tablet 0.4-2-250 mg-mg-mcg] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:14,966 [INFO] Coverage for 'essential man tablet 0.4-2-250 mg-mg-mcg': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:14,966 [INFO] [estroven menopause caplet 400 mcg-40 mg-40 mg-100 mg] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:14,969 [INFO] Coverage for 'estroven menopause caplet 400 mcg-40 mg-40 mg-100 mg': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:14,971 [INFO] [evac-u-gen 8.6 mg tablet] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:14,971 [INFO] Coverage for 'evac-u-gen 8.6 mg tablet': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:14,972 [INFO] [expiratory mouthpiece] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:14,973 [INFO] Coverage for 'expiratory mouthpiece': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:14,974 [INFO] [eye allergy itch-red 0.1% drop] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:14,975 [INFO] Coverage for 'eye allergy itch-red 0.1% drop': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:14,976 [INFO] [eye itch relief 0.025% drops 0.025 % (0.035 %)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:14,976 [INFO] Coverage for 'eye itch relief 0.025% drops 0.025 % (0.035 %)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:14,978 [INFO] [eye itch relief 0.025% drops 12 hour relief,2x5ml 0.025 % (0.035 %)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:14,979 [INFO] Coverage for 'eye itch relief 0.025% drops 12 hour relief,2x5ml 0.025 % (0.035 %)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:14,979 [INFO] [eye itch relief 0.025% drops 12 hours 0.025 % (0.035 %)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:14,979 [INFO] Coverage for 'eye itch relief 0.025% drops 12 hours 0.025 % (0.035 %)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:14,979 [INFO] [eye itch relief 0.025% drops up to 12hrs, sterile 0.025 % (0.035 %)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:14,981 [INFO] Coverage for 'eye itch relief 0.025% drops up to 12hrs, sterile 0.025 % (0.035 %)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:14,981 [INFO] [eye multivitamin tablet 2,148 mcg-113 mg-45 mg-17.4mg] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:14,981 [INFO] Coverage for 'eye multivitamin tablet 2,148 mcg-113 mg-45 mg-17.4mg': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:14,983 [INFO] [eyeprotect tablet 7,160-113-100 unit-mg-unit] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:14,984 [INFO] Coverage for 'eyeprotect tablet 7,160-113-100 unit-mg-unit': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:14,984 [INFO] [face mask blue w/ear loops] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:14,986 [INFO] Coverage for 'face mask blue w/ear loops': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:14,986 [INFO] [famotidine 10 mg tablet] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:14,987 [INFO] Coverage for 'famotidine 10 mg tablet': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:14,987 [INFO] [fenesin dm ir tablet 20-400 mg] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:14,989 [INFO] Coverage for 'fenesin dm ir tablet 20-400 mg': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:14,990 [INFO] [fenesin ir 400 mg tablet] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:14,991 [INFO] Coverage for 'fenesin ir 400 mg tablet': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:14,991 [INFO] [feosol 65 mg tablet (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:14,993 [INFO] Coverage for 'feosol 65 mg tablet (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:14,993 [INFO] [fer-in-sol 15 mg/ml drops 15 mg iron (75 mg)/ml] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:14,995 [INFO] Coverage for 'fer-in-sol 15 mg/ml drops 15 mg iron (75 mg)/ml': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:14,996 [INFO] [ferosul 325 mg tablet (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:14,996 [INFO] Coverage for 'ferosul 325 mg tablet (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:14,996 [INFO] [ferosul 325 mg tablet f/c,blister pack (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:14,996 [INFO] Coverage for 'ferosul 325 mg tablet f/c,blister pack (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:14,999 [INFO] [ferrex 150 capsule 150 mg iron] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:15,000 [INFO] Coverage for 'ferrex 150 capsule 150 mg iron': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:15,001 [INFO] [ferrex 150 capsule outer, u-d 150 mg iron] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:15,001 [INFO] Coverage for 'ferrex 150 capsule outer, u-d 150 mg iron': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:15,002 [INFO] [ferrex 150 capsule u-d,10x10 150 mg iron] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:15,003 [INFO] Coverage for 'ferrex 150 capsule u-d,10x10 150 mg iron': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:15,004 [INFO] [ferric x-150 capsule 150 mg iron] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:15,004 [INFO] Coverage for 'ferric x-150 capsule 150 mg iron': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:15,006 [INFO] [ferro-time 325 mg tablet f/c, green 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:15,006 [INFO] Coverage for 'ferro-time 325 mg tablet f/c, green 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:15,007 [INFO] [ferro-time 325 mg tablet f/c, red 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:15,008 [INFO] Coverage for 'ferro-time 325 mg tablet f/c, red 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:15,009 [INFO] [ferrous sulf 220 mg/5 ml elix (rx) 220 mg (44 mg iron)/5 ml] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:15,009 [INFO] Coverage for 'ferrous sulf 220 mg/5 ml elix (rx) 220 mg (44 mg iron)/5 ml': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:15,009 [INFO] [ferrous sulf 220 mg/5 ml elix (rx) 220 mg (44 mg iron)/5 ml] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:15,011 [INFO] Coverage for 'ferrous sulf 220 mg/5 ml elix (rx) 220 mg (44 mg iron)/5 ml': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:15,011 [INFO] [ferrous sulf 220 mg/5 ml liq (rx) 220 mg (44 mg iron)/5 ml] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:15,011 [INFO] Coverage for 'ferrous sulf 220 mg/5 ml liq (rx) 220 mg (44 mg iron)/5 ml': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:15,011 [INFO] [ferrous sulf 300 mg/6.8 ml soln inner (rx) 220 mg (44 mg iron)/5 ml] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:15,011 [INFO] Coverage for 'ferrous sulf 300 mg/6.8 ml soln inner (rx) 220 mg (44 mg iron)/5 ml': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:15,011 [INFO] [ferrous sulf 300 mg/6.8 ml soln outer (rx) 220 mg (44 mg iron)/5 ml] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:15,011 [INFO] Coverage for 'ferrous sulf 300 mg/6.8 ml soln outer (rx) 220 mg (44 mg iron)/5 ml': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:15,016 [INFO] [ferrous sulf 44 mg iron/5 ml lq (rx) 220 mg (44 mg iron)/5 ml] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:15,016 [INFO] Coverage for 'ferrous sulf 44 mg iron/5 ml lq (rx) 220 mg (44 mg iron)/5 ml': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:15,016 [INFO] [ferrous sulf ec 324 mg tablet 324 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:15,017 [INFO] Coverage for 'ferrous sulf ec 324 mg tablet 324 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:15,018 [INFO] [ferrous sulf ec 325 mg tablet (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:15,020 [INFO] Coverage for 'ferrous sulf ec 325 mg tablet (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:15,021 [INFO] [ferrous sulf ec 325 mg tablet u-d, inner (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:15,022 [INFO] Coverage for 'ferrous sulf ec 325 mg tablet u-d, inner (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:15,023 [INFO] [ferrous sulf ec 325 mg tablet u-d, outer (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:15,023 [INFO] Coverage for 'ferrous sulf ec 325 mg tablet u-d, outer (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:15,025 [INFO] [ferrous sulfate 325 mg tablet (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:15,026 [INFO] Coverage for 'ferrous sulfate 325 mg tablet (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:15,026 [INFO] [ferrous sulfate 325 mg tablet f/c (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:15,026 [INFO] Coverage for 'ferrous sulfate 325 mg tablet f/c (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:15,026 [INFO] [ferrous sulfate 325 mg tablet f/c, green (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:15,026 [INFO] Coverage for 'ferrous sulfate 325 mg tablet f/c, green (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:15,029 [INFO] [ferrous sulfate 325 mg tablet f/c, red (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:15,029 [INFO] Coverage for 'ferrous sulfate 325 mg tablet f/c, red (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:15,029 [INFO] [ferrous sulfate 325 mg tablet n,p/f (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:15,029 [INFO] Coverage for 'ferrous sulfate 325 mg tablet n,p/f (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:15,029 [INFO] [ferrous sulfate 325 mg tablet p/f (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:15,031 [INFO] Coverage for 'ferrous sulfate 325 mg tablet p/f (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:15,032 [INFO] [ferrous sulfate 325 mg tablet u-d, 10x10, f/c (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:15,032 [INFO] Coverage for 'ferrous sulfate 325 mg tablet u-d, 10x10, f/c (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:15,032 [INFO] [ferrous sulfate 325 mg tablet u-d,10x10, film coat (rx) 325 mg (65 mg iron)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:15,032 [INFO] Coverage for 'ferrous sulfate 325 mg tablet u-d,10x10, film coat (rx) 325 mg (65 mg iron)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:15,034 [INFO] [feverall 325 mg suppository junior str, outer] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:15,034 [INFO] Coverage for 'feverall 325 mg suppository junior str, outer': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:15,036 [INFO] [feverall 650 mg suppository adult, outer] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:15,036 [INFO] Coverage for 'feverall 650 mg suppository adult, outer': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:15,037 [INFO] [fexofenadine hcl 180 mg tablet (otc)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:15,039 [INFO] Coverage for 'fexofenadine hcl 180 mg tablet (otc)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:15,039 [INFO] [fexofenadine hcl 180 mg tablet 24 hour, non-drowsy (otc)] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:15,041 [INFO] Coverage for 'fexofenadine hcl 180 mg tablet 24 hour, non-drowsy (otc)': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])
+2026-03-11 14:34:15,303 [INFO] [0] Detected 'Covered' (85.0) from DB Lookup - 0
+2026-03-11 14:34:15,303 [INFO] Coverage for '0': Covered (Source: DB Lookup - 0, Confidence: 85.0, Priority Resolution of ['Covered'])

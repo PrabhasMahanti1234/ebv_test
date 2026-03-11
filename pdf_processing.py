@@ -809,7 +809,7 @@ def _insert_cached_data_for_plan(cached_data, plan_id, plan_name, payer_id, paye
         if acr_reused_count > 0:
             logger.info(f"[ML-REUSE] Reused {acr_reused_count} acronym coverage predictions from hash '{file_hash}'")
 
-        insert_acronyms_to_ref_table(acronyms, state_name, payer_name, plan_name, "ebv_genai.pp_formulary_names")
+        insert_acronyms_to_ref_table(acronyms, state_name, payer_name, plan_name, "ebv_genai.acronym_expansion")
         logger.info(f"Cache re-insert: {len(acronyms)} acronyms for plan {plan_id}")
 
     # Update plan file hash and statuses
@@ -1255,7 +1255,7 @@ def process_single_pdf_url_worker(plan_info):
                                 service="pdf_processing",
                     payload={"plan_id": plan_id, "records": len(enriched_drug_records)})
             
-            # Insert Acronyms into pp_formulary_names with coverage status
+            # Insert Acronyms into acronym_expansion with coverage status
             if acronyms:
                 # ✅ Enrich acronyms with coverage_status before insertion
                 with get_db_connection() as conn:
@@ -1277,8 +1277,8 @@ def process_single_pdf_url_worker(plan_info):
                         # Add coverage_status to acronym dict
                         acronym["coverage_status"] = coverage_status
                 
-                insert_acronyms_to_ref_table(acronyms, state_name, payer_name, plan_name, "ebv_genai.pp_formulary_names")
-                logger.info(f"Inserted {len(acronyms)} acronyms with coverage status into pp_formulary_names for plan {plan_id}")
+                insert_acronyms_to_ref_table(acronyms, state_name, payer_name, plan_name, "ebv_genai.acronym_expansion")
+                logger.info(f"Inserted {len(acronyms)} acronyms with coverage status into acronym_expansion for plan {plan_id}")
                 log_audit_event(transaction_id=transaction_id, event_type="database.insert.acronyms",
                                 service="pdf_processing",
                                 payload={"plan_id": plan_id, "acronyms": len(acronyms)})
@@ -1851,7 +1851,7 @@ def process_plan_batch_result(plan_id: str, chunks: list):
                         acronym_cache=acronym_cache
                     )
                     acronym['coverage_status'] = acr_coverage_status
-            insert_acronyms_to_ref_table(all_acronyms, state_name, payer_name, plan_name, "ebv_genai.pp_formulary_names")
+            insert_acronyms_to_ref_table(all_acronyms, state_name, payer_name, plan_name, "ebv_genai.acronym_expansion")
              
         file_hash = None
         with get_db_connection() as conn:

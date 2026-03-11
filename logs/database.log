@@ -1624,3 +1624,143 @@ DETAIL:  Key (plan_id)=(a2c2e0af-0236-4281-a673-010c6c3cffb4) is not present in 
 2026-03-11 11:12:59,767 [INFO] db.update ebv_genai.payer_details set=status='inactive' rows=0
 2026-03-11 11:12:59,768 [INFO] Successfully updated all plan and payer statuses.
 2026-03-11 11:12:59,769 [INFO] db.update statuses committed
+2026-03-11 14:26:32,128 [INFO] Transaction a3922395-abe3-4058-9153-ffe7e95afb4c created.
+2026-03-11 14:26:32,129 [INFO] Ensuring database schema exists...
+2026-03-11 14:26:32,396 [INFO] Created/ensured ebv_genai.processed_file_cache table
+2026-03-11 14:26:32,399 [INFO] Created/ensured ebv_genai.transaction table
+2026-03-11 14:26:32,402 [INFO] Created/ensured ebv_genai.audit table
+2026-03-11 14:26:32,405 [INFO] Created partitioned ebv_genai.drug_formulary_details table
+2026-03-11 14:26:32,430 [INFO] Created/ensured ebv_genai.acronym_expansion table
+2026-03-11 14:26:32,434 [INFO] Ensured coverage_status column exists in acronym_expansion.
+2026-03-11 14:26:32,436 [INFO] Created/ensured ebv_genai.tier_requirement_expansion master table
+2026-03-11 14:26:32,438 [INFO] Created/ensured ebv_genai.product_master table
+2026-03-11 14:26:32,443 [INFO] Updated confidence_score column type to DECIMAL(5,2).
+2026-03-11 14:26:32,447 [INFO] Ensured product mapping columns exist in ebv_genai.drug_formulary_details.
+2026-03-11 14:26:32,449 [INFO] Added preferred_agent column to ebv_genai.drug_formulary_details.
+2026-03-11 14:26:32,449 [INFO] Added non_preferred_agent column to ebv_genai.drug_formulary_details.
+2026-03-11 14:26:32,527 [INFO] Database schema ensured successfully with partitioning, indexing, and schema sync
+2026-03-11 14:26:40,112 [INFO] Updated file_hash for plan_id: a2c2e0af-0236-4281-a673-010c6c3cffb4
+2026-03-11 14:26:40,185 [INFO] Cache MISS for hash: 92ec3982fa008e2fec3ee690996fc9ac3305c25fa6075d3d4c5cf113a3f7ccc8
+2026-03-11 14:27:07,441 [INFO] Transaction 5fd35155-0232-4d40-a051-6ff59ce3fcea created.
+2026-03-11 14:27:07,622 [INFO] Loaded 23 acronyms into memory cache for Delaware First Health (Delaware)
+2026-03-11 14:27:07,716 [INFO] Preparing to delete all existing drug records for plan_id: a2c2e0af-0236-4281-a673-010c6c3cffb4
+2026-03-11 14:27:07,794 [INFO] Successfully deleted 0 records for plan_id: a2c2e0af-0236-4281-a673-010c6c3cffb4
+2026-03-11 14:27:07,956 [INFO] Preparing to insert 47 records into the database.
+2026-03-11 14:27:08,065 [INFO] Successfully inserted or updated 47 records.
+2026-03-11 14:27:08,066 [INFO] db.insert ebv_genai.drug_formulary_details count=47
+2026-03-11 14:27:08,274 [ERROR] Failed to insert acronyms into ebv_genai.acronym_expansion: there is no unique or exclusion constraint matching the ON CONFLICT specification
+
+2026-03-11 14:27:08,275 [ERROR] Database connection error: there is no unique or exclusion constraint matching the ON CONFLICT specification
+
+2026-03-11 14:31:28,389 [INFO] Ensuring database schema exists...
+2026-03-11 14:31:28,473 [INFO] Created/ensured ebv_genai.processed_file_cache table
+2026-03-11 14:31:28,475 [INFO] Created/ensured ebv_genai.transaction table
+2026-03-11 14:31:28,476 [INFO] Created/ensured ebv_genai.audit table
+2026-03-11 14:31:28,477 [INFO] Created partitioned ebv_genai.drug_formulary_details table
+2026-03-11 14:31:28,477 [INFO] Created/ensured ebv_genai.acronym_expansion table
+2026-03-11 14:31:28,479 [INFO] Ensured coverage_status column exists in acronym_expansion.
+2026-03-11 14:31:28,484 [INFO] Created/ensured ebv_genai.tier_requirement_expansion master table
+2026-03-11 14:31:28,485 [INFO] Created/ensured ebv_genai.product_master table
+2026-03-11 14:31:28,487 [INFO] Updated confidence_score column type to DECIMAL(5,2).
+2026-03-11 14:31:28,492 [INFO] Ensured product mapping columns exist in ebv_genai.drug_formulary_details.
+2026-03-11 14:31:28,494 [INFO] Added preferred_agent column to ebv_genai.drug_formulary_details.
+2026-03-11 14:31:28,495 [INFO] Added non_preferred_agent column to ebv_genai.drug_formulary_details.
+2026-03-11 14:31:28,533 [INFO] Database schema ensured successfully with partitioning, indexing, and schema sync
+2026-03-11 14:32:12,185 [INFO] Transaction dc761165-47ac-463a-8a71-8e3b5719a7f1 created.
+2026-03-11 14:32:12,186 [INFO] Ensuring database schema exists...
+2026-03-11 14:32:12,254 [INFO] Created/ensured ebv_genai.processed_file_cache table
+2026-03-11 14:32:12,257 [INFO] Created/ensured ebv_genai.transaction table
+2026-03-11 14:32:12,259 [INFO] Created/ensured ebv_genai.audit table
+2026-03-11 14:32:12,259 [INFO] Created partitioned ebv_genai.drug_formulary_details table
+2026-03-11 14:32:12,261 [INFO] Created/ensured ebv_genai.acronym_expansion table
+2026-03-11 14:32:12,265 [INFO] Ensured coverage_status column exists in acronym_expansion.
+2026-03-11 14:32:12,267 [INFO] Created/ensured ebv_genai.tier_requirement_expansion master table
+2026-03-11 14:32:12,268 [INFO] Created/ensured ebv_genai.product_master table
+2026-03-11 14:32:12,270 [INFO] Updated confidence_score column type to DECIMAL(5,2).
+2026-03-11 14:32:12,273 [INFO] Ensured product mapping columns exist in ebv_genai.drug_formulary_details.
+2026-03-11 14:32:12,276 [INFO] Added preferred_agent column to ebv_genai.drug_formulary_details.
+2026-03-11 14:32:12,276 [INFO] Added non_preferred_agent column to ebv_genai.drug_formulary_details.
+2026-03-11 14:32:12,309 [INFO] Database schema ensured successfully with partitioning, indexing, and schema sync
+2026-03-11 14:32:12,380 [INFO] Transaction 84a112a0-c460-4f9b-aba8-778b71b166e8 created.
+2026-03-11 14:32:12,569 [INFO] Loaded 23 acronyms into memory cache for Delaware First Health (Delaware)
+2026-03-11 14:32:12,643 [INFO] Preparing to delete all existing drug records for plan_id: a2c2e0af-0236-4281-a673-010c6c3cffb4
+2026-03-11 14:32:12,713 [INFO] Successfully deleted 0 records for plan_id: a2c2e0af-0236-4281-a673-010c6c3cffb4
+2026-03-11 14:32:12,843 [INFO] Preparing to insert 47 records into the database.
+2026-03-11 14:32:12,918 [INFO] Successfully inserted or updated 47 records.
+2026-03-11 14:32:12,919 [INFO] db.insert ebv_genai.drug_formulary_details count=47
+2026-03-11 14:32:13,086 [INFO] Successfully inserted or updated 1 records into ebv_genai.acronym_expansion.
+2026-03-11 14:32:13,313 [INFO] Successfully cached result for hash: 92ec3982fa008e2fec3ee690996fc9ac3305c25fa6075d3d4c5cf113a3f7ccc8 (URL: https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/92ec3982...)
+2026-03-11 14:32:13,313 [INFO] cache.store hash=92ec3982fa008e2fec3ee690996fc9ac3305c25fa6075d3d4c5cf113a3f7ccc8 url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/92ec3982fa008e2fec3ee690996fc9ac3305c25fa6075d3d4c5cf113a3f7ccc8.pdf size_drugs=48 size_acronyms=1
+2026-03-11 14:32:13,314 [INFO] Updating status to 'completed' for drugs in 1 plans.
+2026-03-11 14:32:13,387 [INFO] Successfully updated status for 47 drug formulary records.
+2026-03-11 14:32:13,388 [INFO] db.update ebv_genai.drug_formulary_details set=status='completed' plans=1 rows=47
+2026-03-11 14:32:13,389 [INFO] Updating final status for all payers and plans...
+2026-03-11 14:32:13,453 [INFO] Set 1 plans to 'active'.
+2026-03-11 14:32:13,454 [INFO] db.update ebv_genai.plan_details set=status='active' rows=1
+2026-03-11 14:32:13,457 [INFO] Set 1 payers to 'active'.
+2026-03-11 14:32:13,457 [INFO] db.update ebv_genai.payer_details set=status='active' rows=1
+2026-03-11 14:32:13,459 [INFO] Set 0 payers to 'inactive'.
+2026-03-11 14:32:13,459 [INFO] db.update ebv_genai.payer_details set=status='inactive' rows=0
+2026-03-11 14:32:13,460 [INFO] Successfully updated all plan and payer statuses.
+2026-03-11 14:32:13,460 [INFO] db.update statuses committed
+2026-03-11 14:32:45,766 [INFO] Transaction c3863c3e-9095-40d8-afd4-ffade386bd91 created.
+2026-03-11 14:32:45,767 [INFO] Ensuring database schema exists...
+2026-03-11 14:32:45,841 [INFO] Created/ensured ebv_genai.processed_file_cache table
+2026-03-11 14:32:45,841 [INFO] Created/ensured ebv_genai.transaction table
+2026-03-11 14:32:45,846 [INFO] Created/ensured ebv_genai.audit table
+2026-03-11 14:32:45,847 [INFO] Created partitioned ebv_genai.drug_formulary_details table
+2026-03-11 14:32:45,847 [INFO] Created/ensured ebv_genai.acronym_expansion table
+2026-03-11 14:32:45,857 [INFO] Ensured coverage_status column exists in acronym_expansion.
+2026-03-11 14:32:45,859 [INFO] Created/ensured ebv_genai.tier_requirement_expansion master table
+2026-03-11 14:32:45,859 [INFO] Created/ensured ebv_genai.product_master table
+2026-03-11 14:32:45,864 [INFO] Updated confidence_score column type to DECIMAL(5,2).
+2026-03-11 14:32:45,867 [INFO] Ensured product mapping columns exist in ebv_genai.drug_formulary_details.
+2026-03-11 14:32:45,868 [INFO] Added preferred_agent column to ebv_genai.drug_formulary_details.
+2026-03-11 14:32:45,870 [INFO] Added non_preferred_agent column to ebv_genai.drug_formulary_details.
+2026-03-11 14:32:45,901 [INFO] Database schema ensured successfully with partitioning, indexing, and schema sync
+2026-03-11 14:32:51,051 [INFO] Updated file_hash for plan_id: a2c2e0af-0236-4281-a673-010c6c3cffb4
+2026-03-11 14:32:51,119 [INFO] Cache HIT for hash: 92ec3982fa008e2fec3ee690996fc9ac3305c25fa6075d3d4c5cf113a3f7ccc8
+2026-03-11 14:32:51,120 [INFO] Preparing to delete all existing drug records for plan_id: a2c2e0af-0236-4281-a673-010c6c3cffb4
+2026-03-11 14:32:51,187 [INFO] Successfully deleted 47 records for plan_id: a2c2e0af-0236-4281-a673-010c6c3cffb4
+2026-03-11 14:32:51,561 [INFO] Preparing to insert 47 records into the database.
+2026-03-11 14:32:51,641 [INFO] Successfully inserted or updated 47 records.
+2026-03-11 14:32:51,641 [INFO] db.insert ebv_genai.drug_formulary_details count=47
+2026-03-11 14:33:32,338 [INFO] Transaction 7ceb7602-c474-4efb-952d-c160b91c3693 created.
+2026-03-11 14:33:32,338 [INFO] Ensuring database schema exists...
+2026-03-11 14:33:32,412 [INFO] Created/ensured ebv_genai.processed_file_cache table
+2026-03-11 14:33:32,412 [INFO] Created/ensured ebv_genai.transaction table
+2026-03-11 14:33:32,417 [INFO] Created/ensured ebv_genai.audit table
+2026-03-11 14:33:32,417 [INFO] Created partitioned ebv_genai.drug_formulary_details table
+2026-03-11 14:33:32,418 [INFO] Created/ensured ebv_genai.acronym_expansion table
+2026-03-11 14:33:32,421 [INFO] Ensured coverage_status column exists in acronym_expansion.
+2026-03-11 14:33:32,424 [INFO] Created/ensured ebv_genai.tier_requirement_expansion master table
+2026-03-11 14:33:32,426 [INFO] Created/ensured ebv_genai.product_master table
+2026-03-11 14:33:32,429 [INFO] Updated confidence_score column type to DECIMAL(5,2).
+2026-03-11 14:33:32,429 [INFO] Ensured product mapping columns exist in ebv_genai.drug_formulary_details.
+2026-03-11 14:33:32,429 [INFO] Added preferred_agent column to ebv_genai.drug_formulary_details.
+2026-03-11 14:33:32,434 [INFO] Added non_preferred_agent column to ebv_genai.drug_formulary_details.
+2026-03-11 14:33:32,476 [INFO] Database schema ensured successfully with partitioning, indexing, and schema sync
+2026-03-11 14:33:36,926 [INFO] Updated file_hash for plan_id: a2c2e0af-0236-4281-a673-010c6c3cffb4
+2026-03-11 14:33:36,991 [INFO] Cache MISS for hash: 92ec3982fa008e2fec3ee690996fc9ac3305c25fa6075d3d4c5cf113a3f7ccc8
+2026-03-11 14:34:14,585 [INFO] Transaction 42176a21-f797-4135-8d3e-2d0effbb0315 created.
+2026-03-11 14:34:14,736 [INFO] Loaded 23 acronyms into memory cache for Delaware First Health (Delaware)
+2026-03-11 14:34:14,809 [INFO] Preparing to delete all existing drug records for plan_id: a2c2e0af-0236-4281-a673-010c6c3cffb4
+2026-03-11 14:34:14,888 [INFO] Successfully deleted 0 records for plan_id: a2c2e0af-0236-4281-a673-010c6c3cffb4
+2026-03-11 14:34:15,041 [INFO] Preparing to insert 47 records into the database.
+2026-03-11 14:34:15,209 [INFO] Successfully inserted or updated 47 records.
+2026-03-11 14:34:15,211 [INFO] db.insert ebv_genai.drug_formulary_details count=47
+2026-03-11 14:34:15,376 [INFO] Successfully inserted or updated 1 records into ebv_genai.acronym_expansion.
+2026-03-11 14:34:15,539 [INFO] Successfully cached result for hash: 92ec3982fa008e2fec3ee690996fc9ac3305c25fa6075d3d4c5cf113a3f7ccc8 (URL: https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/92ec3982...)
+2026-03-11 14:34:15,541 [INFO] cache.store hash=92ec3982fa008e2fec3ee690996fc9ac3305c25fa6075d3d4c5cf113a3f7ccc8 url=https://ebv-formulary-repository.s3.us-east-1.amazonaws.com/Testing/pdf/92ec3982fa008e2fec3ee690996fc9ac3305c25fa6075d3d4c5cf113a3f7ccc8.pdf size_drugs=48 size_acronyms=1
+2026-03-11 14:34:15,541 [INFO] Updating status to 'completed' for drugs in 1 plans.
+2026-03-11 14:34:15,623 [INFO] Successfully updated status for 47 drug formulary records.
+2026-03-11 14:34:15,625 [INFO] db.update ebv_genai.drug_formulary_details set=status='completed' plans=1 rows=47
+2026-03-11 14:34:15,626 [INFO] Updating final status for all payers and plans...
+2026-03-11 14:34:15,704 [INFO] Set 1 plans to 'active'.
+2026-03-11 14:34:15,705 [INFO] db.update ebv_genai.plan_details set=status='active' rows=1
+2026-03-11 14:34:15,707 [INFO] Set 1 payers to 'active'.
+2026-03-11 14:34:15,707 [INFO] db.update ebv_genai.payer_details set=status='active' rows=1
+2026-03-11 14:34:15,707 [INFO] Set 0 payers to 'inactive'.
+2026-03-11 14:34:15,709 [INFO] db.update ebv_genai.payer_details set=status='inactive' rows=0
+2026-03-11 14:34:15,709 [INFO] Successfully updated all plan and payer statuses.
+2026-03-11 14:34:15,711 [INFO] db.update statuses committed
