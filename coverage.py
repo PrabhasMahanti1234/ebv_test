@@ -204,20 +204,20 @@ def det_coverage_status(
         # a. Extract Tier tokens (1B, 5^, Tier 1-6, etc.)
         # REVISED: Split 5^, 5*, etc. into separate tokens
         # Also ensure we don't accidentally match dosages (e.g., 325)
-        tier_tokens = re.findall(r'(Tier\s*[1-6]|[1-6][A-Z\^\*]?|[1-6]|\^|\*)', acronym_str, flags=re.IGNORECASE)
+        tier_tokens = re.findall(r'(Tier\s*[0-6]|[0-6][A-Z\^\*]?|[0-6]|\^|\*)', acronym_str, flags=re.IGNORECASE)
         for t in tier_tokens:
             t_clean = t.strip().upper()
             # Split things like 5^ into Tier 5 and ^
-            if re.match(r'^[1-6][\^\*]$', t_clean):
+            if re.match(r'^[0-6][\^\*]$', t_clean):
                 raw_parts.append(f"Tier {t_clean[0]}")
                 raw_parts.append(t_clean[1])
-            elif re.match(r'^[1-6][A-Z]$', t_clean):
+            elif re.match(r'^[0-6][A-Z]$', t_clean):
                 raw_parts.append(t_clean)
             elif t_clean.startswith("TIER"):
                 digit_match = re.search(r'\d+', t_clean)
                 if digit_match:
                     raw_parts.append(f"Tier {digit_match.group()}")
-            elif re.match(r'^[1-6]$', t_clean):
+            elif re.match(r'^[0-6]$', t_clean):
                 raw_parts.append(f"Tier {t_clean}")
             elif t_clean in ("^", "*"):
                 raw_parts.append(t_clean)
@@ -251,7 +251,7 @@ def det_coverage_status(
             is_tier_token = bool(re.match(r'^[0-9][A-Z\^\*]$', part))
             is_req_acronym = part in valid_req_acronyms
             is_tier_name = bool(re.match(r'^Tier[0-9]$', part, re.IGNORECASE))
-            is_simple_digit = bool(re.match(r'^[1-6]$', part))
+            is_simple_digit = bool(re.match(r'^[0-6]$', part))
             
             if (is_tier_token or is_req_acronym or is_tier_name or is_simple_digit) and len(part) <= 5:
                 # Normalize digits to Tier X
