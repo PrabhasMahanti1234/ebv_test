@@ -1,4 +1,4 @@
-mistralai
+mistralai>=1.0.0
 pandas
 requests
 httpx
