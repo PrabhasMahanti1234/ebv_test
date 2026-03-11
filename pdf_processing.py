@@ -544,8 +544,8 @@ def get_plan_and_payer_info(state_name, payer, plan_name):
         try:
             cursor.execute("""
                 SELECT p.plan_id, p.payer_id
-                FROM plan_details p
-                JOIN payer_details pa ON p.payer_id = pa.payer_id
+                FROM ebv_genai.plan_details p
+                JOIN ebv_genai.payer_details pa ON p.payer_id = pa.payer_id
                 WHERE LOWER(p.plan_name) = LOWER(%s) AND LOWER(pa.payer_name) = LOWER(%s)
                 LIMIT 1
             """, (plan_name, payer))
@@ -555,7 +555,7 @@ def get_plan_and_payer_info(state_name, payer, plan_name):
                 return result[0], result[1]
 
             cursor.execute("""
-                SELECT payer_id, payer_name FROM payer_details
+                SELECT payer_id, payer_name FROM ebv_genai.payer_details
                 WHERE LOWER(payer_name) LIKE LOWER(%s) LIMIT 1
             """, (f"%{payer}%",))
 
@@ -563,7 +563,7 @@ def get_plan_and_payer_info(state_name, payer, plan_name):
             if payer_result:
                 payer_id = payer_result[0]
                 cursor.execute("""
-                    SELECT plan_id FROM plan_details
+                    SELECT plan_id FROM ebv_genai.plan_details
                     WHERE payer_id = %s AND LOWER(plan_name) LIKE LOWER(%s) LIMIT 1
                 """, (payer_id, f"%{plan_name}%"))
 
@@ -627,8 +627,8 @@ def get_all_plans_with_formulary_url():
                 p.state_name,
                 pa.payer_name,
                 p.file_hash
-            FROM plan_details p
-            LEFT JOIN payer_details pa 
+            FROM ebv_genai.plan_details p
+            LEFT JOIN ebv_genai.payer_details pa 
                 ON p.payer_id = pa.payer_id
             WHERE LOWER(p.status) = 'active'
               AND p.s3_frozen_pdf_url IS NOT NULL
@@ -809,7 +809,7 @@ def _insert_cached_data_for_plan(cached_data, plan_id, plan_name, payer_id, paye
         if acr_reused_count > 0:
             logger.info(f"[ML-REUSE] Reused {acr_reused_count} acronym coverage predictions from hash '{file_hash}'")
 
-        insert_acronyms_to_ref_table(acronyms, state_name, payer_name, plan_name, "pp_formulary_names")
+        insert_acronyms_to_ref_table(acronyms, state_name, payer_name, plan_name, "ebv_genai.pp_formulary_names")
         logger.info(f"Cache re-insert: {len(acronyms)} acronyms for plan {plan_id}")
 
     # Update plan file hash and statuses
@@ -1277,7 +1277,7 @@ def process_single_pdf_url_worker(plan_info):
                         # Add coverage_status to acronym dict
                         acronym["coverage_status"] = coverage_status
                 
-                insert_acronyms_to_ref_table(acronyms, state_name, payer_name, plan_name, "pp_formulary_names")
+                insert_acronyms_to_ref_table(acronyms, state_name, payer_name, plan_name, "ebv_genai.pp_formulary_names")
                 logger.info(f"Inserted {len(acronyms)} acronyms with coverage status into pp_formulary_names for plan {plan_id}")
                 log_audit_event(transaction_id=transaction_id, event_type="database.insert.acronyms",
                                 service="pdf_processing",
@@ -1757,8 +1757,8 @@ def process_plan_batch_result(plan_id: str, chunks: list):
             cursor = conn.cursor()
             cursor.execute("""
                 SELECT p.plan_name, p.payer_id, p.state_name, pa.payer_name, p.s3_frozen_pdf_url
-                FROM plan_details p
-                LEFT JOIN payer_details pa ON p.payer_id = pa.payer_id
+                FROM ebv_genai.plan_details p
+                LEFT JOIN ebv_genai.payer_details pa ON p.payer_id = pa.payer_id
                 WHERE p.plan_id = %s
             """, (plan_id,))
             plan_data = cursor.fetchone()
@@ -1851,12 +1851,12 @@ def process_plan_batch_result(plan_id: str, chunks: list):
                         acronym_cache=acronym_cache
                     )
                     acronym['coverage_status'] = acr_coverage_status
-            insert_acronyms_to_ref_table(all_acronyms, state_name, payer_name, plan_name, "pp_formulary_names")
+            insert_acronyms_to_ref_table(all_acronyms, state_name, payer_name, plan_name, "ebv_genai.pp_formulary_names")
              
         file_hash = None
         with get_db_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT file_hash FROM plan_details WHERE plan_id = %s", (plan_id,))
+            cursor.execute("SELECT file_hash FROM ebv_genai.plan_details WHERE plan_id = %s", (plan_id,))
             res = cursor.fetchone()
             if res and res[0]:
                 file_hash = res[0]
@@ -1870,9 +1870,23 @@ def process_plan_batch_result(plan_id: str, chunks: list):
                 "raw_text": "\n\n".join(all_raw_text) if all_raw_text else ""
             }, None, formulary_url=s3_frozen_pdf_url)
             
-        from database import update_drug_formulary_status, update_plan_and_payer_statuses
+        from database import update_drug_formulary_status, update_plan_and_payer_statuses, log_audit_event
         update_drug_formulary_status([plan_id])
         update_plan_and_payer_statuses([plan_id], finalize_run=False)
+        
+        log_audit_event(
+            transaction_id=transaction_id,
+            event_type="batch_processing_complete",
+            service="MistralOCRBatch",
+            payload={
+                "message": f"Successfully processed OCR batch results for plan {plan_id}",
+                "totals": {
+                    "drugs_extracted": len(all_drugs),
+                    "acronyms_extracted": len(all_acronyms),
+                    "pages_processed": len(all_pages_processed)
+                }
+            }
+        )
         
         update_transaction(
             transaction_id=transaction_id, status="completed", completed_at=time.strftime('%Y-%m-%d %H:%M:%S'),
@@ -1881,6 +1895,11 @@ def process_plan_batch_result(plan_id: str, chunks: list):
         )
         
     except Exception as e:
+        try:
+            from database import log_audit_event
+            log_audit_event(transaction_id=transaction_id, event_type="batch_processing_failed", service="MistralOCRBatch", payload={"error": str(e)})
+        except:
+            pass
         update_transaction(transaction_id=transaction_id, status="failed", completed_at=time.strftime('%Y-%m-%d %H:%M:%S'), response_summary={"error": str(e)})
         logger.error(f"Failed to process plan {plan_id}: {e}")
         traceback.print_exc()

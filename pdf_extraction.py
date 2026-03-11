@@ -324,8 +324,14 @@ def _extract_drug_from_item(item: dict, page_number: int) -> dict:
     def sanitize_field(val):
         if val is None:
             return None
-        # Remove "$0"
-        cleaned = str(val).replace("$0", "")
+        
+        # Remove "$0" and potentially handle parentheses like "$0 (Tier 1)" -> "(Tier 1)" -> "Tier 1"
+        cleaned = str(val).replace("$0", "").strip()
+        
+        # If it was "$0 (Tier 1)", it might now be "(Tier 1)"
+        if cleaned.startswith("(") and cleaned.endswith(")"):
+            cleaned = cleaned[1:-1].strip()
+            
         # Remove extra whitespace (multiple spaces -> single space)
         cleaned = re.sub(r'\s+', ' ', cleaned).strip()
         # Return None if string became empty

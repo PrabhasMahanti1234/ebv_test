@@ -57,8 +57,8 @@ def fetch_existing_coverage_by_file_hash(file_hash):
                     d.coverage_status,
                     d.confidence_score,
                     d.manual_review
-                FROM drug_formulary_details d
-                JOIN plan_details p ON d.plan_id = p.plan_id
+                FROM ebv_genai.drug_formulary_details d
+                JOIN ebv_genai.plan_details p ON d.plan_id = p.plan_id
                 WHERE p.file_hash = %s
                 AND d.coverage_status IS NOT NULL
             """, (file_hash,))
@@ -77,16 +77,16 @@ def fetch_existing_coverage_by_file_hash(file_hash):
                 }
 
             # Fetch acronym coverage
-            # We join with plan_details to find plans that have this file_hash,
-            # then join with pp_formulary_names on plan/payer/state.
+            # We join with ebv_genai.plan_details to find plans that have this file_hash,
+            # then join with ebv_genai.pp_formulary_names on plan/payer/state.
             cursor.execute("""
                 SELECT DISTINCT
                     a.acronym,
                     a.expansion,
                     a.explanation,
                     a.coverage_status
-                FROM pp_formulary_names a
-                JOIN plan_details p ON a.plan_name = p.plan_name 
+                FROM ebv_genai.pp_formulary_names a
+                JOIN ebv_genai.plan_details p ON a.plan_name = p.plan_name 
                     AND a.payer_name = p.payer_name 
                     AND a.state_name = p.state_name
                 WHERE p.file_hash = %s
@@ -119,9 +119,9 @@ def ensure_database_schema():
         cursor = conn.cursor()
 
         try:
-            # Create payer_details table with status column
+            # Create ebv_genai.payer_details table with status column
             cursor.execute("""
-                CREATE TABLE IF NOT EXISTS payer_details (
+                CREATE TABLE IF NOT EXISTS ebv_genai.payer_details (
                     payer_id VARCHAR(36) PRIMARY KEY,
                     payer_name VARCHAR(1000) NOT NULL,
                     contact_phone VARCHAR(50),
@@ -141,28 +141,28 @@ def ensure_database_schema():
             logger.debug(f"Payer table creation issue (may already exist): {e}")
             conn.rollback()
 
-        # Add status column to existing payer_details if not exists
+        # Add status column to existing ebv_genai.payer_details if not exists
         try:
             cursor.execute("""
-                ALTER TABLE payer_details
+                ALTER TABLE ebv_genai.payer_details
                 ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active'
             """)
             conn.commit()
         except Exception as e:
-            logger.debug(f"Status column may already exist in payer_details: {e}")
+            logger.debug(f"Status column may already exist in ebv_genai.payer_details: {e}")
             conn.rollback()
 
         # Add payer constraints in separate transactions
         _add_constraint(conn, cursor, """
-            ALTER TABLE payer_details
+            ALTER TABLE ebv_genai.payer_details
             ADD CONSTRAINT unique_payer_name_state
             UNIQUE (payer_name, state)
         """, "unique_payer_name_state")
 
         try:
-            # Create plan_details table with status column
+            # Create ebv_genai.plan_details table with status column
             cursor.execute("""
-                CREATE TABLE IF NOT EXISTS plan_details (
+                CREATE TABLE IF NOT EXISTS ebv_genai.plan_details (
                     plan_id VARCHAR(36) PRIMARY KEY,
                     payer_id VARCHAR(36) NOT NULL,
                     payer_name VARCHAR(1000) NOT NULL,
@@ -183,47 +183,47 @@ def ensure_database_schema():
             logger.debug(f"Plan table creation issue (may already exist): {e}")
             conn.rollback()
 
-        # Add status column to existing plan_details if not exists
+        # Add status column to existing ebv_genai.plan_details if not exists
         try:
             cursor.execute("""
-                ALTER TABLE plan_details
+                ALTER TABLE ebv_genai.plan_details
                 ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active'
             """)
             conn.commit()
         except Exception as e:
-            logger.debug(f"Status column may already exist in plan_details: {e}")
+            logger.debug(f"Status column may already exist in ebv_genai.plan_details: {e}")
             conn.rollback()
 
-        # Add file_hash column to plan_details
+        # Add file_hash column to ebv_genai.plan_details
         try:
             cursor.execute("""
-                ALTER TABLE plan_details
+                ALTER TABLE ebv_genai.plan_details
                 ADD COLUMN IF NOT EXISTS file_hash VARCHAR(64)
             """)
             conn.commit()
         except Exception as e:
-            logger.debug(f"file_hash column may already exist in plan_details: {e}")
+            logger.debug(f"file_hash column may already exist in ebv_genai.plan_details: {e}")
             conn.rollback()
 
         # Ensure s3_frozen_pdf_url exists for S3-based processing
         try:
             cursor.execute("""
-                ALTER TABLE plan_details
+                ALTER TABLE ebv_genai.plan_details
                 ADD COLUMN IF NOT EXISTS s3_frozen_pdf_url TEXT
             """)
             conn.commit()
         except Exception as e:
-            logger.debug(f"s3_frozen_pdf_url column may already exist in plan_details: {e}")
+            logger.debug(f"s3_frozen_pdf_url column may already exist in ebv_genai.plan_details: {e}")
             conn.rollback()
 
         # Index for faster selection of S3 URLs
-        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_plan_s3_url ON plan_details(s3_frozen_pdf_url)", "idx_plan_s3_url")
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_plan_s3_url ON ebv_genai.plan_details(s3_frozen_pdf_url)", "idx_plan_s3_url")
 
 
-        # Create processed_file_cache table
+        # Create ebv_genai.processed_file_cache table
         try:
             cursor.execute("""
-                CREATE TABLE IF NOT EXISTS processed_file_cache (
+                CREATE TABLE IF NOT EXISTS ebv_genai.processed_file_cache (
                     file_hash VARCHAR(64) PRIMARY KEY,
                     formulary_url TEXT,  -- ✅ Added for URL-based caching
                     structured_data_json JSONB,
@@ -232,15 +232,15 @@ def ensure_database_schema():
                 );
             """)
             conn.commit()
-            logger.info("Created/ensured processed_file_cache table")
+            logger.info("Created/ensured ebv_genai.processed_file_cache table")
         except Exception as e:
-            logger.debug(f"processed_file_cache table creation issue (may already exist): {e}")
+            logger.debug(f"ebv_genai.processed_file_cache table creation issue (may already exist): {e}")
             conn.rollback()
 
         # Add formulary_url column if it doesn't exist (for existing tables)
         try:
             cursor.execute("""
-                ALTER TABLE processed_file_cache
+                ALTER TABLE ebv_genai.processed_file_cache
                 ADD COLUMN IF NOT EXISTS formulary_url TEXT
             """)
             conn.commit()
@@ -249,17 +249,17 @@ def ensure_database_schema():
             conn.rollback()
 
         # Add index on formulary_url for fast lookups
-        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_cache_url ON processed_file_cache(formulary_url)", "idx_cache_url")
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_cache_url ON ebv_genai.processed_file_cache(formulary_url)", "idx_cache_url")
 
         # Add plan constraints in separate transactions
         _add_constraint(conn, cursor, """
-            ALTER TABLE plan_details
+            ALTER TABLE ebv_genai.plan_details
             ADD CONSTRAINT fk_plan_payer
-            FOREIGN KEY (payer_id) REFERENCES payer_details(payer_id) ON DELETE CASCADE
+            FOREIGN KEY (payer_id) REFERENCES ebv_genai.payer_details(payer_id) ON DELETE CASCADE
         """, "fk_plan_payer")
 
         _add_constraint(conn, cursor, """
-            ALTER TABLE plan_details
+            ALTER TABLE ebv_genai.plan_details
             ADD CONSTRAINT unique_plan_payer_state
             UNIQUE (payer_id, plan_name, state_name)
         """, "unique_plan_payer_state")
@@ -269,7 +269,7 @@ def ensure_database_schema():
         # ---------------------------------------------------------
         try:
             cursor.execute("""
-                CREATE TABLE IF NOT EXISTS transaction (
+                CREATE TABLE IF NOT EXISTS ebv_genai.transaction (
                     transaction_id UUID PRIMARY KEY,
                     created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
                     started_at TIMESTAMP WITH TIME ZONE NULL,
@@ -277,7 +277,7 @@ def ensure_database_schema():
                     status VARCHAR(32), -- queued, submitted, in_progress, completed, failed, cancelled
                     job_type VARCHAR(64), -- ocr_batch, single_pdf, cache_lookup, manual_reprocess
                     plan_id VARCHAR(36) NULL, -- FK to plan_details
-                    payer_id VARCHAR(36) NULL, -- FK to payer_details
+                    payer_id VARCHAR(36) NULL, -- FK to ebv_genai.payer_details
                     file_hash VARCHAR(64) NULL, -- link to processed_file_cache
                     file_name VARCHAR(1000) NULL,
                     request_summary JSONB NULL,
@@ -290,17 +290,17 @@ def ensure_database_schema():
                 );
             """)
             conn.commit()
-            logger.info("Created/ensured transaction table")
+            logger.info("Created/ensured ebv_genai.transaction table")
         except Exception as e:
-            logger.debug(f"Transaction table creation issue (may already exist): {e}")
+            logger.debug(f"ebv_genai.transaction table creation issue (may already exist): {e}")
             conn.rollback()
         
         # Add Indexes for Transaction
-        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_txn_plan_id ON transaction(plan_id)", "idx_txn_plan_id")
-        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_txn_payer_id ON transaction(payer_id)", "idx_txn_payer_id")
-        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_txn_status ON transaction(status)", "idx_txn_status")
-        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_txn_created_at ON transaction(created_at)", "idx_txn_created_at")
-        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_txn_plan_date ON transaction(plan_id, created_at)", "idx_txn_plan_date")
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_txn_plan_id ON ebv_genai.transaction(plan_id)", "idx_txn_plan_id")
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_txn_payer_id ON ebv_genai.transaction(payer_id)", "idx_txn_payer_id")
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_txn_status ON ebv_genai.transaction(status)", "idx_txn_status")
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_txn_created_at ON ebv_genai.transaction(created_at)", "idx_txn_created_at")
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_txn_plan_date ON ebv_genai.transaction(plan_id, created_at)", "idx_txn_plan_date")
 
 
         # ---------------------------------------------------------
@@ -308,7 +308,7 @@ def ensure_database_schema():
         # ---------------------------------------------------------
         try:
             cursor.execute("""
-                CREATE TABLE IF NOT EXISTS audit (
+                CREATE TABLE IF NOT EXISTS ebv_genai.audit (
                     audit_id BIGSERIAL PRIMARY KEY,
                     transaction_id UUID NOT NULL,
                     created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
@@ -320,19 +320,19 @@ def ensure_database_schema():
                     error_stack TEXT NULL,
                     meta JSONB NULL,
                     CONSTRAINT fk_audit_transaction FOREIGN KEY (transaction_id) 
-                        REFERENCES transaction(transaction_id) ON DELETE CASCADE
+                        REFERENCES ebv_genai.transaction(transaction_id) ON DELETE CASCADE
                 );
             """)
             conn.commit()
-            logger.info("Created/ensured audit table")
+            logger.info("Created/ensured ebv_genai.audit table")
         except Exception as e:
-            logger.debug(f"Audit table creation issue (may already exist): {e}")
+            logger.debug(f"ebv_genai.audit table creation issue (may already exist): {e}")
             conn.rollback()
 
-        # Create the main partitioned drug_formulary_details table
+        # Create the main partitioned ebv_genai.drug_formulary_details table
         try:
             cursor.execute("""
-                CREATE TABLE IF NOT EXISTS drug_formulary_details (
+                CREATE TABLE IF NOT EXISTS ebv_genai.drug_formulary_details (
                     id VARCHAR(36) NOT NULL,
                     plan_id VARCHAR(36) NOT NULL,
                             plan_name VARCHAR(1000),
@@ -361,16 +361,16 @@ def ensure_database_schema():
                 ) PARTITION BY HASH (plan_id);
             """)
             conn.commit()
-            logger.info("Created partitioned drug_formulary_details table")
+            logger.info("Created partitioned ebv_genai.drug_formulary_details table")
 
         except Exception as e:
             logger.debug(f"Drug table creation issue (may already exist): {e}")
             conn.rollback()
 
-        # Create pp_formulary_names table for all acronyms and tier definitions
+        # Create ebv_genai.pp_formulary_names table for all acronyms and tier definitions
         try:
             cursor.execute("""
-                CREATE TABLE IF NOT EXISTS pp_formulary_names (
+                CREATE TABLE IF NOT EXISTS ebv_genai.pp_formulary_names (
                     id BIGSERIAL PRIMARY KEY,
                     state_name VARCHAR(100),
                     payer_name VARCHAR(1000),
@@ -382,20 +382,20 @@ def ensure_database_schema():
                 );
             """)
             conn.commit()
-            logger.info("Created/ensured pp_formulary_names table")
+            logger.info("Created/ensured ebv_genai.pp_formulary_names table")
             
             # Ensure columns are wide enough if table existed with smaller columns
-            cursor.execute("ALTER TABLE pp_formulary_names ALTER COLUMN payer_name TYPE VARCHAR(1000);")
-            cursor.execute("ALTER TABLE pp_formulary_names ALTER COLUMN plan_name TYPE VARCHAR(1000);")
+            cursor.execute("ALTER TABLE ebv_genai.pp_formulary_names ALTER COLUMN payer_name TYPE VARCHAR(1000);")
+            cursor.execute("ALTER TABLE ebv_genai.pp_formulary_names ALTER COLUMN plan_name TYPE VARCHAR(1000);")
             conn.commit()
         except Exception as e:
             logger.debug(f"pp_formulary_names table creation/alter issue (may already exist): {e}")
             conn.rollback()
 
-        # Add coverage_status column to existing pp_formulary_names if not exists
+        # Add coverage_status column to existing ebv_genai.pp_formulary_names if not exists
         try:
             cursor.execute("""
-                ALTER TABLE pp_formulary_names
+                ALTER TABLE ebv_genai.pp_formulary_names
                 ADD COLUMN IF NOT EXISTS coverage_status VARCHAR(1000)
             """)
             conn.commit()
@@ -405,15 +405,62 @@ def ensure_database_schema():
             conn.rollback()
 
         _add_constraint(conn, cursor, """
-            ALTER TABLE pp_formulary_names
+            ALTER TABLE ebv_genai.pp_formulary_names
             ADD CONSTRAINT uq_formulary_names
             UNIQUE (state_name, payer_name, plan_name, acronym)
         """, "uq_formulary_names")
 
-        # Add new columns to existing drug_formulary_details if not exists
+        # Create ebv_genai.tier_requirement_expansion master table
         try:
             cursor.execute("""
-                ALTER TABLE drug_formulary_details
+                CREATE TABLE IF NOT EXISTS ebv_genai.tier_requirement_expansion (
+                    id BIGSERIAL PRIMARY KEY,
+                    state_name VARCHAR(100),
+                    payer_name VARCHAR(1000),
+                    acronym VARCHAR(50),
+                    expansion TEXT,
+                    explanation TEXT,
+                    coverage_status VARCHAR(1000)
+                );
+            """)
+            conn.commit()
+            logger.info("Created/ensured ebv_genai.tier_requirement_expansion master table")
+        except Exception as e:
+            logger.debug(f"tier_requirement_expansion table creation issue (may already exist): {e}")
+            conn.rollback()
+
+        _add_constraint(conn, cursor, """
+            ALTER TABLE ebv_genai.tier_requirement_expansion
+            ADD CONSTRAINT uq_tier_expansion
+            UNIQUE (state_name, payer_name, acronym)
+        """, "uq_tier_expansion")
+
+        # Create ebv_genai.product_master table if it doesn't exist
+        try:
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS ebv_genai.product_master (
+                    id SERIAL PRIMARY KEY,
+                    product_labeler_code VARCHAR(100),
+                    product_ndc VARCHAR(50),
+                    proprietaryname TEXT,
+                    nonproprietaryname TEXT,
+                    labelername TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+            """)
+            conn.commit()
+            logger.info("Created/ensured ebv_genai.product_master table")
+        except Exception as e:
+            logger.debug(f"product_master table creation issue: {e}")
+            conn.rollback()
+
+        # Add index on proprietaryname for faster lookups in product_mapper.py
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_product_proprietaryname_pm ON ebv_genai.product_master(proprietaryname)", "idx_product_proprietaryname_pm")
+
+        # Add new columns to existing ebv_genai.drug_formulary_details if not exists
+        try:
+            cursor.execute("""
+                ALTER TABLE ebv_genai.drug_formulary_details
                 ALTER COLUMN confidence_score TYPE DECIMAL(5,2)
             """)
             conn.commit()
@@ -424,7 +471,7 @@ def ensure_database_schema():
 
         try:
             cursor.execute("""
-                ALTER TABLE drug_formulary_details
+                ALTER TABLE ebv_genai.drug_formulary_details
                 ADD COLUMN IF NOT EXISTS manual_review BOOLEAN DEFAULT FALSE
             """)
             conn.commit()
@@ -434,7 +481,7 @@ def ensure_database_schema():
 
         try:
             cursor.execute("""
-                ALTER TABLE drug_formulary_details
+                ALTER TABLE ebv_genai.drug_formulary_details
                 ADD COLUMN IF NOT EXISTS is_prior_authorization_required BOOLEAN DEFAULT FALSE
             """)
             conn.commit()
@@ -444,7 +491,7 @@ def ensure_database_schema():
 
         try:
             cursor.execute("""
-                ALTER TABLE drug_formulary_details
+                ALTER TABLE ebv_genai.drug_formulary_details
                 ADD COLUMN IF NOT EXISTS is_step_therapy_required BOOLEAN DEFAULT FALSE
             """)
             conn.commit()
@@ -454,7 +501,7 @@ def ensure_database_schema():
 
         try:
             cursor.execute("""
-                ALTER TABLE drug_formulary_details
+                ALTER TABLE ebv_genai.drug_formulary_details
                 ADD COLUMN IF NOT EXISTS is_quantity_limit_applied BOOLEAN DEFAULT FALSE
             """)
             conn.commit()
@@ -464,141 +511,181 @@ def ensure_database_schema():
 
         try:
             cursor.execute("""
-                ALTER TABLE drug_formulary_details
+                ALTER TABLE ebv_genai.drug_formulary_details
                 ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'processing'
             """)
             conn.commit()
         except Exception as e:
-            logger.debug(f"Status column may already exist in drug_formulary_details: {e}")
+            logger.debug(f"Status column may already exist in ebv_genai.drug_formulary_details: {e}")
             conn.rollback()
 
         try:
             cursor.execute("""
-                ALTER TABLE drug_formulary_details
+                ALTER TABLE ebv_genai.drug_formulary_details
                 ADD COLUMN IF NOT EXISTS product_labeler_code VARCHAR(100),
                 ADD COLUMN IF NOT EXISTS product_proprietaryname TEXT;
             """)
             conn.commit()
-            logger.info("Ensured product mapping columns exist in drug_formulary_details.")
+            logger.info("Ensured product mapping columns exist in ebv_genai.drug_formulary_details.")
         except Exception as e:
             logger.debug(f"Product mapping columns may already exist: {e}")
             conn.rollback()
 
         try:
             cursor.execute("""
-                ALTER TABLE drug_formulary_details
+                ALTER TABLE ebv_genai.drug_formulary_details
                 ADD COLUMN IF NOT EXISTS page_number INTEGER
             """)
             conn.commit()
         except Exception as e:
-            logger.debug(f"page_number column may already exist in drug_formulary_details: {e}")
+            logger.debug(f"page_number column may already exist in ebv_genai.drug_formulary_details: {e}")
             conn.rollback()
 
         try:
             cursor.execute("""
-                ALTER TABLE drug_formulary_details
+                ALTER TABLE ebv_genai.drug_formulary_details
                 ADD COLUMN IF NOT EXISTS badge_colors JSONB
             """)
             conn.commit()
         except Exception as e:
-            logger.debug(f"badge_colors column may already exist in drug_formulary_details: {e}")
+            logger.debug(f"badge_colors column may already exist in ebv_genai.drug_formulary_details: {e}")
             conn.rollback()
 
         try:
             cursor.execute("""
-                ALTER TABLE drug_formulary_details
+                ALTER TABLE ebv_genai.drug_formulary_details
                 ADD COLUMN IF NOT EXISTS preferred_agent VARCHAR(10)
             """)
             conn.commit()
-            logger.info("Added preferred_agent column to drug_formulary_details.")
+            logger.info("Added preferred_agent column to ebv_genai.drug_formulary_details.")
         except Exception as e:
             logger.debug(f"preferred_agent column may already exist: {e}")
             conn.rollback()
 
         try:
             cursor.execute("""
-                ALTER TABLE drug_formulary_details
+                ALTER TABLE ebv_genai.drug_formulary_details
                 ADD COLUMN IF NOT EXISTS non_preferred_agent VARCHAR(10)
             """)
             conn.commit()
-            logger.info("Added non_preferred_agent column to drug_formulary_details.")
+            logger.info("Added non_preferred_agent column to ebv_genai.drug_formulary_details.")
         except Exception as e:
             logger.debug(f"non_preferred_agent column may already exist: {e}")
             conn.rollback()
 
         # Add indexes for the new columns for better query performance
-        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_product_labeler_code ON drug_formulary_details(product_labeler_code)", "idx_product_labeler_code")
-        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_product_proprietaryname ON drug_formulary_details(product_proprietaryname)", "idx_product_proprietaryname")
-        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_page_number ON drug_formulary_details(page_number)", "idx_page_number")
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_product_labeler_code ON ebv_genai.drug_formulary_details(product_labeler_code)", "idx_product_labeler_code")
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_product_proprietaryname ON ebv_genai.drug_formulary_details(product_proprietaryname)", "idx_product_proprietaryname")
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_page_number ON ebv_genai.drug_formulary_details(page_number)", "idx_page_number")
         # Create partitions for better performance with 15-20M records
         # Create 8 partitions based on hash of plan_id
         for i in range(8):
             try:
                 cursor.execute(f"""
-                    CREATE TABLE IF NOT EXISTS drug_formulary_details_{i}
-                    PARTITION OF drug_formulary_details
+                    CREATE TABLE IF NOT EXISTS ebv_genai.drug_formulary_details_{i}
+                    PARTITION OF ebv_genai.drug_formulary_details
                     FOR VALUES WITH (MODULUS 8, REMAINDER {i});
                 """)
                 conn.commit()
-                logger.debug(f"Created partition drug_formulary_details_{i}")
+                logger.debug(f"Created partition ebv_genai.drug_formulary_details_{i}")
             except Exception as e:
                 logger.debug(f"Partition {i} may already exist: {e}")
                 conn.rollback()
 
         # Add drug table constraints in separate transactions
+        # Drop existing ones first to ensure they point to the new schema
+        try:
+            cursor.execute("ALTER TABLE ebv_genai.drug_formulary_details DROP CONSTRAINT IF EXISTS fk_drug_plan;")
+            cursor.execute("ALTER TABLE ebv_genai.drug_formulary_details DROP CONSTRAINT IF EXISTS fk_drug_payer;")
+            conn.commit()
+        except:
+            conn.rollback()
+
         _add_constraint(conn, cursor, """
-            ALTER TABLE drug_formulary_details
+            ALTER TABLE ebv_genai.drug_formulary_details
             ADD CONSTRAINT fk_drug_plan
-            FOREIGN KEY (plan_id) REFERENCES plan_details(plan_id) ON DELETE CASCADE
+            FOREIGN KEY (plan_id) REFERENCES ebv_genai.plan_details(plan_id) ON DELETE CASCADE
         """, "fk_drug_plan")
 
         _add_constraint(conn, cursor, """
-            ALTER TABLE drug_formulary_details
+            ALTER TABLE ebv_genai.drug_formulary_details
             ADD CONSTRAINT fk_drug_payer
-            FOREIGN KEY (payer_id) REFERENCES payer_details(payer_id) ON DELETE CASCADE
+            FOREIGN KEY (payer_id) REFERENCES ebv_genai.payer_details(payer_id) ON DELETE CASCADE
         """, "fk_drug_payer")
 
         _add_constraint(conn, cursor, """
-            ALTER TABLE drug_formulary_details
+            ALTER TABLE ebv_genai.drug_formulary_details
             ADD CONSTRAINT unique_drug_plan_tier_req
             UNIQUE (plan_id, drug_name, drug_tier, drug_requirements)
         """, "unique_drug_plan_tier_req")
 
         # Create comprehensive indexes for 15-20M records
         # Basic indexes
-        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_payer_name ON payer_details(payer_name)", "idx_payer_name")
-        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_payer_status ON payer_details(status)", "idx_payer_status")
-        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_plan_name ON plan_details(plan_name)", "idx_plan_name")
-        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_plan_status ON plan_details(status)", "idx_plan_status")
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_payer_name ON ebv_genai.payer_details(payer_name)", "idx_payer_name")
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_payer_status ON ebv_genai.payer_details(status)", "idx_payer_status")
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_plan_name ON ebv_genai.plan_details(plan_name)", "idx_plan_name")
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_plan_status ON ebv_genai.plan_details(status)", "idx_plan_status")
 
-        # Comprehensive indexes for drug_formulary_details
-        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_drug_name ON drug_formulary_details(drug_name)", "idx_drug_name")
-        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_drug_name_lower ON drug_formulary_details(LOWER(drug_name))", "idx_drug_name_lower")
-        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_plan_drug ON drug_formulary_details(plan_id, drug_name)", "idx_plan_drug")
-        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_payer_drug ON drug_formulary_details(payer_id, drug_name)", "idx_payer_drug")
-        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_state_drug ON drug_formulary_details(state_name, drug_name)", "idx_state_drug")
-        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_drug_tier ON drug_formulary_details(drug_tier)", "idx_drug_tier")
-        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_coverage_status ON drug_formulary_details(coverage_status)", "idx_coverage_status")
-        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_prior_auth ON drug_formulary_details(is_prior_authorization_required)", "idx_prior_auth")
-        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_step_therapy ON drug_formulary_details(is_step_therapy_required)", "idx_step_therapy")
-        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_drug_status ON drug_formulary_details(status)", "idx_drug_status")
-        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_created_at ON drug_formulary_details(created_at)", "idx_created_at")
+        # Comprehensive indexes for ebv_genai.drug_formulary_details
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_drug_name ON ebv_genai.drug_formulary_details(drug_name)", "idx_drug_name")
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_drug_name_lower ON ebv_genai.drug_formulary_details(LOWER(drug_name))", "idx_drug_name_lower")
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_plan_drug ON ebv_genai.drug_formulary_details(plan_id, drug_name)", "idx_plan_drug")
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_payer_drug ON ebv_genai.drug_formulary_details(payer_id, drug_name)", "idx_payer_drug")
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_state_drug ON ebv_genai.drug_formulary_details(state_name, drug_name)", "idx_state_drug")
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_drug_tier ON ebv_genai.drug_formulary_details(drug_tier)", "idx_drug_tier")
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_coverage_status ON ebv_genai.drug_formulary_details(coverage_status)", "idx_coverage_status")
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_prior_auth ON ebv_genai.drug_formulary_details(is_prior_authorization_required)", "idx_prior_auth")
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_step_therapy ON ebv_genai.drug_formulary_details(is_step_therapy_required)", "idx_step_therapy")
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_drug_status ON ebv_genai.drug_formulary_details(status)", "idx_drug_status")
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_created_at ON ebv_genai.drug_formulary_details(created_at)", "idx_created_at")
 
         # Composite indexes for common queries
-        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_plan_status_drug ON drug_formulary_details(plan_id, status, drug_name)", "idx_plan_status_drug")
-        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_payer_state_drug ON drug_formulary_details(payer_id, state_name, drug_name)", "idx_payer_state_drug")
-        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_drug_auth_therapy ON drug_formulary_details(drug_name, is_prior_authorization_required, is_step_therapy_required)", "idx_drug_auth_therapy")
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_plan_status_drug ON ebv_genai.drug_formulary_details(plan_id, status, drug_name)", "idx_plan_status_drug")
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_payer_state_drug ON ebv_genai.drug_formulary_details(payer_id, state_name, drug_name)", "idx_payer_state_drug")
+        _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_drug_auth_therapy ON ebv_genai.drug_formulary_details(drug_name, is_prior_authorization_required, is_step_therapy_required)", "idx_drug_auth_therapy")
 
         # Text search index for drug names (using GIN for better text search performance)
         try:
             cursor.execute("CREATE EXTENSION IF NOT EXISTS pg_trgm;")
             conn.commit()
-            _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_drug_name_gin ON drug_formulary_details USING GIN (drug_name gin_trgm_ops)", "idx_drug_name_gin")
+            _add_index(conn, cursor, "CREATE INDEX IF NOT EXISTS idx_drug_name_gin ON ebv_genai.drug_formulary_details USING GIN (drug_name gin_trgm_ops)", "idx_drug_name_gin")
         except Exception as e:
             logger.debug(f"GIN index creation failed (extension may not be available): {e}")
             conn.rollback()
 
-        logger.info("Database schema ensured successfully with partitioning and comprehensive indexing")
+        # Sync missing payers and plans from public to ebv_genai
+        _sync_public_to_ebv_genai(conn, cursor)
+
+        logger.info("Database schema ensured successfully with partitioning, indexing, and schema sync")
+
+def _sync_public_to_ebv_genai(conn, cursor):
+    """Synchronizes payer and plan details from public to ebv_genai schema if they are missing."""
+    try:
+        # Sync Payer Details
+        cursor.execute("""
+            INSERT INTO ebv_genai.payer_details (payer_id, payer_name, contact_phone, address_line_1, address_line_2, city, state, zip_code, status, created_at, last_updated_at)
+            SELECT payer_id, payer_name, contact_phone, address_line_1, address_line_2, city, state, zip_code, status, created_at, last_updated_at
+            FROM public.payer_details
+            ON CONFLICT (payer_id) DO NOTHING;
+        """)
+        if cursor.rowcount > 0:
+            logger.info(f"Synced {cursor.rowcount} missing payers from public to ebv_genai.")
+
+        # Sync Plan Details
+        cursor.execute("""
+            INSERT INTO ebv_genai.plan_details (plan_id, payer_id, payer_name, plan_name, state_name, formulary_url, source_link, formulary_date, status, created_at, last_updated_date)
+            SELECT plan_id, payer_id, payer_name, plan_name, state_name, formulary_url, source_link, formulary_date, status, created_at, last_updated_date
+            FROM public.plan_details
+            ON CONFLICT (plan_id) DO NOTHING;
+        """)
+        if cursor.rowcount > 0:
+            logger.info(f"Synced {cursor.rowcount} missing plans from public to ebv_genai.")
+            
+        conn.commit()
+    except Exception as e:
+        logger.warning(f"Failed to sync public to ebv_genai schema: {e}")
+        conn.rollback()
+
 
 def create_transaction(transaction_id, job_type, plan_id=None, payer_id=None, file_hash=None, file_name=None, request_summary=None, status='queued'):
     """Creates a new transaction record."""
@@ -606,7 +693,7 @@ def create_transaction(transaction_id, job_type, plan_id=None, payer_id=None, fi
         cursor = conn.cursor()
         try:
             cursor.execute("""
-                INSERT INTO transaction (
+                INSERT INTO ebv_genai.transaction (
                     transaction_id, job_type, plan_id, payer_id, file_hash, file_name, request_summary, status, created_at, last_updated
                 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
             """, (transaction_id, job_type, plan_id, payer_id, file_hash, file_name, json.dumps(request_summary) if request_summary else None, status))
@@ -659,7 +746,7 @@ def update_transaction(transaction_id, status=None, started_at=None, completed_a
             params.append(transaction_id) # For the WHERE clause
 
             if updates:
-                query = f"UPDATE transaction SET {', '.join(updates)} WHERE transaction_id = %s"
+                query = f"UPDATE ebv_genai.transaction SET {', '.join(updates)} WHERE transaction_id = %s"
                 cursor.execute(query, tuple(params))
                 conn.commit()
                 # logger.info(f"Transaction {transaction_id} updated.")
@@ -669,11 +756,14 @@ def update_transaction(transaction_id, status=None, started_at=None, completed_a
 
 def log_audit_event(transaction_id, event_type, event_subtype=None, service=None, payload=None, error_message=None, error_stack=None, meta=None):
     """Logs an event to the audit table."""
+    # Always log to the console/log file for debugging
+    logger.debug(f"Logging audit event: {event_type} for txn: {transaction_id}")
+    
     with get_db_connection() as conn:
         cursor = conn.cursor()
         try:
             cursor.execute("""
-                INSERT INTO audit (
+                INSERT INTO ebv_genai.audit (
                     transaction_id, event_type, event_subtype, service, payload, error_message, error_stack, meta, created_at
                 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())
             """, (
@@ -687,9 +777,12 @@ def log_audit_event(transaction_id, event_type, event_subtype=None, service=None
                 json.dumps(meta) if meta else None
             ))
             conn.commit()
+            # logger.debug(f"Audit event {event_type} committed.")
         except Exception as e:
             conn.rollback()
-            logger.error(f"Failed to log audit event check if transaction id is present in transaction table: {e}")
+            # Log EVERYTHING for now to find the issue
+            logger.error(f"Failed to log audit event '{event_type}' for txn {transaction_id}: {e}")
+            db_logger.error(f"audit.insert_error type={event_type} txn={transaction_id} error={e}")
 
 
 def _add_constraint(conn, cursor, sql, constraint_name):
@@ -726,7 +819,7 @@ def get_cached_result(file_hash):
     with get_db_connection() as conn:
         cursor = conn.cursor()
         cursor.execute(
-            "SELECT structured_data_json, raw_content FROM processed_file_cache WHERE file_hash = %s",
+            "SELECT structured_data_json, raw_content FROM ebv_genai.processed_file_cache WHERE file_hash = %s",
             (file_hash,)
         )
         result = cursor.fetchone()
@@ -761,7 +854,7 @@ def get_cached_result_by_url(formulary_url):
     with get_db_connection() as conn:
         cursor = conn.cursor()
         cursor.execute(
-            "SELECT file_hash, structured_data_json, raw_content FROM processed_file_cache WHERE formulary_url = %s",
+            "SELECT file_hash, structured_data_json, raw_content FROM ebv_genai.processed_file_cache WHERE formulary_url = %s",
             (formulary_url,)
         )
         result = cursor.fetchone()
@@ -797,7 +890,7 @@ def cache_result(file_hash, structured_data_dict, raw_content, formulary_url=Non
             # psycopg2 can automatically serialize a Python dictionary to a JSONB field.
             cursor.execute(
                 """
-                INSERT INTO processed_file_cache (file_hash, formulary_url, structured_data_json, raw_content)
+                INSERT INTO ebv_genai.processed_file_cache (file_hash, formulary_url, structured_data_json, raw_content)
                 VALUES (%s, %s, %s, %s)
                 ON CONFLICT (file_hash) DO UPDATE SET
                     formulary_url = EXCLUDED.formulary_url,
@@ -919,7 +1012,7 @@ def insert_drug_formulary_data(processed_data):
         # Using standard INSERT since previous records are deleted prior to this step
          
         insert_query = f"""
-            INSERT INTO drug_formulary_details ({', '.join(cols)})
+            INSERT INTO ebv_genai.drug_formulary_details ({', '.join(cols)})
             VALUES %s
             ON CONFLICT (plan_id, drug_name, drug_tier, drug_requirements)
             DO UPDATE SET
@@ -951,22 +1044,22 @@ def insert_drug_formulary_data(processed_data):
             )
             conn.commit()
             logger.info(f"Successfully inserted or updated {len(data_tuples)} records.")
-            db_logger.info(f"db.insert drug_formulary_details count={len(data_tuples)}")
+            db_logger.info(f"db.insert ebv_genai.drug_formulary_details count={len(data_tuples)}")
 
         except IntegrityError as e:
             conn.rollback()
             logger.error(f"Database integrity error during insertion: {e}")
-            db_logger.error(f"db.integrity_error table=drug_formulary_details error={e}")
+            db_logger.error(f"db.integrity_error table=ebv_genai.drug_formulary_details error={e}")
             raise
         except Exception as e:
             conn.rollback()
             logger.error(f"An unexpected error occurred during data insertion: {e}")
-            db_logger.error(f"db.insert_error table=drug_formulary_details error={e}")
+            db_logger.error(f"db.insert_error table=ebv_genai.drug_formulary_details error={e}")
             raise
 
 def update_drug_formulary_status(processed_plan_ids):
     """
-    Updates the status of records in drug_formulary_details to 'completed'
+    Updates the status of records in ebv_genai.drug_formulary_details to 'completed'
     for all successfully processed plans.
     """
     if not processed_plan_ids:
@@ -978,15 +1071,15 @@ def update_drug_formulary_status(processed_plan_ids):
     with get_db_connection() as conn:
         cursor = conn.cursor()
         try:
-            query = "UPDATE drug_formulary_details SET status = 'completed', last_updated_date = CURRENT_TIMESTAMP WHERE plan_id = ANY(%s)"
+            query = "UPDATE ebv_genai.drug_formulary_details SET status = 'completed', last_updated_date = CURRENT_TIMESTAMP WHERE plan_id = ANY(%s)"
             cursor.execute(query, (processed_plan_ids,))
             conn.commit()
             logger.info(f"Successfully updated status for {cursor.rowcount} drug formulary records.")
-            db_logger.info(f"db.update drug_formulary_details set=status='completed' plans={len(processed_plan_ids)} rows={cursor.rowcount}")
+            db_logger.info(f"db.update ebv_genai.drug_formulary_details set=status='completed' plans={len(processed_plan_ids)} rows={cursor.rowcount}")
         except Exception as e:
             conn.rollback()
             logger.error(f"Failed to update drug formulary statuses: {e}")
-            db_logger.error(f"db.update_error table=drug_formulary_details error={e}")
+            db_logger.error(f"db.update_error table=ebv_genai.drug_formulary_details error={e}")
             raise
 
 def update_plan_and_payer_statuses(processed_plan_ids, finalize_run=True):
@@ -1003,42 +1096,42 @@ def update_plan_and_payer_statuses(processed_plan_ids, finalize_run=True):
         try:
             # Update successfully processed plans to 'active'
             if processed_plan_ids:
-                active_query = "UPDATE plan_details SET status = 'active', last_updated_date = CURRENT_TIMESTAMP WHERE plan_id = ANY(%s)"
+                active_query = "UPDATE ebv_genai.plan_details SET status = 'active', last_updated_date = CURRENT_TIMESTAMP WHERE plan_id = ANY(%s)"
                 cursor.execute(active_query, (processed_plan_ids,))
                 logger.info(f"Set {cursor.rowcount} plans to 'active'.")
-                db_logger.info(f"db.update plan_details set=status='active' rows={cursor.rowcount}")
+                db_logger.info(f"db.update ebv_genai.plan_details set=status='active' rows={cursor.rowcount}")
 
             # Update any plans that were 'processing' but did not complete successfully to 'inactive'.
             # This correctly marks failed plans without affecting existing 'active' or 'inactive' plans.
             if finalize_run:
-                inactive_query = "UPDATE plan_details SET status = 'inactive', last_updated_date = CURRENT_TIMESTAMP WHERE status = 'processing'"
+                inactive_query = "UPDATE ebv_genai.plan_details SET status = 'inactive', last_updated_date = CURRENT_TIMESTAMP WHERE status = 'processing'"
                 cursor.execute(inactive_query)
                 logger.info(f"Set {cursor.rowcount} failed or unprocessed plans to 'inactive'.")
-                db_logger.info(f"db.update plan_details set=status='inactive' rows={cursor.rowcount}")
+                db_logger.info(f"db.update ebv_genai.plan_details set=status='inactive' rows={cursor.rowcount}")
 
             # Update payers with at least one active plan to 'active'
             update_payers_to_active_query = """
-                UPDATE payer_details
+                UPDATE ebv_genai.payer_details
                 SET status = 'active', last_updated_at = CURRENT_TIMESTAMP
                 WHERE payer_id IN (
-                    SELECT DISTINCT payer_id FROM plan_details WHERE status = 'active'
+                    SELECT DISTINCT payer_id FROM ebv_genai.plan_details WHERE status = 'active'
                 );
             """
             cursor.execute(update_payers_to_active_query)
             logger.info(f"Set {cursor.rowcount} payers to 'active'.")
-            db_logger.info(f"db.update payer_details set=status='active' rows={cursor.rowcount}")
+            db_logger.info(f"db.update ebv_genai.payer_details set=status='active' rows={cursor.rowcount}")
 
             # Update payers with no active plans to 'inactive'
             update_payers_to_inactive_query = """
-                UPDATE payer_details
+                UPDATE ebv_genai.payer_details
                 SET status = 'inactive', last_updated_at = CURRENT_TIMESTAMP
                 WHERE payer_id NOT IN (
-                    SELECT DISTINCT payer_id FROM plan_details WHERE status = 'active'
+                    SELECT DISTINCT payer_id FROM ebv_genai.plan_details WHERE status = 'active'
                 );
             """
             cursor.execute(update_payers_to_inactive_query)
             logger.info(f"Set {cursor.rowcount} payers to 'inactive'.")
-            db_logger.info(f"db.update payer_details set=status='inactive' rows={cursor.rowcount}")
+            db_logger.info(f"db.update ebv_genai.payer_details set=status='inactive' rows={cursor.rowcount}")
 
             conn.commit()
             logger.info("Successfully updated all plan and payer statuses.")
@@ -1059,7 +1152,7 @@ def get_all_processed_plan_ids():
     with get_db_connection() as conn:
         cursor = conn.cursor()
         try:
-            cursor.execute("SELECT plan_id FROM plan_details WHERE status = 'processing'")
+            cursor.execute("SELECT plan_id FROM ebv_genai.plan_details WHERE status = 'processing'")
             plan_ids = [row[0] for row in cursor.fetchall()]
             logger.info(f"Found {len(plan_ids)} plans marked for processing.")
             return plan_ids
@@ -1075,7 +1168,7 @@ def update_plan_file_hash(plan_id, file_hash):
         cursor = conn.cursor()
         try:
             cursor.execute(
-                "UPDATE plan_details SET file_hash = %s, last_updated_date = CURRENT_TIMESTAMP WHERE plan_id = %s",
+                "UPDATE ebv_genai.plan_details SET file_hash = %s, last_updated_date = CURRENT_TIMESTAMP WHERE plan_id = %s",
                 (file_hash, plan_id)
             )
             conn.commit()
@@ -1099,10 +1192,10 @@ def process_and_cache_file(file_hash, structured_data, raw_content):
     plan_name = structured_data['plan_name'].iloc[0] if 'plan_name' in structured_data else None
     payer_name = structured_data['payer_name'].iloc[0] if 'payer_name' in structured_data else None
 
-    # Update or insert the main data into drug_formulary_details
+    # Update or insert the main data into ebv_genai.drug_formulary_details
     insert_drug_formulary_data(structured_data.to_dict(orient='records'))
 
-    # Update the plan_details and payer_details statuses
+    # Update the plan_details and ebv_genai.payer_details statuses
     update_plan_and_payer_statuses([plan_id])
 
     # Cache the result for quick retrieval
@@ -1209,7 +1302,7 @@ def batch_determine_coverage_status(requirement_tier_pairs, conn, state_name, pa
 
 def delete_drug_formulary_records_for_plan(plan_id: str):
     """
-    Deletes all records from the drug_formulary_details table for a specific plan_id.
+    Deletes all records from the ebv_genai.drug_formulary_details table for a specific plan_id.
     This is used when a formulary file has been updated and needs to be replaced.
     """
     if not plan_id:
@@ -1221,7 +1314,7 @@ def delete_drug_formulary_records_for_plan(plan_id: str):
     with get_db_connection() as conn:
         cursor = conn.cursor()
         try:
-            query = "DELETE FROM drug_formulary_details WHERE plan_id = %s"
+            query = "DELETE FROM ebv_genai.drug_formulary_details WHERE plan_id = %s"
             cursor.execute(query, (plan_id,))
             conn.commit()
             count = cursor.rowcount
@@ -1243,11 +1336,11 @@ def fetch_acronym_cache(payer_name, state_name):
     with get_db_connection() as conn:
         cursor = conn.cursor()
         
-        # 1. Fetch from the master table (tier_requirement_expansion)
+        # 1. Fetch from the master table (ebv_genai.tier_requirement_expansion)
         # Order by specificity: (state, payer) > (state) > (payer) > (global)
         cursor.execute("""
             SELECT acronym, expansion, explanation, coverage_status, state_name, payer_name
-            FROM tier_requirement_expansion
+            FROM ebv_genai.tier_requirement_expansion
             WHERE (state_name IS NULL OR UPPER(state_name) = UPPER(%s))
               AND (payer_name IS NULL OR UPPER(payer_name) = UPPER(%s))
             ORDER BY (state_name IS NOT NULL)::int DESC, (payer_name IS NOT NULL)::int DESC
@@ -1261,11 +1354,11 @@ def fetch_acronym_cache(payer_name, state_name):
             if acr not in cache:
                 cache[acr] = (row[1], row[2], row[3])
 
-        # 2. Fetch from the plan-specific table (pp_formulary_names)
+        # 2. Fetch from the plan-specific table (ebv_genai.pp_formulary_names)
         # These might overwrite or supplement the master table for this specific payer/state
         cursor.execute("""
             SELECT acronym, expansion, explanation, coverage_status
-            FROM pp_formulary_names
+            FROM ebv_genai.pp_formulary_names
             WHERE (state_name IS NULL OR UPPER(state_name) = UPPER(%s))
               AND (payer_name IS NULL OR UPPER(payer_name) = UPPER(%s))
         """, (state_name, payer_name))

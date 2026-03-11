@@ -40,14 +40,14 @@ def map_products_to_formulary():
         logger.info("Loading all records from database...")
         
         # Load all records from the drug formulary
-        formulary_query = "SELECT id, drug_name FROM drug_formulary_details;"
+        formulary_query = "SELECT id, drug_name FROM ebv_genai.drug_formulary_details;"
         df_formulary = pd.read_sql(text(formulary_query), engine)
-        logger.info(f"Loaded {len(df_formulary):,} records from drug_formulary_details.")
+        logger.info(f"Loaded {len(df_formulary):,} records from ebv_genai.drug_formulary_details.")
         
         # Load all records from the product master table
-        product_master_query = "SELECT product_labeler_code, product_ndc, proprietaryname FROM product_master;"
+        product_master_query = "SELECT product_labeler_code, product_ndc, proprietaryname FROM ebv_genai.product_master;"
         df_product_master = pd.read_sql(text(product_master_query), engine)
-        logger.info(f"Loaded {len(df_product_master):,} records from product_master.")
+        logger.info(f"Loaded {len(df_product_master):,} records from ebv_genai.product_master.")
         
         # --- 2. PRE-PROCESS PRODUCT MASTER DATA ---
         logger.info("Pre-processing product master data...")
@@ -111,7 +111,7 @@ def map_products_to_formulary():
                 prop_name_case = " ".join([f"WHEN :id{i} THEN :prop_name{i}" for i, _ in enumerate(updates)])
             
                 query = f"""
-                    UPDATE drug_formulary_details
+                    UPDATE ebv_genai.drug_formulary_details
                     SET 
                         product_labeler_code = CASE id {labeler_case} END,
                         product_proprietaryname = CASE id {prop_name_case} END

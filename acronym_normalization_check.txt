@@ -1,6 +1,0 @@
-('Tier 2', 'Generic Drugs', 'Covered with Conditions')
-('Tier 3', 'Preferred Brand Drugs', 'Covered with Conditions')
-('Tier 4', 'Non-Preferred Drugs', 'Covered with Conditions')
-('NEDS', 'Non-EDS', 'Covered with Conditions')
-('LA', 'Limitation on Age', 'Covered with Conditions')
-('SP', 'Specialty', 'Covered with Conditions')

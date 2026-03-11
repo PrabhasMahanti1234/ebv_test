@@ -193,6 +193,31 @@ def extract_requirements_from_drug_name(drug_name_cell):
     final_requirements = ', '.join(extracted_requirements) if extracted_requirements else ""
     return cleaned_name, final_requirements
 
+def normalize_state_name(state: str) -> str:
+    """Normalize state name to full name if it's an abbreviation."""
+    if not state:
+        return ""
+    
+    state_map = {
+        'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 'CA': 'California',
+        'CO': 'Colorado', 'CT': 'Connecticut', 'DE': 'Delaware', 'FL': 'Florida', 'GA': 'Georgia',
+        'HI': 'Hawaii', 'ID': 'Idaho', 'IL': 'Illinois', 'IN': 'Indiana', 'IA': 'Iowa',
+        'KS': 'Kansas', 'KY': 'Kentucky', 'LA': 'Louisiana', 'ME': 'Maine', 'MD': 'Maryland',
+        'MA': 'Massachusetts', 'MI': 'Michigan', 'MN': 'Minnesota', 'MS': 'Mississippi',
+        'MO': 'Missouri', 'MT': 'Montana', 'NE': 'Nebraska', 'NV': 'Nevada', 'NH': 'New Hampshire',
+        'NJ': 'New Jersey', 'NM': 'New Mexico', 'NY': 'New York', 'NC': 'North Carolina',
+        'ND': 'North Dakota', 'OH': 'Ohio', 'OK': 'Oklahoma', 'OR': 'Oregon', 'PA': 'Pennsylvania',
+        'RI': 'Rhode Island', 'SC': 'South Carolina', 'SD': 'South Dakota', 'TN': 'Tennessee',
+        'TX': 'Texas', 'UT': 'Utah', 'VT': 'Vermont', 'VA': 'Virginia', 'WA': 'Washington',
+        'WV': 'West Virginia', 'WI': 'Wisconsin', 'WY': 'Wyoming', 'DC': 'District of Columbia'
+    }
+    
+    val = state.strip().upper()
+    if val in state_map:
+        return state_map[val]
+    # If already a full name or unknown, title case it
+    return state.strip().title()
+
 def lookup_expansion(acronym, state_name, payer_name, conn, acronym_cache=None):
     """
     Look up expansion and coverage status from memory cache OR tier_requirement_expansion SQL table.
@@ -229,18 +254,21 @@ def lookup_expansion(acronym, state_name, payer_name, conn, acronym_cache=None):
                     return acronym_cache[token_norm]
 
     # Fallback to DB if not in cache
-    state_name = str(state_name).strip() if state_name else None
+    # NORMALIZE STATE NAME for better matching
+    original_state = state_name
+    state_name = normalize_state_name(state_name) if state_name else None
     payer_name = str(payer_name).strip() if payer_name else None
 
-    logger.info(f"Searching for acronym: '{acronym}' (normalized: '{acronym_str}'), state: '{state_name}', payer: '{payer_name}'")  # Debug
+    logger.info(f"Searching for acronym: '{acronym}' (normalized: '{acronym_str}'), state: '{state_name}' (from '{original_state}'), payer: '{payer_name}'")  # Debug
 
     pattern = f'%{acronym}%'
     
     with conn.cursor() as cur:
+        # ATTEMPT 1: Specific state/payer
         cur.execute(
             """
-            SELECT expansion, explanation, coverage_status
-            FROM tier_requirement_expansion 
+            SELECT expansion, explanation, coverage_status, state_name
+            FROM ebv_genai.tier_requirement_expansion 
             WHERE acronym ILIKE %s
               AND (%s IS NULL OR UPPER(state_name) = UPPER(%s) OR state_name IS NULL)
               AND (%s IS NULL OR UPPER(payer_name) = UPPER(%s) OR payer_name IS NULL)
@@ -250,8 +278,39 @@ def lookup_expansion(acronym, state_name, payer_name, conn, acronym_cache=None):
             (pattern, state_name, state_name, payer_name, payer_name)
         )
         result = cur.fetchone()
+
+        # ATTEMPT 2: Global Fallback if no result found with specific state
+        if not result and state_name:
+             logger.info(f"Searching for acronym: '{acronym}' with GLOBAL fallback (state=NULL)")
+             cur.execute(
+                """
+                SELECT expansion, explanation, coverage_status, state_name
+                FROM ebv_genai.tier_requirement_expansion 
+                WHERE acronym ILIKE %s
+                  AND state_name IS NULL
+                  AND (%s IS NULL OR UPPER(payer_name) = UPPER(%s) OR payer_name IS NULL)
+                ORDER BY (payer_name IS NOT NULL)::int DESC
+                LIMIT 1
+                """,
+                (pattern, payer_name, payer_name)
+            )
+             result = cur.fetchone()
         
-    exp, expl, cs = result if result else (None, None, None)
+    exp, expl, cs, matched_state = result if result else (None, None, None, None)
+    
+    # ATTEMPT 3: High-confidence defaults for standard acronyms if DB lookup failed
+    if not cs:
+        if acronym_str in ('PA', 'PRIOR AUTHORIZATION'):
+            cs = "Covered with PA"
+        elif acronym_str in ('ST', 'STEP THERAPY'):
+            cs = "Covered with ST"
+        elif acronym_str in ('QL', 'QUANTITY LIMIT'):
+            cs = "Covered with Conditions"
+        elif acronym_str.startswith('TIER'):
+            cs = "Covered"
+        elif acronym_str in ('1', '2', '3', '4', '5', '6'):
+            cs = "Covered"
+
     if cs:
         cs_norm = str(cs).strip().lower()
         if cs_norm in ("covered with condition", "covered with ql"):

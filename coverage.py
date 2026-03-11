@@ -202,13 +202,15 @@ def det_coverage_status(
         raw_parts = []
         
         # a. Extract Tier tokens (1B, 5^, Tier 1-6, etc.)
-        # Handle "5^" -> "Tier 5" and "^"
-        tier_tokens = re.findall(r'(Tier\s*[1-6]|[1-6][A-Z\^]?|[1-6]|\^)', acronym_str, flags=re.IGNORECASE)
+        # REVISED: Split 5^, 5*, etc. into separate tokens
+        # Also ensure we don't accidentally match dosages (e.g., 325)
+        tier_tokens = re.findall(r'(Tier\s*[1-6]|[1-6][A-Z\^\*]?|[1-6]|\^|\*)', acronym_str, flags=re.IGNORECASE)
         for t in tier_tokens:
             t_clean = t.strip().upper()
-            if re.match(r'^[1-6]\^$', t_clean):
+            # Split things like 5^ into Tier 5 and ^
+            if re.match(r'^[1-6][\^\*]$', t_clean):
                 raw_parts.append(f"Tier {t_clean[0]}")
-                raw_parts.append("^")
+                raw_parts.append(t_clean[1])
             elif re.match(r'^[1-6][A-Z]$', t_clean):
                 raw_parts.append(t_clean)
             elif t_clean.startswith("TIER"):
@@ -217,35 +219,45 @@ def det_coverage_status(
                     raw_parts.append(f"Tier {digit_match.group()}")
             elif re.match(r'^[1-6]$', t_clean):
                 raw_parts.append(f"Tier {t_clean}")
-            elif t_clean == "^":
-                raw_parts.append("^")
+            elif t_clean in ("^", "*"):
+                raw_parts.append(t_clean)
             else:
                 raw_parts.append(t_clean)
 
         # b. Requirement Parsing: Remove everything inside parentheses
+        # BUT keep the parentheses content if it looks like a drug name (handled elsewhere)
         cleaned_reqs = re.sub(r'\(.*?\)', ' ', acronym_str)
         
         # c. Token Cleaning: Remove commas, split by ; or whitespace
         split_parts = re.split(r'[,\s;]+', cleaned_reqs)
         
         # d. Valid Acronym Filter
-        valid_req_acronyms = {"PA", "QL", "ST", "SP", "AL", "NM", "B/D", "^"}
+        valid_req_acronyms = {"PA", "QL", "ST", "SP", "AL", "NM", "B/D", "^", "*"}
         
         for part in split_parts:
             part = part.strip()
-            if not part or " " in part or any(c.islower() for c in part):
+            if not part or " " in part:
                 continue
             
+            # Skip common units/strengths to avoid false positive acronyms
+            if part in ("MG", "ML", "MCG", "GM", "CAP", "TAB", "SOLN"):
+                continue
+
             if part.startswith("QL="):
                 if "QL" not in raw_parts:
                     raw_parts.append("QL")
                 continue
                 
-            is_tier_token = bool(re.match(r'^[0-9][A-Z\^]$', part))
+            is_tier_token = bool(re.match(r'^[0-9][A-Z\^\*]$', part))
             is_req_acronym = part in valid_req_acronyms
             is_tier_name = bool(re.match(r'^Tier[0-9]$', part, re.IGNORECASE))
+            is_simple_digit = bool(re.match(r'^[1-6]$', part))
             
-            if (is_tier_token or is_req_acronym or is_tier_name) and len(part) <= 4:
+            if (is_tier_token or is_req_acronym or is_tier_name or is_simple_digit) and len(part) <= 5:
+                # Normalize digits to Tier X
+                if is_simple_digit:
+                    part = f"Tier {part}"
+                
                 if part not in raw_parts:
                     raw_parts.append(part)
 
@@ -292,9 +304,15 @@ def det_coverage_status(
             logger.info(f"Coverage for '{log_id}': {final_status} (Source: {source}, Confidence: {conf}, Priority Resolution of {[r[0] for r in detected_results]})")
             return final_status, conf, source, manual_review
 
-    # 5. Final Fallback - Default to Covered if nothing else detected
-    logger.info(f"Coverage for '{log_id}': Covered (Source: Final Default Fallback)")
-    return "Covered", 50.0, "Default", True
+    # 5. Final Fallback
+    # If there is literally no tier or requirement extracted (e.g., $0 was stripped),
+    # or if we couldn't resolve it but we know it's on the formulary list
+    if not tier_text_clean and not req_text_clean:
+        logger.info(f"Coverage for '{log_id}': Covered (Source: No Restrictions/Tier Detected)")
+        return "Covered", 85.0, "No DB Coverage Status Found", False
+        
+    logger.info(f"Coverage for '{log_id}': Covered with Conditions (Source: Final Default Fallback)")
+    return "Covered with Conditions", 50.0, "Unresolved Definitions", True
 
 
 def normalize_drug_tier(raw_tier):
